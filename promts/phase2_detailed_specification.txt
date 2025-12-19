@@ -1,0 +1,787 @@
+================================================================================
+            PHASE 2: DETAILED SPECIFICATION FOR CLAUDE
+================================================================================
+
+Phase: Phase 2 of 4
+Document: Technical Architecture & Algorithms
+Status: Complete specification ready
+Date: December 19, 2025
+
+================================================================================
+SECTION 1: PHASE 1 → PHASE 2 HANDOFF
+================================================================================
+
+**What Phase 1 Produces** (Your Input):
+
+Phase 1 outputs a JSON file: phase1_output.json with this structure:
+
+{
+  "url": "https://example.com/login",
+  "exploration_time_ms": 45000,
+  "total_elements": 156,
+  "interactive_elements": [
+    {
+      "element_id": "elem_001",
+      "type": "button",
+      "label": "Submit",
+      "description": "Form submission button",
+      "locators": {
+        "p1_role": "button[name='Submit']",
+        "p2_label": "button:has-text('Submit')",
+        "p3_testid": "[data-testid='submit-btn']",
+        "p4_css": "button.primary",
+        "p5_xpath": "//button[@class='primary']"
+      },
+      "locator_confidence": {
+        "p1_role": 0.98,
+        "p2_label": 0.95,
+        "p3_testid": 0.99,
+        "p4_css": 0.92,
+        "p5_xpath": 0.88
+      },
+      "interaction_type": "click",
+      "states": ["enabled", "disabled", "loading"],
+      "state_graph": {
+        "initial": "enabled",
+        "transitions": [
+          {"from": "enabled", "to": "loading", "trigger": "click"},
+          {"from": "loading", "to": "enabled", "trigger": "error"},
+          {"from": "loading", "to": "success", "trigger": "success"}
+        ]
+      },
+      "dependencies": ["elem_003", "elem_004"],
+      "importance_rank": 1
+    },
+    {
+      "element_id": "elem_002",
+      "type": "input",
+      "label": "Username",
+      "description": "User login field",
+      "locators": { ... },
+      "locator_confidence": { ... },
+      "input_type": "text",
+      "constraints": {
+        "min_length": 3,
+        "max_length": 50,
+        "pattern": "^[a-zA-Z0-9_]+$",
+        "required": true
+      },
+      "valid_values": ["user123", "test_user"],
+      "invalid_values": ["ab", "user@invalid", ""]
+    },
+    ... more elements
+  ],
+  "state_transitions": [...],
+  "workflows": [
+    {
+      "name": "login_flow",
+      "steps": ["elem_002", "elem_003", "elem_001"],
+      "description": "Complete login process"
+    }
+  ]
+}
+
+**Key Properties to Use**:
+
+✅ element_id - CRITICAL: Use this to prevent hallucinations
+✅ type - Determines test generation strategy (button vs input vs dropdown)
+✅ locators - Use BEST strategy (highest confidence)
+✅ locator_confidence - Guides test prioritization
+✅ constraints - Drives Boundary Value Analysis
+✅ valid_values / invalid_values - Seeds Equivalence Partitioning
+✅ state_graph - Powers State Combination Testing
+✅ workflows - Natural user sequences to test
+✅ dependencies - Elements that must be tested together
+✅ importance_rank - Prioritization signal
+
+================================================================================
+SECTION 2: TEST GENERATION ALGORITHMS
+================================================================================
+
+**ALGORITHM 1: EQUIVALENCE PARTITIONING (EP)**
+
+Purpose: Partition input domain into classes where all values behave similarly
+
+Approach for Different Element Types:
+
+FOR TEXT INPUT:
+  - Valid class: correct format, within length bounds, allowed characters
+  - Invalid class: wrong format, too short, too long, special chars
+  - Boundary class: min length, max length, edge characters
+  
+  Example for username (3-50 chars, alphanumeric + underscore):
+    EP1: Valid   = "user123", "test_user", "a_b_c"
+    EP2: Invalid = "ab", "user@domain", "!!!!"
+    EP3: Boundary = "abc" (min), "a"*50 (max)
+    
+FOR BUTTON:
+  - Enabled class: clickable, responsive
+  - Disabled class: grayed out, no response
+  - Loading class: spinning, in-progress
+  
+  Example for Submit button:
+    EP1: Enabled   = Click normally
+    EP2: Disabled  = Try to click (should not work)
+    EP3: Loading   = Check state during load
+    
+FOR DROPDOWN:
+  - Valid option class: each option in dropdown
+  - Invalid option class: values not in dropdown
+  - Empty state class: no selection made
+  
+  Example for country dropdown:
+    EP1: Valid   = "USA", "Canada", "Mexico"
+    EP2: Invalid = "InvalidCountry", ""
+    EP3: Empty   = Initial state
+
+FOR CHECKBOX:
+  - Checked class: checkbox is marked
+  - Unchecked class: checkbox is unmarked
+  - Disabled class: cannot interact
+  
+  Example:
+    EP1: Checked   = Mark → Unmark → Mark
+    EP2: Unchecked = Keep unchecked
+    EP3: Disabled  = Try to check (should fail)
+
+ALGORITHM FOR GENERATING EP TESTS:
+  1. Identify element type
+  2. Partition input domain into classes
+  3. Select ONE representative from each class
+  4. Create test for each representative
+  5. Expected result: covers all classes with minimal tests
+
+Example Code Logic:
+```
+for element in phase1_output.interactive_elements:
+    if element.type == "input":
+        partitions = partition_text_input(element)
+        # partitions = [valid_class, invalid_class, boundary_class]
+        
+        for partition in partitions:
+            test = {
+                "element_id": element.element_id,
+                "partition": partition,
+                "test_input": select_representative(partition),
+                "expected_behavior": partition.expected_result
+            }
+            tests.append(test)
+```
+
+---
+
+**ALGORITHM 2: BOUNDARY VALUE ANALYSIS (BVA)**
+
+Purpose: Test values at the edges of input domains (where bugs often hide)
+
+Approach:
+
+FOR NUMERIC INPUT (min=0, max=100):
+  - Test: -1 (below min)
+  - Test: 0 (min)
+  - Test: 1 (just above min)
+  - Test: 99 (just below max)
+  - Test: 100 (max)
+  - Test: 101 (above max)
+  
+FOR LENGTH CONSTRAINT (3-50 chars):
+  - Test: 2 chars (below min)
+  - Test: 3 chars (min)
+  - Test: 4 chars (just above min)
+  - Test: 49 chars (just below max)
+  - Test: 50 chars (max)
+  - Test: 51 chars (above max)
+  
+FOR DATE INPUT (valid range: 2000-01-01 to 2025-12-31):
+  - Test: 1999-12-31 (before min)
+  - Test: 2000-01-01 (min)
+  - Test: 2000-01-02 (just after min)
+  - Test: 2025-12-30 (just before max)
+  - Test: 2025-12-31 (max)
+  - Test: 2026-01-01 (after max)
+
+WHEN TO USE BVA:
+  ✅ Numeric inputs with min/max
+  ✅ Length constraints
+  ✅ Date/time ranges
+  ✅ File size limits
+  ✅ Percentage values (0-100)
+  
+WHEN NOT TO USE BVA:
+  ❌ Categorical inputs (country, status)
+  ❌ Freeform text (no defined bounds)
+  ❌ Boolean fields
+
+Example Code Logic:
+```
+for element in phase1_output.interactive_elements:
+    if element.type == "input" and has_constraints(element):
+        constraints = element.constraints
+        
+        boundary_values = [
+            constraints.min - 1,
+            constraints.min,
+            constraints.min + 1,
+            constraints.max - 1,
+            constraints.max,
+            constraints.max + 1
+        ]
+        
+        for value in boundary_values:
+            test = {
+                "element_id": element.element_id,
+                "boundary_type": classify_boundary(value, constraints),
+                "test_value": value,
+                "expected_behavior": "validate_bounds"
+            }
+            tests.append(test)
+```
+
+---
+
+**ALGORITHM 3: STATE COMBINATION TESTING**
+
+Purpose: Test how elements interact when combined in sequences
+
+Approach:
+
+USE PHASE 1 STATE GRAPH:
+  From state_transitions, identify sequences:
+    login_form:
+      elem_002 (username) → enabled
+      elem_003 (password) → enabled
+      elem_001 (submit) → enabled → clicking → loading → success/error
+
+WORKFLOW-BASED SEQUENCES:
+  From workflows array in Phase 1:
+    "login_flow": ["elem_002", "elem_003", "elem_001"]
+    
+  Generate tests:
+    1. Fill username (elem_002) → Check state
+    2. Fill password (elem_003) → Check state
+    3. Click submit (elem_001) → Check state changes
+    4. Verify success/error → Check page state
+
+INTERACTION PATTERNS:
+  - Sequential: A then B then C (workflow tests)
+  - Conditional: If A enabled, then test B
+  - Dependent: Changes to A affect B's behavior
+  - Exclusive: Can't do A and B together
+
+Example Code Logic:
+```
+for workflow in phase1_output.workflows:
+    test_steps = []
+    
+    for element_id in workflow.steps:
+        element = find_element(element_id)
+        step = {
+            "action": determine_action(element),
+            "element_id": element_id,
+            "locator": element.locators[best_strategy],
+            "confidence": element.locator_confidence[best_strategy],
+            "validate_state": True
+        }
+        test_steps.append(step)
+    
+    test = {
+        "test_id": f"workflow_{workflow.name}",
+        "test_steps": test_steps,
+        "expected_result": workflow.expected_outcome,
+        "coverage_contribution": calculate_coverage(workflow)
+    }
+    tests.append(test)
+```
+
+---
+
+**ALGORITHM 4: COMBINING EP + BVA + STATE**
+
+How they work together:
+
+Step 1: IDENTIFY ELEMENT GROUPS
+  - Group A: High-confidence inputs with constraints → BVA + EP
+  - Group B: Workflows/sequences → State Combination
+  - Group C: Low-confidence elements → More tests needed
+
+Step 2: PRIORITIZE BY COVERAGE GAP
+  Formula: Priority = 0.3×confidence + 0.3×coverage_gap + 0.2×risk + 0.2×complexity
+  
+  - High confidence (0.95+), zero gap → 2 tests (EP basics)
+  - Medium confidence (0.80-0.94), medium gap → 4 tests (EP + BVA)
+  - Low confidence (<0.80), high gap → 6+ tests (EP + BVA + edge cases)
+
+Step 3: BUILD TEST POOL
+  - Generate 100+ candidate tests using algorithms above
+  - Calculate coverage contribution for each
+  - Sort by coverage impact
+
+Step 4: SELECT 50 BEST TESTS
+  - Greedy algorithm: Pick test with highest coverage impact
+  - Add to selection
+  - Recalculate coverage
+  - Repeat until 50 tests OR 85%+ coverage achieved
+
+================================================================================
+SECTION 3: COVERAGE CALCULATION
+================================================================================
+
+**THREE TYPES OF COVERAGE**:
+
+1. ELEMENT COVERAGE
+   - How many elements are tested?
+   - Formula: (tested_elements / total_elements) × 100
+   - Example: 45/52 elements = 86.5% element coverage
+
+2. PATH COVERAGE
+   - How many user workflows are covered?
+   - Formula: (tested_workflows / total_workflows) × 100
+   - Example: 8/10 workflows = 80% path coverage
+
+3. SCENARIO COVERAGE
+   - How many input combinations are tested?
+   - Each test covers scenarios = partitions × boundary_values
+   - Formula: (tested_scenarios / reachable_scenarios) × 100
+   - Example: 350/400 scenarios = 87.5% scenario coverage
+
+BLENDED COVERAGE SCORE:
+  Overall = 0.4×element + 0.35×path + 0.25×scenario
+  
+  Example:
+    Element coverage: 86.5%
+    Path coverage: 80%
+    Scenario coverage: 87.5%
+    
+    Overall = 0.4(86.5) + 0.35(80) + 0.25(87.5)
+             = 34.6 + 28 + 21.875
+             = 84.475% ≈ 84.5%
+
+TARGET: 85%+ overall coverage
+
+================================================================================
+SECTION 4: HITL 2.0 FEEDBACK LOOP
+================================================================================
+
+**WHAT IS HITL 2.0?**
+
+HITL 1.0 (Old Way):
+  AI generates tests → Human reviews all tests → Done
+  
+HITL 2.0 (New Way):
+  AI generates → Human reviews → Human provides feedback → AI learns → 
+  AI improves generation → Next tests are better
+
+**THE LOOP STRUCTURE**:
+
+Phase 2.1: INITIAL GENERATION
+  1. Generate 50+ candidate tests using EP + BVA + State
+  2. For each test, track:
+     - Element used
+     - Algorithm used (EP/BVA/State)
+     - Confidence score
+     - Coverage contribution
+
+Phase 2.2: HUMAN REVIEW
+  Present test to human with:
+    Test title: "Login with valid credentials"
+    Steps: [step1, step2, step3]
+    Expected result: "User logged in"
+    Element IDs used: [elem_001, elem_002, elem_003]
+    Coverage impact: 2.5%
+    
+  Human provides feedback:
+    ✅ APPROVE - Test is good, add to final set
+    ❌ REJECT - Test is flawed, remove
+    📝 MODIFY - Test needs changes, provide suggestions
+
+Phase 2.3: FEEDBACK RECORDING
+  Store feedback as:
+    {
+      "test_id": "test_001",
+      "feedback": "APPROVE",
+      "comment": "Good workflow test",
+      "timestamp": "2025-12-19T10:00:00Z",
+      "element_id": "elem_001",
+      "algorithm_used": "state_combination"
+    }
+
+Phase 2.4: PATTERN EXTRACTION
+  Analyze feedback to find patterns:
+  
+  Pattern 1: "Workflow tests (state_combination) have 95% approval rate"
+  Pattern 2: "Boundary value tests (BVA) have 85% approval rate"
+  Pattern 3: "Tests for high-confidence elements approved 98% of time"
+  Pattern 4: "Tests for low-confidence elements approved 60% of time"
+
+Phase 2.5: LEARNING
+  Adjust test generation for NEXT batch:
+  
+  IF pattern says "workflow tests approved 95%":
+    → Generate MORE workflow tests next round
+    
+  IF pattern says "low-confidence elements approved 60%":
+    → FOR low-confidence elements:
+       → Generate more tests (6+ instead of 4)
+       → Use simpler, more straightforward scenarios
+       → Add more boundary cases
+
+Phase 2.6: ITERATION
+  With feedback from round 1:
+    1. Generate 50 more tests (improved by learning)
+    2. Present to human
+    3. Get feedback
+    4. Extract patterns
+    5. Generate 50 more tests (even better)
+
+**IMPLEMENTATION DETAILS**:
+
+Feedback Storage Schema:
+```
+{
+  "feedback_rounds": [
+    {
+      "round_number": 1,
+      "tests_presented": 50,
+      "feedback": [
+        {
+          "test_id": "test_001",
+          "verdict": "APPROVE",
+          "element_id": "elem_001",
+          "algorithm": "ep",
+          "approval_confidence": 0.95,
+          "comment": "Clear test, good coverage"
+        },
+        {
+          "test_id": "test_002",
+          "verdict": "REJECT",
+          "element_id": "elem_002",
+          "algorithm": "bva",
+          "rejection_reason": "Test scenario unrealistic",
+          "comment": "Username validation too strict"
+        }
+      ],
+      "approval_rate": 0.92,
+      "patterns_learned": [
+        "workflow_tests_high_approval",
+        "bva_input_tests_lower_approval",
+        "high_confidence_elements_always_good"
+      ]
+    },
+    {
+      "round_number": 2,
+      "tests_presented": 50,
+      "feedback": [ ... ],
+      "approval_rate": 0.96,
+      "patterns_learned": [ ... ]
+    }
+  ]
+}
+```
+
+Pattern Learning Rules:
+```
+IF algorithm X has >90% approval rate:
+  → Use algorithm X more frequently
+  
+IF algorithm Y has <70% approval rate:
+  → Reduce frequency of algorithm Y
+  → Modify approach for algorithm Y
+  
+IF element_type Z has high rejection:
+  → Generate more tests for element_type Z
+  → Use simpler, clearer scenarios
+  
+IF workflow W has high approval:
+  → Generate more tests for similar workflows
+  → Extract patterns from W
+```
+
+================================================================================
+SECTION 5: OUTPUT SCHEMA
+================================================================================
+
+**FINAL OUTPUT: test_cases.json**
+
+{
+  "metadata": {
+    "phase": 2,
+    "version": "1.0",
+    "generated_timestamp": "2025-12-19T10:00:00Z",
+    "total_tests": 50,
+    "total_coverage": 85.5,
+    "hitl_rounds_completed": 2,
+    "approval_rate": 0.92
+  },
+  "tests": [
+    {
+      "test_id": "test_001",
+      "title": "Login with valid credentials",
+      "description": "Test successful user login with correct username and password",
+      "priority": "high",
+      "algorithm_used": "state_combination",
+      "elements_used": ["elem_001", "elem_002", "elem_003"],
+      "test_steps": [
+        {
+          "step_number": 1,
+          "action": "Enter username",
+          "element_id": "elem_002",
+          "element_label": "Username",
+          "element_type": "input",
+          "locator": "input[data-testid='username']",
+          "locator_strategy": "p3_testid",
+          "locator_confidence": 0.99,
+          "input_value": "testuser123",
+          "validation": {
+            "type": "presence",
+            "expected": "Input accepts text"
+          }
+        },
+        {
+          "step_number": 2,
+          "action": "Enter password",
+          "element_id": "elem_003",
+          "element_label": "Password",
+          "element_type": "input",
+          "locator": "input[data-testid='password']",
+          "locator_strategy": "p3_testid",
+          "locator_confidence": 0.99,
+          "input_value": "password123",
+          "validation": {
+            "type": "presence",
+            "expected": "Input accepts text, hides characters"
+          }
+        },
+        {
+          "step_number": 3,
+          "action": "Click submit",
+          "element_id": "elem_001",
+          "element_label": "Submit",
+          "element_type": "button",
+          "locator": "button[data-testid='login-submit']",
+          "locator_strategy": "p3_testid",
+          "locator_confidence": 0.99,
+          "validation": {
+            "type": "element_state",
+            "expected": "Button enabled and clickable"
+          }
+        },
+        {
+          "step_number": 4,
+          "action": "Verify navigation",
+          "element_type": "navigation",
+          "validation": {
+            "type": "url_change",
+            "expected": "Page redirects to /dashboard"
+          }
+        }
+      ],
+      "expected_result": "User successfully logs in and navigates to dashboard",
+      "edge_cases_covered": ["valid_username", "valid_password", "button_click"],
+      "coverage_contribution": {
+        "elements": 3,
+        "paths": 1,
+        "scenarios": 1,
+        "total_percentage": 2.5
+      },
+      "importance_score": 0.95,
+      "hitl_feedback": {
+        "rounds": [
+          {
+            "round": 1,
+            "verdict": "APPROVE",
+            "comment": "Clear, realistic workflow test",
+            "timestamp": "2025-12-19T10:05:00Z"
+          }
+        ],
+        "final_approval_rate": 1.0
+      }
+    },
+    {
+      "test_id": "test_002",
+      "title": "Username boundary value - max length",
+      "description": "Test username input at maximum allowed length boundary",
+      "priority": "medium",
+      "algorithm_used": "bva",
+      "elements_used": ["elem_002"],
+      "test_steps": [
+        {
+          "step_number": 1,
+          "action": "Enter username at max length",
+          "element_id": "elem_002",
+          "element_label": "Username",
+          "element_type": "input",
+          "locator": "input[data-testid='username']",
+          "locator_strategy": "p3_testid",
+          "locator_confidence": 0.99,
+          "input_value": "a" * 50,
+          "validation": {
+            "type": "input_acceptance",
+            "expected": "Input accepts 50 character username"
+          }
+        },
+        {
+          "step_number": 2,
+          "action": "Try to enter beyond max",
+          "element_id": "elem_002",
+          "element_label": "Username",
+          "element_type": "input",
+          "input_value": "a" * 51,
+          "validation": {
+            "type": "input_rejection",
+            "expected": "Input rejects character 51 (max boundary)"
+          }
+        }
+      ],
+      "expected_result": "Input accepts exactly 50 characters, rejects 51st character",
+      "edge_cases_covered": ["max_length_boundary", "overflow_prevention"],
+      "coverage_contribution": {
+        "elements": 1,
+        "paths": 0,
+        "scenarios": 1,
+        "total_percentage": 1.2
+      },
+      "importance_score": 0.78,
+      "hitl_feedback": {
+        "rounds": [
+          {
+            "round": 1,
+            "verdict": "APPROVE",
+            "comment": "Good boundary testing",
+            "timestamp": "2025-12-19T10:10:00Z"
+          }
+        ],
+        "final_approval_rate": 1.0
+      }
+    }
+    ... 48 more tests
+  ],
+  "coverage_metrics": {
+    "element_coverage": 86.5,
+    "path_coverage": 80.0,
+    "scenario_coverage": 87.5,
+    "blended_coverage": 85.5,
+    "coverage_by_element_type": {
+      "button": 95.0,
+      "input": 82.0,
+      "dropdown": 78.0,
+      "link": 75.0
+    },
+    "coverage_gaps": [
+      {
+        "element_id": "elem_045",
+        "element_label": "Advanced search",
+        "coverage": 0.0,
+        "reason": "Low confidence (0.42), deferred to Phase 3",
+        "recommendation": "Add 3-5 tests after validation"
+      }
+    ]
+  },
+  "hitl_summary": {
+    "total_rounds": 2,
+    "round_1": {
+      "tests_presented": 50,
+      "approved": 46,
+      "rejected": 4,
+      "approval_rate": 0.92,
+      "patterns_learned": [
+        "workflow_tests_high_approval_95%",
+        "bva_tests_medium_approval_85%",
+        "high_confidence_elements_always_good_98%"
+      ]
+    },
+    "round_2": {
+      "tests_presented": 50,
+      "approved": 48,
+      "rejected": 2,
+      "approval_rate": 0.96,
+      "improvements_made": [
+        "Increased workflow tests by 20%",
+        "Simplified BVA test scenarios",
+        "Focused more on high-confidence elements"
+      ]
+    },
+    "overall_approval_rate": 0.92
+  }
+}
+```
+
+**COVERAGE METRICS OUTPUT: coverage_metrics.json**
+
+{
+  "summary": {
+    "total_elements": 52,
+    "tested_elements": 45,
+    "element_coverage": 86.5,
+    "total_workflows": 10,
+    "tested_workflows": 8,
+    "path_coverage": 80.0,
+    "total_scenarios": 400,
+    "tested_scenarios": 350,
+    "scenario_coverage": 87.5,
+    "blended_coverage": 85.5
+  },
+  "by_element_type": {
+    "button": {
+      "total": 12,
+      "tested": 12,
+      "coverage": 100.0,
+      "test_count": 18
+    },
+    "input": {
+      "total": 25,
+      "tested": 20,
+      "coverage": 80.0,
+      "test_count": 22
+    },
+    "dropdown": {
+      "total": 9,
+      "tested": 7,
+      "coverage": 77.8,
+      "test_count": 6
+    },
+    "link": {
+      "total": 6,
+      "tested": 6,
+      "coverage": 100.0,
+      "test_count": 4
+    }
+  },
+  "coverage_gaps": [
+    {
+      "element_id": "elem_045",
+      "type": "dropdown",
+      "label": "Advanced filters",
+      "confidence": 0.42,
+      "reason": "Low confidence score, deferred to Phase 3",
+      "impact": "2 coverage percentage points",
+      "recommendation": "Validate element exists, then add 3-5 tests"
+    }
+  ]
+}
+```
+
+================================================================================
+SECTION 6: SUCCESS CRITERIA
+================================================================================
+
+Phase 2 is successful when:
+
+✅ 50+ test cases generated
+✅ 85%+ blended coverage achieved (element + path + scenario)
+✅ HITL 2.0 working (human feedback loop integrated)
+✅ 0% hallucinated tests (all element_ids verified against Phase 1)
+✅ All tests human-readable with clear steps
+✅ Coverage gaps identified and documented
+✅ test_cases.json matches schema exactly
+✅ coverage_metrics.json shows detailed breakdown
+✅ Sample Phase 1 → Phase 2 pipeline working end-to-end
+✅ Code fully documented with docstrings
+✅ All unit tests passing
+✅ README explains how to use Phase 2
+
+================================================================================
+END OF DETAILED SPECIFICATION
+================================================================================
+
+This specification is complete and ready for implementation.
+Send to Claude if they need clarification on any algorithms or concepts.

@@ -1,0 +1,419 @@
+================================================================================
+                    PHASE 2: MASTER PROMPT FOR CLAUDE
+================================================================================
+
+Phase: Phase 2 of 4
+Project: Championship-Level Web-Based Testing Agent
+Status: Ready to send to Claude
+Date: December 19, 2025
+
+================================================================================
+COPY & PASTE THIS ENTIRE TEXT INTO CLAUDE CHAT
+================================================================================
+
+I'm building a championship-level Web-Based Testing Agent, and I need your 
+help building Phase 2: Collaborative Test Design & Generation.
+
+## THE ASSIGNMENT
+
+Build a **production-ready Phase 2 engine** that:
+
+1. **Consumes Phase 1 output** - Takes the JSON with 95%+ discovered elements
+2. **Generates 50+ test cases** - Using intelligent algorithms (EP + BVA)
+3. **Achieves 85%+ coverage** - Smart prioritization, not exhaustive (impossible)
+4. **Implements HITL 2.0** - Humans approve/reject/modify tests → System learns
+5. **Validates everything** - 0% hallucinated tests (all traceable to Phase 1)
+6. **Outputs clean JSON** - Test cases ready for Phase 3 code generation
+
+## WHAT MAKES THIS HARD
+
+✅ **Algorithm Complexity**: Equivalence Partitioning + Boundary Value Analysis 
++ State Combinations = Sophisticated test generation
+
+✅ **Smart Coverage**: 85%+ is NOT "test everything" - requires prioritization 
+by element confidence, risk, and coverage gaps
+
+✅ **HITL 2.0 Loop**: Tests presented to humans → Humans give feedback → System 
+learns patterns → Improves future tests. Complex feedback loop!
+
+✅ **Zero Hallucinations**: Every test must link back to Phase 1 element with 
+confidence score. No made-up scenarios!
+
+✅ **Human-Readable**: Tests must be understandable to non-technical people - 
+clear steps, realistic scenarios
+
+✅ **Quality > Speed**: A mediocre test generator is worthless. This must be 
+championship-level.
+
+## WHAT I'M PROVIDING
+
+I've saved detailed specification documents:
+- phase2_DETAILED_SPECIFICATION.md - Technical architecture and algorithms
+- phase2_IMPLEMENTATION_GUIDE.md - Layer-by-layer build plan with code structure
+- Sample phase1_output.json - Real Phase 1 data to work with
+
+Please read both documents carefully, then ask clarifying questions before 
+you start coding.
+
+## KEY DETAILS
+
+**Core Architecture (5 Layers)**:
+
+Layer 1: Parse Phase 1 JSON
+  - Extract elements, confidence scores, relationships
+  
+Layer 2: Apply test generation algorithms
+  - Equivalence Partitioning (EP)
+  - Boundary Value Analysis (BVA)
+  - State combination testing
+
+Layer 3: Calculate coverage metrics
+  - Element coverage / Path coverage / Scenario coverage
+  - Overall coverage blended score
+
+Layer 4: Generate coverage heatmap visualization data
+  - JSON visualization for Phase 3
+
+Layer 5: Implement HITL 2.0 feedback loop
+  - Present tests to humans
+  - Get feedback (approve/reject/modify)
+  - Learn from feedback
+  - Improve future test generation
+
+**Test Generation Algorithms**:
+
+EQUIVALENCE PARTITIONING (EP)
+- Partition input domain into equivalence classes
+- For text input: Valid | Invalid | Boundary
+- For button: Clickable/Enabled | Disabled/Blocked
+- For dropdown: Valid Option | Invalid Option | Empty State
+- Test one representative from each class
+
+BOUNDARY VALUE ANALYSIS (BVA)
+- Test at boundaries of input domain
+- For length: 0, 1, max-1, max, max+1
+- For numbers: min, min+1, max-1, max
+- For dates: min_date, today, max_date
+
+STATE COMBINATION TESTING
+- Test how elements interact with each other
+- Use Phase 1's state graph to identify sequences
+- Workflow tests: login → search → filter → sort → export
+
+**Output Format Example**:
+
+{
+  "test_id": "test_001",
+  "title": "Submit form with valid data",
+  "elements_used": ["elem_001", "elem_002", "elem_003"],
+  "test_steps": [
+    {
+      "action": "Enter username",
+      "element_id": "elem_001",
+      "locator": "button[name='Submit']",
+      "locator_strategy": "p1_role",
+      "confidence": 0.98
+    },
+    {
+      "action": "Enter password",
+      "element_id": "elem_002",
+      "locator": "input[type='password']",
+      "locator_strategy": "p2_label",
+      "confidence": 0.92
+    },
+    {
+      "action": "Click submit",
+      "element_id": "elem_003",
+      "locator": "button[name='Submit']",
+      "locator_strategy": "p1_role",
+      "confidence": 0.98
+    }
+  ],
+  "expected_result": "User logged in",
+  "coverage_contribution": 2.5,
+  "importance_score": 0.92
+}
+
+**Success Metrics**:
+- 50+ test cases generated
+- 85%+ coverage achieved (element + path + scenario blended)
+- HITL 2.0 working (humans approve/reject/modify)
+- 0% hallucinated tests (all traceable to Phase 1)
+- <2 minutes generation time
+- All tests human-readable and realistic
+
+**Timeline**: 5-7 days
+
+## MY REQUEST
+
+1. **Read** phase2_DETAILED_SPECIFICATION.md carefully (technical details)
+2. **Read** phase2_IMPLEMENTATION_GUIDE.md carefully (build plan)
+3. **Ask** me clarifying questions if anything is unclear
+4. **Propose** your implementation approach (architecture, build sequence)
+5. **Get approval** before starting to code
+6. **Build** iteratively with daily check-ins, testing at each layer
+
+## KEY DETAILS EXPLAINED
+
+**Why This Matters**
+
+Phase 1 discovered the elements. Phase 2 generates intelligent test cases.
+Phase 3 will generate test code. Phase 4 will execute the tests.
+
+If Phase 2 fails: Phase 3 gets garbage input → generates garbage code 
+→ Phase 4 has nothing to execute.
+
+If Phase 2 succeeds: Phase 3 gets high-quality test specifications → generates 
+reliable test code → Phase 4 produces trust metrics.
+
+**Why HITL 2.0 Is Different**
+
+This isn't "AI generates tests in isolation."
+
+This is "AI generates + humans guide + system learns + improve together"
+
+Flow:
+1. Generate test case
+2. Show to human with explanation
+3. Get feedback: Approve | Reject | Modify
+4. Record feedback
+5. Extract patterns from feedback
+6. Adjust future test generation
+7. Next test is better because we learned
+
+**Why 85% Coverage Matters**
+
+100% coverage is impossible (infinite test scenarios).
+0% coverage is useless (no tests).
+85% is **smart** - covers 85% of elements intelligently.
+
+How:
+- High confidence elements: 2-3 tests each
+- Medium confidence: 4-5 tests each
+- Low confidence: More tests or skip (document gap)
+- Prioritize by risk level
+- Prioritize by coverage gap
+
+================================================================================
+GOOD RESPONSE (You understand the scope)
+================================================================================
+
+"I've read both phase2_DETAILED_SPECIFICATION.md and phase2_IMPLEMENTATION_GUIDE.md 
+carefully. I understand this is not just 'generate random test cases' - it's a 
+sophisticated system that must:
+
+1. Use algorithms (EP + BVA + state combinations)
+2. Achieve smart 85%+ coverage (not exhaustive)
+3. Implement HITL 2.0 (humans guide, system learns)
+4. Maintain 0% hallucinations (all tests traceable to Phase 1)
+5. Generate human-readable tests (clear, realistic scenarios)
+
+Before I propose implementation, I have clarifying questions:
+
+1. When humans approve/reject tests, how should I store that feedback?
+2. Should I prioritize high-confidence elements first or high-risk elements?
+3. For HITL 2.0 learning, should I extract patterns or just track approval rates?
+4. Should I validate against Phase 1 in real-time or batch validate?
+5. For the coverage heatmap, what visualization tool will Phase 3 use?
+
+Here's my proposed approach:
+[Concrete technical plan with module names, build sequence, testing strategy]"
+
+================================================================================
+RED FLAGS (You're not ready)
+================================================================================
+
+❌ "I'll build a test generator that creates random test cases"
+   → No - requires algorithms (EP + BVA)
+
+❌ "I can have this done in 2 days"
+   → No - 5-7 days for championship-level
+
+❌ "I'll just test every element with every possible input"
+   → No - must be smart prioritization for 85%+ coverage
+
+❌ "Humans can review tests after I'm done"
+   → No - HITL 2.0 is integrated into generation, not after
+
+❌ "What's EP + BVA?"
+   → If you don't know, read the specification documents first
+
+================================================================================
+BUILD EXPECTATIONS
+================================================================================
+
+I expect:
+
+✅ **Questions before coding** - Better to clarify than build wrong
+✅ **Proposed architecture** - Show me your plan first
+✅ **Layer-by-layer delivery** - Build one module, test, show results
+✅ **Daily check-ins** - Show me progress, get feedback
+✅ **Comprehensive testing** - Unit tests for each layer
+✅ **Complete documentation** - Code comments + guides
+✅ **Sample output** - Generate test cases from sample Phase 1 JSON
+
+================================================================================
+COMMON STUCK POINTS
+================================================================================
+
+**"How do I partition text inputs?"**
+→ Consider: length (valid/too short/too long), content type 
+  (letters/numbers/special chars), empty/null
+
+**"How do I weight coverage priorities?"**
+→ Use formula: 0.3×confidence + 0.3×coverage_gap + 0.2×risk + 0.2×complexity
+
+**"What makes a test 'hallucinated'?"**
+→ If it references an element_id that doesn't exist in Phase 1, or uses a 
+  locator not in Phase 1
+
+**"How do I implement the approval workflow?"**
+→ Present test → Get feedback (approve/reject/modify) → Record decision 
+  → Learn pattern
+
+**"When do I stop at 50 tests?"**
+→ When coverage hits 85% OR all high-priority elements tested OR 
+  diminishing returns
+
+================================================================================
+WHAT SUCCESS LOOKS LIKE
+================================================================================
+
+When Phase 2 is done, Phase 3 can consume this:
+
+```python
+import json
+
+phase2_output = json.load(open("test_cases.json"))
+
+for test in phase2_output["tests"]:
+    test_id = test["test_id"]                    # "test_001"
+    steps = test["test_steps"]                   # [step1, step2, step3]
+    element_locators = [
+        s["locator"] 
+        for s in steps 
+        if "locator" in s
+    ]  # All locators valid from Phase 1
+    
+    coverage_value = test["coverage_contribution"]  # 2.5%
+    
+    # Generate test code based on this
+```
+
+If Phase 3 can easily consume it = Phase 2 succeeded ✅
+
+================================================================================
+TIMELINE EXPECTATION
+================================================================================
+
+Day 1:  Architecture & planning (NO coding yet)
+        ├─ You read specs
+        ├─ You ask questions
+        ├─ I propose approach
+        └─ You approve
+
+Day 2-3: Build Layers 1-2 (Parsing + Test Generation)
+        ├─ Daily check-in
+        ├─ Show sample output
+        └─ Get feedback
+
+Day 4: Build Layers 3-4 (Coverage + Visualization)
+      ├─ Daily check-in
+      └─ Show heatmap data
+
+Day 5: Build Layer 5 (HITL 2.0)
+      ├─ Show approval workflow
+      └─ Test feedback loop
+
+Day 6: End-to-end testing & refinement
+      ├─ Run on sample Phase 1 data
+      ├─ Generate full test set
+      └─ Verify output quality
+
+Day 7: Documentation & delivery
+      ├─ README + guides
+      ├─ API documentation
+      └─ Sample execution
+
+Result: 50+ test cases, 85%+ coverage, HITL 2.0 working
+
+================================================================================
+QUESTIONS I'LL ASK BEFORE STARTING
+================================================================================
+
+I'll ask things like:
+
+1. "What's the target business domain?" (e-commerce, SaaS, banking?)
+2. "Should test generation prioritize by element confidence or element type?"
+3. "For HITL 2.0, how do you want to provide feedback?" (CLI, GUI, JSON file?)
+4. "Should I include security/negative testing or just happy path + edge cases?"
+5. "What's your Phase 3 environment?" (Playwright, Selenium, Cypress?)
+6. "Do you have specific user workflows from Phase 1 state graph?"
+7. "Should I store coverage heatmap as JSON or image/dashboard-ready?"
+
+These are GOOD questions - they show I understand the scope.
+
+================================================================================
+APPROVAL CHECKLIST BEFORE DELIVERY
+================================================================================
+
+Before Phase 2 is complete, verify:
+
+- [ ] All 5 layers built and tested
+- [ ] 50+ test cases generated
+- [ ] 85%+ coverage achieved and calculated
+- [ ] Coverage heatmap generated (JSON visualization data)
+- [ ] HITL 2.0 feedback loop tested
+- [ ] Sample Phase 1 → Phase 2 pipeline working end-to-end
+- [ ] All tests readable and realistic
+- [ ] 0% hallucinated tests (verified)
+- [ ] test_cases.json matches schema exactly
+- [ ] coverage_metrics.json shows 85%+ coverage
+- [ ] Coverage gaps documented with recommendations
+- [ ] README explains how to use Phase 2
+- [ ] Code is 100% documented with docstrings
+- [ ] All unit tests passing
+- [ ] Sample output ready for Phase 3
+
+================================================================================
+FINAL WORDS
+================================================================================
+
+I'm not looking for quick code. I'm looking for **championship-level 
+architecture** that's:
+
+✅ **Accurate** - Uses proven algorithms (EP + BVA)
+✅ **Well-validated** - 0% hallucinations, all tests traceable
+✅ **Human-readable** - Tests make sense, realistic scenarios
+✅ **Intelligent** - HITL 2.0 learns and improves
+✅ **Production-ready** - Clean code, comprehensive tests, complete docs
+
+Take the time to do it right.
+
+**Ask questions. Propose approach. Build iteratively. Test thoroughly.**
+
+**We'd rather have this in 1 week done right than 3 days done wrong.**
+
+================================================================================
+YOU'RE READY
+================================================================================
+
+You have:
+- ✅ Complete specification document
+- ✅ Implementation guide with code structure
+- ✅ Sample Phase 1 data to work with
+- ✅ Clear success metrics
+- ✅ Timeline expectations
+- ✅ Everything you need
+
+Questions before you read the specs?
+
+================================================================================
+END OF MASTER PROMPT
+================================================================================
+
+This is the complete Phase 2 Master Prompt ready to send to Claude.
+
+Copy everything above and paste into Claude chat to launch Phase 2!
+
+🚀 READY TO SEND TO CLAUDE NOW!
