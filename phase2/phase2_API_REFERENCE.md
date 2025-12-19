@@ -17,6 +17,7 @@ summary = parser.summary()
 ### EquivalencePartitioning (Layer 2A)
 ```python
 ep = EquivalencePartitioning(phase1)
+tests = ep.generate_ep_tests()  # Generate ~15-20 EP tests
 
 # Tests cover:
 # - Valid/invalid/boundary partitions
