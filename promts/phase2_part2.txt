@@ -1,0 +1,181 @@
+🚀 COMPLETE PHASE 2 NOW - DAYS 4-7 BUILD PROMPT
+
+You've successfully delivered Days 2-3 (2,390 lines, 8 files, 15+ tests).
+Now complete the remaining 40% - Days 4-7.
+
+Status: 60% Complete | Remaining: 40% (1,350 lines, 8 files, 20+ tests)
+Timeline: 4 days | Quality: Championship-Level A+
+
+═════════════════════════════════════════════════════════════════════════════
+
+WHAT YOU HAVE (Foundation Ready):
+✅ phase1_parser.py (300 lines)
+✅ test_generator.py (280 lines) 
+✅ equivalence_partitioning.py (400 lines)
+✅ boundary_value_analysis.py (170 lines)
+✅ models.py (370 lines)
+✅ validators.py (170 lines)
+✅ test_comprehensive.py (700+ lines)
+✅ requirements.txt
+
+Total: 2,390 lines | 8 files | 15+ tests (all passing)
+
+═════════════════════════════════════════════════════════════════════════════
+
+DAY 4: BUILD LAYERS 3+4 (Coverage & Visualization)
+
+Task 1: coverage_calculator.py (250 lines)
+Purpose: Calculate element/path/scenario coverage → blended score
+
+Implement:
+class CoverageCalculator:
+  - calculate_coverage() → CoverageMetrics (element, path, scenario, blended)
+  - calculate_element_coverage() → (tested_elements / total_elements) * 100
+  - calculate_path_coverage() → (tested_workflows / total_workflows) * 100
+  - calculate_scenario_coverage() → (tested_scenarios / reachable_scenarios) * 100
+  - blend_coverage(elem, path, scenario) → 0.4×elem + 0.35×path + 0.25×scenario
+  - get_coverage_by_element_type() → Dict[type, coverage%]
+  - identify_coverage_gaps() → List[CoverageGap]
+
+Expected: 85%+ blended coverage achieved
+Tests: 5+ tests covering all methods
+
+Output Example:
+{
+  "element_coverage": 86.5,
+  "path_coverage": 80.0,
+  "scenario_coverage": 87.5,
+  "blended_coverage": 85.6,
+  "coverage_by_type": {"button": 100.0, "input": 82.0},
+  "coverage_gaps": [...]
+}
+
+Task 2: coverage_visualizer.py (150 lines)
+Purpose: Generate heatmap visualization data for Phase 3
+
+Implement:
+class CoverageVisualizer:
+  - generate_heatmap_data() → Dict with elements + summary
+  - _coverage_to_color(coverage) → "#00AA00" (green), "#FFAA00" (orange), "#FF0000" (red)
+  - generate_element_heatmap() → Dict by element type
+
+Expected: Heatmap JSON with color-coded elements
+Tests: 3+ tests for heatmap generation and colors
+
+═════════════════════════════════════════════════════════════════════════════
+
+DAY 5: BUILD LAYER 5 (HITL 2.0 Feedback Loop)
+
+Task 1: hitl_manager.py (400 lines)
+Purpose: Implement human-in-the-loop feedback with learning
+
+Implement:
+class HITLManager:
+  - run_hitl_loop(rounds=2) → HITLResult
+  - present_and_collect_feedback(tests, round_num) → List[Dict] with verdicts
+  - extract_patterns(feedback) → List[str] (4 types: algorithm, type, confidence, complexity)
+  - apply_learning(patterns) → adjusts algorithm frequencies
+
+Behavior:
+Round 1: Generate 50 tests → CLI presents → human gives verdict → patterns extracted
+Round 2: Generate 50 NEW tests (improved) → CLI presents → human gives verdict → verify improvement
+
+Expected: Round 1 approval ~92% → Round 2 approval ~98% (improvement demonstrated)
+Tests: 5+ tests for feedback collection, pattern extraction, learning
+
+═════════════════════════════════════════════════════════════════════════════
+
+DAY 6: INTEGRATION (main.py + test_integration.py)
+
+Task 1: main.py (150 lines)
+Orchestrate all 5 layers:
+1. Parse Phase 1
+2. Generate tests
+3. Calculate coverage
+4. Generate heatmap
+5. Run HITL loop
+6. Save outputs (test_cases.json, coverage_metrics.json, coverage_heatmap.json, feedback_logs.json)
+
+Expected: Full pipeline working, all outputs generated
+Tests: Integration tests for each layer interaction
+
+═════════════════════════════════════════════════════════════════════════════
+
+DAY 7: DOCUMENTATION
+
+Write:
+- README.md (overview, setup, usage, examples)
+- API_REFERENCE.md (classes, methods, parameters)
+- IMPLEMENTATION_NOTES.md (design decisions, algorithms)
+
+═════════════════════════════════════════════════════════════════════════════
+
+SUCCESS CRITERIA:
+
+Layer 3:
+✅ Element coverage calculated
+✅ Path coverage calculated
+✅ Scenario coverage calculated
+✅ Blended >= 85.0%
+✅ 5+ tests passing
+
+Layer 4:
+✅ Heatmap JSON generated
+✅ All elements included
+✅ Color coding correct (green/orange/red)
+✅ 3+ tests passing
+
+Layer 5:
+✅ Round 1: 50 tests, feedback collected
+✅ Round 1: Patterns extracted
+✅ Round 2: Tests improved
+✅ Round 2: Approval rate > Round 1
+✅ Learning demonstrated
+✅ 5+ tests passing
+
+Integration:
+✅ Full pipeline working
+✅ All 4 JSON outputs generated
+✅ 5+ integration tests passing
+
+Documentation:
+✅ README complete
+✅ API docs complete
+✅ Implementation notes complete
+
+═════════════════════════════════════════════════════════════════════════════
+
+FINAL DELIVERABLES (After Days 4-7):
+
+✅ 16 Total Files (8 existing + 8 new)
+✅ 3,740+ Lines of Code
+✅ 40+ Tests All Passing
+✅ 50+ Test Cases Generated
+✅ 85%+ Blended Coverage
+✅ HITL 2.0 Working (2 rounds with improvement)
+✅ 0% Hallucinated Tests
+✅ Complete Documentation
+✅ Phase 3 Ready
+
+═════════════════════════════════════════════════════════════════════════════
+
+QUALITY STANDARDS:
+
+✅ 100% type hints
+✅ 100% docstrings
+✅ 100% PEP-8 compliant
+✅ 40+ tests all passing
+✅ Championship-quality code
+✅ Zero technical debt
+
+═════════════════════════════════════════════════════════════════════════════
+
+BUILD PHASE 2 COMPLETE NOW!
+
+Days 4-7: 1,350 lines | 8 files | 20+ tests
+Timeline: 4 days
+Quality: A+ Championship-Level
+
+YOU'RE READY - BUILD IT NOW! 🚀🏆
+
+═════════════════════════════════════════════════════════════════════════════
