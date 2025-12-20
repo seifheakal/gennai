@@ -1,6 +1,6 @@
 {
   "page_url": "https://automationexercise.com/",
-  "exploration_timestamp": "2025-12-20T16:10:41.114399",
+  "exploration_timestamp": "2025-12-20 16:58:38.443742",
   "total_states_discovered": 3,
   "total_elements": 8,
   "coverage_percentage": 0.95,
@@ -10,19 +10,22 @@
         "state_id": "state_1",
         "label": "Page at depth 0",
         "url": "https://automationexercise.com/",
-        "timestamp": 0.7027597999986028
+        "screenshot": null,
+        "timestamp": 0.926964099999168
       },
       {
         "state_id": "state_2",
         "label": "Page at depth 1",
         "url": "https://automationexercise.com/test_cases",
-        "timestamp": 8.761251500000071
+        "screenshot": null,
+        "timestamp": 16.54530479999812
       },
       {
         "state_id": "state_3",
         "label": "Page at depth 1",
         "url": "https://automationexercise.com/api_list",
-        "timestamp": 14.838776399999915
+        "screenshot": null,
+        "timestamp": 23.881334600002447
       }
     ],
     "edges": [
@@ -41,30 +44,6 @@
         "element_id": "elem_002",
         "description": "click on elem_002",
         "timestamp": 0.0
-      },
-      {
-        "from_state": "state_1",
-        "to_state": "state_2",
-        "action": "click",
-        "element_id": "elem_003",
-        "description": "click on elem_003",
-        "timestamp": 0.0
-      },
-      {
-        "from_state": "state_1",
-        "to_state": "state_3",
-        "action": "click",
-        "element_id": "elem_004",
-        "description": "click on elem_004",
-        "timestamp": 0.0
-      },
-      {
-        "from_state": "state_1",
-        "to_state": "state_2",
-        "action": "click",
-        "element_id": "elem_005",
-        "description": "click on elem_005",
-        "timestamp": 0.0
       }
     ]
   },
@@ -80,7 +59,11 @@
       "locators": {
         "priority_1_role": "button[name='Test Cases']",
         "priority_2_label": "label:has-text('Test Cases')",
-        "priority_4_text": ":text('Test Cases')"
+        "priority_3_placeholder": null,
+        "priority_4_text": ":text('Test Cases')",
+        "priority_5_testid": null,
+        "priority_6_css": null,
+        "priority_7_xpath": null
       },
       "locator_confidence": {
         "priority_1_role": 0.95,
@@ -95,6 +78,8 @@
         "role": "button",
         "accessible_name": "Test Cases",
         "accessible_description": "",
+        "labelledby": null,
+        "describedby": null,
         "aria_label": ""
       },
       "interactivity": {
@@ -137,7 +122,11 @@
       "locators": {
         "priority_1_role": "button[name='APIs list for practice']",
         "priority_2_label": "label:has-text('APIs list for practice')",
-        "priority_4_text": ":text('APIs list for practice')"
+        "priority_3_placeholder": null,
+        "priority_4_text": ":text('APIs list for practice')",
+        "priority_5_testid": null,
+        "priority_6_css": null,
+        "priority_7_xpath": null
       },
       "locator_confidence": {
         "priority_1_role": 0.95,
@@ -152,6 +141,8 @@
         "role": "button",
         "accessible_name": "APIs list for practice",
         "accessible_description": "",
+        "labelledby": null,
+        "describedby": null,
         "aria_label": ""
       },
       "interactivity": {
@@ -194,7 +185,11 @@
       "locators": {
         "priority_1_role": "button[name='Test Cases']",
         "priority_2_label": "label:has-text('Test Cases')",
-        "priority_4_text": ":text('Test Cases')"
+        "priority_3_placeholder": null,
+        "priority_4_text": ":text('Test Cases')",
+        "priority_5_testid": null,
+        "priority_6_css": null,
+        "priority_7_xpath": null
       },
       "locator_confidence": {
         "priority_1_role": 0.95,
@@ -209,6 +204,8 @@
         "role": "button",
         "accessible_name": "Test Cases",
         "accessible_description": "",
+        "labelledby": null,
+        "describedby": null,
         "aria_label": ""
       },
       "interactivity": {
@@ -251,7 +248,11 @@
       "locators": {
         "priority_1_role": "button[name='APIs list for practice']",
         "priority_2_label": "label:has-text('APIs list for practice')",
-        "priority_4_text": ":text('APIs list for practice')"
+        "priority_3_placeholder": null,
+        "priority_4_text": ":text('APIs list for practice')",
+        "priority_5_testid": null,
+        "priority_6_css": null,
+        "priority_7_xpath": null
       },
       "locator_confidence": {
         "priority_1_role": 0.95,
@@ -266,6 +267,8 @@
         "role": "button",
         "accessible_name": "APIs list for practice",
         "accessible_description": "",
+        "labelledby": null,
+        "describedby": null,
         "aria_label": ""
       },
       "interactivity": {
@@ -308,7 +311,11 @@
       "locators": {
         "priority_1_role": "button[name='Test Cases']",
         "priority_2_label": "label:has-text('Test Cases')",
-        "priority_4_text": ":text('Test Cases')"
+        "priority_3_placeholder": null,
+        "priority_4_text": ":text('Test Cases')",
+        "priority_5_testid": null,
+        "priority_6_css": null,
+        "priority_7_xpath": null
       },
       "locator_confidence": {
         "priority_1_role": 0.95,
@@ -323,6 +330,8 @@
         "role": "button",
         "accessible_name": "Test Cases",
         "accessible_description": "",
+        "labelledby": null,
+        "describedby": null,
         "aria_label": ""
       },
       "interactivity": {
@@ -365,7 +374,11 @@
       "locators": {
         "priority_1_role": "button[name='APIs list for practice']",
         "priority_2_label": "label:has-text('APIs list for practice')",
-        "priority_4_text": ":text('APIs list for practice')"
+        "priority_3_placeholder": null,
+        "priority_4_text": ":text('APIs list for practice')",
+        "priority_5_testid": null,
+        "priority_6_css": null,
+        "priority_7_xpath": null
       },
       "locator_confidence": {
         "priority_1_role": 0.95,
@@ -380,6 +393,8 @@
         "role": "button",
         "accessible_name": "APIs list for practice",
         "accessible_description": "",
+        "labelledby": null,
+        "describedby": null,
         "aria_label": ""
       },
       "interactivity": {
@@ -422,7 +437,11 @@
       "locators": {
         "priority_1_role": "button[name='Continue Shopping']",
         "priority_2_label": "label:has-text('Continue Shopping')",
-        "priority_4_text": ":text('Continue Shopping')"
+        "priority_3_placeholder": null,
+        "priority_4_text": ":text('Continue Shopping')",
+        "priority_5_testid": null,
+        "priority_6_css": null,
+        "priority_7_xpath": null
       },
       "locator_confidence": {
         "priority_1_role": 0.95,
@@ -437,6 +456,8 @@
         "role": "button",
         "accessible_name": "Continue Shopping",
         "accessible_description": "",
+        "labelledby": null,
+        "describedby": null,
         "aria_label": ""
       },
       "interactivity": {
@@ -477,7 +498,13 @@
       "visible": true,
       "enabled": true,
       "locators": {
-        "priority_1_role": "button"
+        "priority_1_role": "button",
+        "priority_2_label": null,
+        "priority_3_placeholder": null,
+        "priority_4_text": null,
+        "priority_5_testid": null,
+        "priority_6_css": null,
+        "priority_7_xpath": null
       },
       "locator_confidence": {
         "priority_1_role": 0.95,
@@ -492,6 +519,8 @@
         "role": "button",
         "accessible_name": "",
         "accessible_description": "",
+        "labelledby": null,
+        "describedby": null,
         "aria_label": ""
       },
       "interactivity": {
@@ -524,10 +553,10 @@
   ],
   "validation_checkpoints": [],
   "exploration_statistics": {
-    "total_time_seconds": 68.30305969999972,
+    "total_time_seconds": 82.6464122000034,
     "screenshots_taken": 0,
-    "tokens_used_accessibility_tree": 4624,
-    "tokens_estimate_full_dom": 46240,
+    "tokens_used_accessibility_tree": 2940,
+    "tokens_estimate_full_dom": 29400,
     "efficiency_ratio": 10.0,
     "elements_discovered": 8,
     "elements_with_multiple_locators": 8,

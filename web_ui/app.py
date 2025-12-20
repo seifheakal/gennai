@@ -128,93 +128,189 @@ def run_full_pipeline(url: str):
 
 def run_phase1(url: str, output_dir: Path):
     """Run Phase 1: Web Exploration"""
-    from phase1_main import main as phase1_main
-    from phase1_config import ExplorationConfig, DEFAULT_CONFIG
-    from phase1_accessibility_parser import parse_accessibility_tree
+    # Change to phase1 directory
+    import os
+    project_root = Path(__file__).parent.parent
+    phase1_dir = project_root / 'phase1'
+    original_dir = os.getcwd()
+    os.chdir(phase1_dir)
     
-    config = ExplorationConfig(
-        headless=True,
-        max_depth=2,
-        max_states=10,
-        enable_crawling=True
-    )
-    
-    # Run exploration
-    result = asyncio.run(parse_accessibility_tree(url, config))
-    
-    # Save output
-    output_file = output_dir / "phase1_output.json"
-    with open(output_file, 'w') as f:
-        json.dump(result.model_dump(), f, indent=2, default=str)
-    
-    return {
-        "status": "complete",
-        "url": url,
-        "states_discovered": result.total_states_discovered,
-        "elements_found": result.total_elements,
-        "coverage": f"{result.coverage_percentage * 100:.1f}%",
-        "time_seconds": result.exploration_statistics.total_time_seconds,
-        "output_file": str(output_file)
-    }
+    try:
+        sys.path.insert(0, str(phase1_dir))
+        from phase1_config import create_custom_config
+        from phase1_accessibility_parser import parse_accessibility_tree
+        from phase1_formatter import OutputFormatter
+        
+        # Configure with increased timeout for slow websites
+        config = create_custom_config(
+            timeout_seconds=60,  # Increase to 60 seconds
+            headless=True,
+            coverage_threshold=0.85,
+            max_states=10,
+            validation_level="moderate"
+        )
+        
+        # Run exploration (async)
+        result = asyncio.run(parse_accessibility_tree(url, config))
+        
+        # Save output
+        output_file = phase1_dir / 'phase1_output.json'
+        with open(output_file, 'w', encoding='utf-8') as f:
+            json.dump(result.model_dump(), f, indent=2, default=str)
+        
+        # Copy output to web_ui outputs dir
+        import shutil
+        output_dir.mkdir(parents=True, exist_ok=True)
+        shutil.copy(output_file, output_dir / 'phase1_output.json')
+        
+        # Parse result
+        with open(phase1_dir / 'phase1_output.json', 'r') as f:
+            data = json.load(f)
+        
+        return {
+            "status": "complete",
+            "url": url,
+            "states_discovered": data.get('total_states_discovered', 0),
+            "elements_found": data.get('total_elements', 0),
+            "coverage": f"{data.get('coverage_percentage', 0) * 100:.1f}%",
+            "time_seconds": data.get('exploration_statistics', {}).get('total_time_seconds', 0),
+            "output_file": str(output_dir / 'phase1_output.json')
+        }
+    finally:
+        os.chdir(original_dir)
 
 def run_phase2(phase1_file: Path, output_dir: Path):
     """Run Phase 2: Test Generation"""
-    from phase2_main import Phase2Orchestrator
+    # Change to phase2 directory
+    import os
+    project_root = Path(__file__).parent.parent
+    phase2_dir = project_root / 'phase2'
+    original_dir = os.getcwd()
+    os.chdir(phase2_dir)
     
-    orchestrator = Phase2Orchestrator(str(phase1_file.parent))
-    result = orchestrator.run_full_pipeline(
-        target_coverage=85.0,
-        hitl_rounds=2,
-        output_dir=str(output_dir)
-    )
-    
-    return {
-        "status": "complete",
-        "total_tests": result["metrics"]["total_tests"],
-        "coverage": result["metrics"]["blended_coverage"],
-        "element_coverage": result["metrics"]["element_coverage"],
-        "hitl_approval": result["metrics"]["hitl_approval_rate"],
-        "coverage_target_met": result["metrics"]["coverage_target_met"]
-    }
+    try:
+        sys.path.insert(0, str(phase2_dir))
+        from phase2_main import main as phase2_main
+        
+        # Copy phase1 output to phase2 directory
+        import shutil
+        shutil.copy(phase1_file, phase2_dir / 'phase1_output.json')
+        
+        # Run phase2
+        phase2_main()
+        
+        # Copy results back
+        output_dir.mkdir(parents=True, exist_ok=True)
+        shutil.copy(phase2_dir / 'phase2_test_cases.json', output_dir / 'phase2_test_cases.json')
+        shutil.copy(phase2_dir / 'phase2_coverage_metrics.json', output_dir / 'phase2_coverage_metrics.json')
+        
+        # Parse results
+        with open(phase2_dir / 'phase2_coverage_metrics.json', 'r') as f:
+            metrics = json.load(f)
+        
+        return {
+            "status": "complete",
+            "total_tests": metrics.get('total_tests', 0),
+            "coverage": f"{metrics.get('blended_coverage', 0):.1f}%",
+            "element_coverage": f"{metrics.get('element_coverage', 0):.1f}%",
+            "hitl_approval": f"{metrics.get('hitl_approval_rate', 0):.1f}%",
+            "coverage_target_met": metrics.get('coverage_target_met', False)
+        }
+    finally:
+        os.chdir(original_dir)
 
 def run_phase3(phase2_dir: Path, output_dir: Path):
     """Run Phase 3: Code Generation"""
-    from phase3_main import Phase3Orchestrator
+    # Change to phase3 directory
+    import os
+    project_root = Path(__file__).parent.parent
+    phase3_dir = project_root / 'phase3'
+    original_dir = os.getcwd()
+    os.chdir(phase3_dir)
     
-    orchestrator = Phase3Orchestrator(str(phase2_dir), str(output_dir))
-    result = orchestrator.run_full_pipeline(
-        framework="pytest",
-        language="python",
-        browsers=["chrome"],
-        parallel_workers=1
-    )
-    
-    return {
-        "status": "complete",
-        "tests_generated": result["layers"]["layer_1"]["tests_generated"],
-        "page_objects": result["layers"]["layer_2"].get("page_objects_generated", 0),
-        "framework": "pytest",
-        "output_dir": str(output_dir)
-    }
+    try:
+        sys.path.insert(0, str(phase3_dir))
+        from phase3_main import main as phase3_main
+        
+        # Copy phase2 outputs
+        import shutil
+        shutil.copy(phase2_dir / 'phase2_test_cases.json', phase3_dir / 'phase2_test_cases.json')
+        shutil.copy(phase2_dir / 'phase1_output.json', phase3_dir / 'phase1_output.json')
+        
+        # Run phase3
+        phase3_main()
+        
+        # Copy results back
+        output_dir.mkdir(parents=True, exist_ok=True)
+        if (phase3_dir / 'phase3_outputs').exists():
+            shutil.copytree(phase3_dir / 'phase3_outputs', output_dir / 'phase3_outputs', dirs_exist_ok=True)
+        
+        # Count generated files
+        test_files = list((phase3_dir / 'phase3_outputs' / 'tests').glob('test_*.py')) if (phase3_dir / 'phase3_outputs' / 'tests').exists() else []
+        page_objects = list((phase3_dir / 'phase3_outputs' / 'pages').glob('*_page.py')) if (phase3_dir / 'phase3_outputs' / 'pages').exists() else []
+        
+        return {
+            "status": "complete",
+            "tests_generated": len(test_files),
+            "page_objects": len(page_objects),
+            "framework": "pytest",
+            "output_dir": str(output_dir / 'phase3_outputs')
+        }
+    finally:
+        os.chdir(original_dir)
 
 def run_phase4(test_dir: Path, output_dir: Path):
     """Run Phase 4: Test Execution"""
-    from phase4_main import Phase4Orchestrator
+    # Change to phase4 directory
+    import os
+    project_root = Path(__file__).parent.parent
+    phase4_dir = project_root / 'phase4'
+    original_dir = os.getcwd()
+    os.chdir(phase4_dir)
     
-    orchestrator = Phase4Orchestrator(str(test_dir), str(output_dir))
-    result = orchestrator.run_full_pipeline(
-        execution_type="all",
-        parallel_workers=1
-    )
-    
-    return {
-        "status": "complete",
-        "tests_executed": result.get("total_tests", 0),
-        "passed": result.get("passed", 0),
-        "failed": result.get("failed", 0),
-        "pass_rate": result.get("pass_rate", 0),
-        "duration": result.get("duration", 0)
-    }
+    try:
+        sys.path.insert(0, str(phase4_dir))
+        from phase4_main import main as phase4_main
+        
+        # Copy phase3 outputs
+        import shutil
+        if (test_dir / 'tests').exists():
+            shutil.copytree(test_dir / 'tests', phase4_dir / 'tests', dirs_exist_ok=True)
+        
+        # Run phase4
+        phase4_main()
+        
+        # Copy results back
+        output_dir.mkdir(parents=True, exist_ok=True)
+        if (phase4_dir / 'phase4_output').exists():
+            shutil.copytree(phase4_dir / 'phase4_output', output_dir / 'phase4_output', dirs_exist_ok=True)
+        
+        # Parse dashboard for metrics
+        dashboard_file = phase4_dir / 'phase4_output' / 'dashboard.html'
+        if dashboard_file.exists():
+            # Simple HTML parsing for metrics
+            import re
+            with open(dashboard_file, 'r') as f:
+                html = f.read()
+            
+            # Extract basic metrics from dashboard
+            passed = int(re.search(r'Passed:\s*(\d+)', html).group(1)) if re.search(r'Passed:\s*(\d+)', html) else 0
+            failed = int(re.search(r'Failed:\s*(\d+)', html).group(1)) if re.search(r'Failed:\s*(\d+)', html) else 0
+            total = passed + failed
+            pass_rate = (passed / total * 100) if total > 0 else 0
+        else:
+            passed = failed = total = pass_rate = 0
+        
+        return {
+            "status": "complete",
+            "tests_executed": total,
+            "passed": passed,
+            "failed": failed,
+            "pass_rate": pass_rate,
+            "duration": 0
+        }
+    finally:
+        os.chdir(original_dir)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True, threaded=True)
