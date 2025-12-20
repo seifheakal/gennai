@@ -1,0 +1,23 @@
+{
+  "total_rounds": 2,
+  "rounds": [
+    {
+      "round": 1,
+      "tests_presented": 8,
+      "approval_rate": 0.875,
+      "patterns_learned": []
+    },
+    {
+      "round": 2,
+      "tests_presented": 8,
+      "approval_rate": 0.75,
+      "patterns_learned": [
+        "weak_feedback_needs_improvement"
+      ]
+    }
+  ],
+  "overall_approval": 0.8125,
+  "improvements": [
+    "Learned new patterns: ['weak_feedback_needs_improvement']"
+  ]
+}

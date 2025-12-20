@@ -67,8 +67,8 @@ class Phase1Parser:
 
         Handles flexible Phase 1 JSON format.
         """
-        # Extract top-level fields
-        url = raw_data.get("url", "")
+        # Extract top-level fields - handle both 'url' and 'page_url'
+        url = raw_data.get("url") or raw_data.get("page_url", "")
         total_elements = raw_data.get("total_elements", 0)
         exploration_time_ms = raw_data.get("exploration_time_ms")
 
@@ -98,24 +98,24 @@ class Phase1Parser:
 
     def _parse_element(self, elem_data: dict) -> Element:
         """Parse single element from Phase 1 data"""
-        # Parse locators
+        # Parse locators - handle both priority_X and pX formats
         locators_data = elem_data.get("locators", {})
         locators = Locator(
-            p1_role=locators_data.get("p1_role"),
-            p2_label=locators_data.get("p2_label"),
-            p3_testid=locators_data.get("p3_testid"),
-            p4_css=locators_data.get("p4_css"),
-            p5_xpath=locators_data.get("p5_xpath"),
+            p1_role=locators_data.get("p1_role") or locators_data.get("priority_1_role"),
+            p2_label=locators_data.get("p2_label") or locators_data.get("priority_2_label"),
+            p3_testid=locators_data.get("p3_testid") or locators_data.get("priority_3_placeholder") or locators_data.get("priority_5_testid"),
+            p4_css=locators_data.get("p4_css") or locators_data.get("priority_4_text") or locators_data.get("priority_6_css"),
+            p5_xpath=locators_data.get("p5_xpath") or locators_data.get("priority_7_xpath"),
         )
 
-        # Parse confidence scores
+        # Parse confidence scores - handle both formats
         confidence_data = elem_data.get("locator_confidence", {})
         locator_confidence = LocatorConfidence(
-            p1_role=confidence_data.get("p1_role"),
-            p2_label=confidence_data.get("p2_label"),
-            p3_testid=confidence_data.get("p3_testid"),
-            p4_css=confidence_data.get("p4_css"),
-            p5_xpath=confidence_data.get("p5_xpath"),
+            p1_role=confidence_data.get("p1_role") or confidence_data.get("priority_1_role"),
+            p2_label=confidence_data.get("p2_label") or confidence_data.get("priority_2_label"),
+            p3_testid=confidence_data.get("p3_testid") or confidence_data.get("priority_3_placeholder") or confidence_data.get("priority_5_testid"),
+            p4_css=confidence_data.get("p4_css") or confidence_data.get("priority_4_text") or confidence_data.get("priority_6_css"),
+            p5_xpath=confidence_data.get("p5_xpath") or confidence_data.get("priority_7_xpath"),
         )
 
         # Parse constraints

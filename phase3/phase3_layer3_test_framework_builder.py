@@ -402,7 +402,7 @@ allure-pytest==2.13.2
 
         for file_name, content in files.items():
             file_path = output_path / file_name
-            file_path.write_text(content)
+            file_path.write_text(content, encoding='utf-8')
             print(f"✅ Created: {file_path}")
 
         # Create directories

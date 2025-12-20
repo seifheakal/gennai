@@ -3,6 +3,12 @@ Phase 3: Layer 2 - Page Object Model Generator
 Generates Page Object classes from Phase 1 elements
 """
 
+import sys
+from pathlib import Path
+
+# Add phase2 directory to path
+sys.path.insert(0, str(Path(__file__).parent.parent / "phase2"))
+
 from typing import Dict, List
 from phase2_phase1_parser import Phase1Parser
 

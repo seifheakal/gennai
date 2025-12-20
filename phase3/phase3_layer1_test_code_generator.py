@@ -3,8 +3,13 @@ Phase 3: Layer 1 - Test Code Generator
 Converts Phase 2 JSON test cases into executable Selenium + Python tests
 """
 
-from typing import Dict, List, Tuple, Optional
+import sys
 from pathlib import Path
+
+# Add phase2 directory to path
+sys.path.insert(0, str(Path(__file__).parent.parent / "phase2"))
+
+from typing import Dict, List, Tuple, Optional
 import json
 from phase2_models import TestCase, TestStep
 

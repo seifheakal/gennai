@@ -3,8 +3,13 @@ Phase 3: Main Orchestrator
 Coordinates all 7 layers for complete test code generation
 """
 
-import json
+import sys
 from pathlib import Path
+
+# Add parent directory to path so we can import from phase2
+sys.path.insert(0, str(Path(__file__).parent.parent / "phase2"))
+
+import json
 from typing import Dict, Optional
 from datetime import datetime
 
@@ -33,9 +38,21 @@ class Phase3Orchestrator:
         self.timestamp = datetime.now().isoformat()
 
         # Load Phase 2 outputs
-        self.test_cases = self._load_json("test_cases.json")
-        self.coverage_metrics = self._load_json("coverage_metrics.json")
-        self.phase1_parser = None  # Would be loaded from Phase 1
+        self.test_cases = self._load_json("phase2_test_cases.json")
+        self.coverage_metrics = self._load_json("phase2_coverage_metrics.json")
+        
+        # Try to load Phase 1 output if available
+        self.phase1_output = self._load_json("../phase1/phase1_output.json")
+        self.phase1_parser = None
+        if self.phase1_output:
+            try:
+                from phase2_phase1_parser import Phase1Parser
+                phase1_path = self.phase2_dir.parent / "phase1" / "phase1_output.json"
+                if phase1_path.exists():
+                    self.phase1_parser = Phase1Parser(str(phase1_path))
+                    self.phase1_parser.parse()
+            except Exception as e:
+                print(f"⚠️  Could not load Phase 1 parser: {e}")
 
     def _load_json(self, filename: str) -> Dict:
         """Load JSON file from Phase 2 outputs"""
@@ -129,7 +146,7 @@ class Phase3Orchestrator:
         """Run Layer 1: Test Code Generator"""
         print("✓ Initializing test code generator...")
         generator = TestCodeGenerator(
-            str(self.phase2_dir / "test_cases.json"),
+            str(self.phase2_dir / "phase2_test_cases.json"),
             framework=framework.lower(),
             language=language
         )
@@ -152,7 +169,16 @@ class Phase3Orchestrator:
     def _run_layer_2(self, language: str) -> Dict:
         """Run Layer 2: Page Object Model Generator"""
         print("✓ Initializing POM generator...")
-        # In real scenario, would use actual Phase1Parser
+        
+        # Skip if no Phase 1 parser available
+        if not self.phase1_parser:
+            print("⚠️  Skipping Layer 2: Phase 1 parser not available")
+            return {
+                "status": "skipped",
+                "reason": "Phase 1 parser not loaded",
+                "page_objects_generated": 0
+            }
+        
         generator = PageObjectGenerator(self.phase1_parser, language)
 
         print("✓ Generating page objects...")

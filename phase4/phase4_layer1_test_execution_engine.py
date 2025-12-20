@@ -156,7 +156,7 @@ class TestExecutionEngine:
 
         try:
             cmd = [
-                "pytest",
+                "python", "-m", "pytest",
                 str(self.test_dir),
                 "-v",
                 "--tb=short",
