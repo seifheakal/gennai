@@ -30,11 +30,24 @@ class ExplorationConfig:
     coverage_threshold: float = 0.85
     """Stop exploration when 85% of elements discovered"""
     
-    max_states: int = 20
-    """Maximum state graph nodes before stopping"""
+    max_states: int = 10
+    """Maximum state graph nodes before stopping (conservative for crawling)"""
+    
+    max_depth: int = 2
+    """Maximum crawl depth from initial page"""
     
     exploration_depth: Literal["dynamic", "shallow", "deep"] = "dynamic"
     """Exploration strategy: dynamic (adjust based on findings) | shallow | deep"""
+    
+    # Crawler Settings
+    enable_crawling: bool = True
+    """Enable multi-page crawling (BFS exploration)"""
+    
+    wait_after_click_ms: int = 2000
+    """Wait time after clicking element (for page settle)"""
+    
+    same_page_threshold: float = 0.8
+    """DOM similarity threshold to consider same state (0-1)"""
     
     # Timeouts & Performance
     timeout_seconds: int = 120

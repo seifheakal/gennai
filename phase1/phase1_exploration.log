@@ -1,0 +1,35 @@
+2025-12-20 16:31:24 - phase1_accessibility_parser.AccessibilityParser - INFO - Navigating to: https://automationexercise.com/
+2025-12-20 16:31:37 - phase1_accessibility_parser.AccessibilityParser - INFO - STEP 1: Parsing accessibility tree (Layer A)
+2025-12-20 16:31:37 - phase1_accessibility_parser.AccessibilityParser - ERROR - Accessibility tree parsing failed: 'Page' object has no attribute 'accessibility'
+2025-12-20 16:32:32 - phase1_accessibility_parser.AccessibilityParser - INFO - Navigating to: https://automationexercise.com/
+2025-12-20 16:32:38 - phase1_accessibility_parser.AccessibilityParser - INFO - STEP 1: Parsing accessibility tree (Layer A)
+2025-12-20 16:32:38 - phase1_accessibility_parser.AccessibilityParser - INFO - STEP 2: Extracting interactive elements from tree
+2025-12-20 16:32:38 - phase1_accessibility_parser.AccessibilityParser - INFO - STEP 3: Generating locators for 8 elements
+2025-12-20 16:32:38 - phase1_accessibility_parser.AccessibilityParser - INFO - STEP 4: Building exploration state graph
+2025-12-20 16:32:38 - phase1_accessibility_parser.AccessibilityParser - INFO - STEP 5: Formatting output
+2025-12-20 18:07:27 - phase1_accessibility_parser.AccessibilityParser - INFO - BFS starting: max_depth=2, max_states=20
+2025-12-20 18:07:27 - phase1_accessibility_parser.AccessibilityParser - INFO - Navigating to: https://automationexercise.com/
+2025-12-20 18:07:39 - phase1_accessibility_parser.AccessibilityParser - INFO - STEP 1: Parsing accessibility tree (Layer A)
+2025-12-20 18:07:39 - phase1_accessibility_parser.AccessibilityParser - INFO - STEP 2: Extracting interactive elements from tree
+2025-12-20 18:07:39 - phase1_accessibility_parser.AccessibilityParser - INFO - STEP 3: Generating locators for 8 elements
+2025-12-20 18:08:33 - phase1_accessibility_parser.AccessibilityParser - INFO - Navigating to: https://automationexercise.com/test_cases
+2025-12-20 18:08:36 - phase1_accessibility_parser.AccessibilityParser - INFO - STEP 1: Parsing accessibility tree (Layer A)
+2025-12-20 18:08:36 - phase1_accessibility_parser.AccessibilityParser - INFO - STEP 2: Extracting interactive elements from tree
+2025-12-20 18:08:36 - phase1_accessibility_parser.AccessibilityParser - INFO - STEP 3: Generating locators for 1 elements
+2025-12-20 18:08:38 - phase1_accessibility_parser.AccessibilityParser - INFO - Navigating to: https://automationexercise.com/api_list
+2025-12-20 18:08:40 - phase1_accessibility_parser.AccessibilityParser - INFO - STEP 1: Parsing accessibility tree (Layer A)
+2025-12-20 18:08:40 - phase1_accessibility_parser.AccessibilityParser - INFO - STEP 2: Extracting interactive elements from tree
+2025-12-20 18:08:40 - phase1_accessibility_parser.AccessibilityParser - INFO - STEP 3: Generating locators for 1 elements
+2025-12-20 18:09:33 - phase1_accessibility_parser.AccessibilityParser - INFO - BFS starting: max_depth=2, max_states=20
+2025-12-20 18:09:33 - phase1_accessibility_parser.AccessibilityParser - INFO - Navigating to: https://automationexercise.com/
+2025-12-20 18:09:38 - phase1_accessibility_parser.AccessibilityParser - INFO - STEP 1: Parsing accessibility tree (Layer A)
+2025-12-20 18:09:39 - phase1_accessibility_parser.AccessibilityParser - INFO - STEP 2: Extracting interactive elements from tree
+2025-12-20 18:09:39 - phase1_accessibility_parser.AccessibilityParser - INFO - STEP 3: Generating locators for 8 elements
+2025-12-20 18:10:30 - phase1_accessibility_parser.AccessibilityParser - INFO - Navigating to: https://automationexercise.com/test_cases
+2025-12-20 18:10:33 - phase1_accessibility_parser.AccessibilityParser - INFO - STEP 1: Parsing accessibility tree (Layer A)
+2025-12-20 18:10:33 - phase1_accessibility_parser.AccessibilityParser - INFO - STEP 2: Extracting interactive elements from tree
+2025-12-20 18:10:33 - phase1_accessibility_parser.AccessibilityParser - INFO - STEP 3: Generating locators for 1 elements
+2025-12-20 18:10:35 - phase1_accessibility_parser.AccessibilityParser - INFO - Navigating to: https://automationexercise.com/api_list
+2025-12-20 18:10:39 - phase1_accessibility_parser.AccessibilityParser - INFO - STEP 1: Parsing accessibility tree (Layer A)
+2025-12-20 18:10:39 - phase1_accessibility_parser.AccessibilityParser - INFO - STEP 2: Extracting interactive elements from tree
+2025-12-20 18:10:39 - phase1_accessibility_parser.AccessibilityParser - INFO - STEP 3: Generating locators for 1 elements

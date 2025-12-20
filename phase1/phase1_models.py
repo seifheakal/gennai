@@ -13,6 +13,30 @@ __version__ = "1.0.0"
 
 
 # ============================================================================
+# PAGE STATE MODEL (for crawler)
+# ============================================================================
+
+class PageState(BaseModel):
+    """Represents a discovered page state during crawling."""
+    
+    state_id: str = Field(..., description="Unique state identifier")
+    url: str = Field(..., description="URL of this state")
+    depth: int = Field(0, description="Depth from initial page")
+    timestamp: float = Field(0.0, description="Discovery timestamp")
+    parent_state_id: Optional[str] = Field(None, description="Parent state that led here")
+    via_element_id: Optional[str] = Field(None, description="Element clicked to reach this state")
+
+
+class ExplorationEdge(BaseModel):
+    """Represents a transition between states."""
+    
+    from_state_id: str = Field(..., description="Source state")
+    to_state_id: str = Field(..., description="Destination state")
+    via_element_id: str = Field(..., description="Element that triggered transition")
+    action: str = Field("click", description="Action performed (click, navigate, etc.)")
+
+
+# ============================================================================
 # ARIA STATE MODELS
 # ============================================================================
 
