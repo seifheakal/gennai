@@ -2,10 +2,10 @@
 # Requirements for dependency installation
 
 # Web Automation
-playwright==1.48.2
+playwright==1.48.0
 
 # Data Validation & Schema
-pydantic==2.5.3
+pydantic>=2.10.3
 pydantic-settings==2.1.0
 
 # Logging
