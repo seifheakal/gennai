@@ -64,43 +64,43 @@ class Phase2Orchestrator:
             Dictionary with pipeline results
         """
         print("\n" + "=" * 80)
-        print("🚀 PHASE 2: COLLABORATIVE TEST DESIGN & GENERATION")
+        print("[PHASE 2] COLLABORATIVE TEST DESIGN & GENERATION")
         print("=" * 80)
 
         try:
             # LAYER 1: Parse Phase 1
-            print("\n📍 LAYER 1: Parsing Phase 1 Output...")
+            print("\n[LAYER] LAYER 1: Parsing Phase 1 Output...")
             self._layer_1_parse()
 
             # LAYER 2: Generate Tests
-            print("\n📍 LAYER 2: Generating Test Cases...")
+            print("\n[LAYER] LAYER 2: Generating Test Cases...")
             self._layer_2_generate(target_coverage)
 
             # LAYER 3: Calculate Coverage
-            print("\n📍 LAYER 3: Calculating Coverage...")
+            print("\n[LAYER] LAYER 3: Calculating Coverage...")
             self._layer_3_calculate_coverage()
 
             # LAYER 4: Visualize
-            print("\n📍 LAYER 4: Generating Visualization...")
+            print("\n[LAYER] LAYER 4: Generating Visualization...")
             self._layer_4_visualize()
 
             # LAYER 5: HITL Loop
-            print("\n📍 LAYER 5: Running HITL 2.0 Feedback Loop...")
+            print("\n[LAYER] LAYER 5: Running HITL 2.0 Feedback Loop...")
             self._layer_5_hitl(hitl_rounds)
 
             # Save Outputs
-            print("\n📍 Saving Outputs...")
+            print("\n[LAYER] Saving Outputs...")
             self._save_outputs(output_dir)
 
             # Summary
             print("\n" + "=" * 80)
-            print("✅ PHASE 2 COMPLETE")
+            print("[OK] PHASE 2 COMPLETE")
             print("=" * 80)
 
             return self._generate_summary()
 
         except Exception as e:
-            print(f"\n❌ ERROR: {e}")
+            print(f"\n[ERROR] ERROR: {e}")
             raise
 
     def _layer_1_parse(self):
@@ -108,7 +108,7 @@ class Phase2Orchestrator:
         self.parser = Phase1Parser(self.phase1_json_path)
         phase1 = self.parser.parse()
 
-        print(f"  ✅ Parsed Phase 1 output")
+        print(f"  [OK] Parsed Phase 1 output")
         print(f"     URL: {phase1.url}")
         print(f"     Elements: {len(phase1.interactive_elements)}")
         print(f"     Workflows: {len(self.parser.get_workflows())}")
@@ -127,7 +127,7 @@ class Phase2Orchestrator:
         )
 
         stats = self.generator.get_algorithm_stats(self.test_cases)
-        print(f"  ✅ Generated {len(self.test_cases)} test cases")
+        print(f"  [OK] Generated {len(self.test_cases)} test cases")
         print(f"     EP tests: {stats['ep_tests']} ({stats['ep_percentage']:.1f}%)")
         print(f"     BVA tests: {stats['bva_tests']} ({stats['bva_percentage']:.1f}%)")
         print(f"     State tests: {stats['state_tests']} ({stats['state_percentage']:.1f}%)")
@@ -139,7 +139,7 @@ class Phase2Orchestrator:
         print(f"     Hallucination rate: {result['hallucination_rate']:.1%}")
 
         if result['hallucination_rate'] > 0:
-            print(f"     ⚠️  WARNING: Found hallucinations!")
+            print(f"     [WARN]  WARNING: Found hallucinations!")
 
     def _layer_3_calculate_coverage(self):
         """Layer 3: Calculate coverage metrics"""
@@ -147,7 +147,7 @@ class Phase2Orchestrator:
         self.coverage_metrics = calculator.calculate_coverage()
 
         summary = calculator.get_coverage_summary()
-        print(f"  ✅ Coverage calculated")
+        print(f"  [OK] Coverage calculated")
         print(f"     Element coverage: {summary['element_coverage']}")
         print(f"     Path coverage: {summary['path_coverage']}")
         print(f"     Scenario coverage: {summary['scenario_coverage']}")
@@ -165,7 +165,7 @@ class Phase2Orchestrator:
         self.heatmap_data = visualizer.generate_heatmap_data()
 
         quality_score = visualizer.get_quality_score()
-        print(f"  ✅ Visualization generated")
+        print(f"  [OK] Visualization generated")
         print(f"     Quality score: {quality_score:.1f}/100")
         print(f"     Elements: {len(self.heatmap_data['elements'])}")
 
@@ -179,7 +179,7 @@ class Phase2Orchestrator:
         self.hitl_manager = HITLManager(self.generator, self.parser)
         self.hitl_result = self.hitl_manager.run_hitl_loop(rounds=rounds)
 
-        print(f"  ✅ HITL 2.0 loop complete")
+        print(f"  [OK] HITL 2.0 loop complete")
         print(f"     Rounds: {len(self.hitl_result.feedback_rounds)}")
         print(f"     Overall approval: {self.hitl_result.overall_approval_rate:.1%}")
 
@@ -211,19 +211,19 @@ class Phase2Orchestrator:
         test_file = output_path / "phase2_test_cases.json"
         with open(test_file, "w") as f:
             json.dump(test_cases_dict, f, indent=2)
-        print(f"  💾 Saved: {test_file}")
+        print(f"  [SAVE] Saved: {test_file}")
 
         # Save coverage metrics
         coverage_file = output_path / "phase2_coverage_metrics.json"
         with open(coverage_file, "w") as f:
             json.dump(self.coverage_metrics.model_dump(), f, indent=2)
-        print(f"  💾 Saved: {coverage_file}")
+        print(f"  [SAVE] Saved: {coverage_file}")
 
         # Save heatmap
         heatmap_file = output_path / "phase2_coverage_heatmap.json"
         with open(heatmap_file, "w") as f:
             json.dump(self.heatmap_data, f, indent=2, default=str)
-        print(f"  💾 Saved: {heatmap_file}")
+        print(f"  [SAVE] Saved: {heatmap_file}")
 
         # Save HITL feedback
         feedback_file = output_path / "phase2_feedback_logs.json"
@@ -244,7 +244,7 @@ class Phase2Orchestrator:
 
         with open(feedback_file, "w") as f:
             json.dump(feedback_dict, f, indent=2)
-        print(f"  💾 Saved: {feedback_file}")
+        print(f"  [SAVE] Saved: {feedback_file}")
 
     def _generate_summary(self) -> dict:
         """Generate summary of Phase 2 results"""
@@ -289,7 +289,7 @@ def main():
         output_dir=output_dir,
     )
 
-    print("\n🎉 Summary:")
+    print("\n[SUMMARY] Summary:")
     print(json.dumps(result, indent=2))
 
 

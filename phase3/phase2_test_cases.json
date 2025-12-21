@@ -1,0 +1,290 @@
+{
+  "metadata": {
+    "phase": 2,
+    "version": "1.0",
+    "generated_timestamp": "2025-12-20T18:31:22.344686",
+    "total_tests": 8
+  },
+  "tests": [
+    {
+      "test_id": "test_001",
+      "title": "Test Cases - enabled state",
+      "description": "Verify Test Cases is enabled and clickable",
+      "priority": "high",
+      "algorithm_used": "ep",
+      "elements_used": [
+        "elem_001"
+      ],
+      "test_steps": [
+        {
+          "step_number": 1,
+          "action": "Click Test Cases",
+          "element_id": "elem_001",
+          "element_label": "Test Cases",
+          "element_type": "button",
+          "locator": "button[name='Test Cases']",
+          "locator_strategy": "p1_role",
+          "locator_confidence": 0.95,
+          "input_value": null,
+          "validation": {
+            "type": "element_state",
+            "expected": "Button is enabled"
+          }
+        }
+      ],
+      "expected_result": "Button responds to click",
+      "edge_cases_covered": [
+        "enabled"
+      ],
+      "coverage_contribution": 1.0,
+      "importance_score": 0.9,
+      "risk_level": "medium",
+      "priority_score": 0.48249999999999993
+    },
+    {
+      "test_id": "test_002",
+      "title": "APIs list for practice - enabled state",
+      "description": "Verify APIs list for practice is enabled and clickable",
+      "priority": "high",
+      "algorithm_used": "ep",
+      "elements_used": [
+        "elem_002"
+      ],
+      "test_steps": [
+        {
+          "step_number": 1,
+          "action": "Click APIs list for practice",
+          "element_id": "elem_002",
+          "element_label": "APIs list for practice",
+          "element_type": "button",
+          "locator": "button[name='APIs list for practice']",
+          "locator_strategy": "p1_role",
+          "locator_confidence": 0.95,
+          "input_value": null,
+          "validation": {
+            "type": "element_state",
+            "expected": "Button is enabled"
+          }
+        }
+      ],
+      "expected_result": "Button responds to click",
+      "edge_cases_covered": [
+        "enabled"
+      ],
+      "coverage_contribution": 1.0,
+      "importance_score": 0.9,
+      "risk_level": "medium",
+      "priority_score": 0.48249999999999993
+    },
+    {
+      "test_id": "test_003",
+      "title": "Test Cases - enabled state",
+      "description": "Verify Test Cases is enabled and clickable",
+      "priority": "high",
+      "algorithm_used": "ep",
+      "elements_used": [
+        "elem_003"
+      ],
+      "test_steps": [
+        {
+          "step_number": 1,
+          "action": "Click Test Cases",
+          "element_id": "elem_003",
+          "element_label": "Test Cases",
+          "element_type": "button",
+          "locator": "button[name='Test Cases']",
+          "locator_strategy": "p1_role",
+          "locator_confidence": 0.95,
+          "input_value": null,
+          "validation": {
+            "type": "element_state",
+            "expected": "Button is enabled"
+          }
+        }
+      ],
+      "expected_result": "Button responds to click",
+      "edge_cases_covered": [
+        "enabled"
+      ],
+      "coverage_contribution": 1.0,
+      "importance_score": 0.9,
+      "risk_level": "medium",
+      "priority_score": 0.48249999999999993
+    },
+    {
+      "test_id": "test_004",
+      "title": "APIs list for practice - enabled state",
+      "description": "Verify APIs list for practice is enabled and clickable",
+      "priority": "high",
+      "algorithm_used": "ep",
+      "elements_used": [
+        "elem_004"
+      ],
+      "test_steps": [
+        {
+          "step_number": 1,
+          "action": "Click APIs list for practice",
+          "element_id": "elem_004",
+          "element_label": "APIs list for practice",
+          "element_type": "button",
+          "locator": "button[name='APIs list for practice']",
+          "locator_strategy": "p1_role",
+          "locator_confidence": 0.95,
+          "input_value": null,
+          "validation": {
+            "type": "element_state",
+            "expected": "Button is enabled"
+          }
+        }
+      ],
+      "expected_result": "Button responds to click",
+      "edge_cases_covered": [
+        "enabled"
+      ],
+      "coverage_contribution": 1.0,
+      "importance_score": 0.9,
+      "risk_level": "medium",
+      "priority_score": 0.48249999999999993
+    },
+    {
+      "test_id": "test_005",
+      "title": "Test Cases - enabled state",
+      "description": "Verify Test Cases is enabled and clickable",
+      "priority": "high",
+      "algorithm_used": "ep",
+      "elements_used": [
+        "elem_005"
+      ],
+      "test_steps": [
+        {
+          "step_number": 1,
+          "action": "Click Test Cases",
+          "element_id": "elem_005",
+          "element_label": "Test Cases",
+          "element_type": "button",
+          "locator": "button[name='Test Cases']",
+          "locator_strategy": "p1_role",
+          "locator_confidence": 0.95,
+          "input_value": null,
+          "validation": {
+            "type": "element_state",
+            "expected": "Button is enabled"
+          }
+        }
+      ],
+      "expected_result": "Button responds to click",
+      "edge_cases_covered": [
+        "enabled"
+      ],
+      "coverage_contribution": 1.0,
+      "importance_score": 0.9,
+      "risk_level": "medium",
+      "priority_score": 0.48249999999999993
+    },
+    {
+      "test_id": "test_006",
+      "title": "APIs list for practice - enabled state",
+      "description": "Verify APIs list for practice is enabled and clickable",
+      "priority": "high",
+      "algorithm_used": "ep",
+      "elements_used": [
+        "elem_006"
+      ],
+      "test_steps": [
+        {
+          "step_number": 1,
+          "action": "Click APIs list for practice",
+          "element_id": "elem_006",
+          "element_label": "APIs list for practice",
+          "element_type": "button",
+          "locator": "button[name='APIs list for practice']",
+          "locator_strategy": "p1_role",
+          "locator_confidence": 0.95,
+          "input_value": null,
+          "validation": {
+            "type": "element_state",
+            "expected": "Button is enabled"
+          }
+        }
+      ],
+      "expected_result": "Button responds to click",
+      "edge_cases_covered": [
+        "enabled"
+      ],
+      "coverage_contribution": 1.0,
+      "importance_score": 0.9,
+      "risk_level": "medium",
+      "priority_score": 0.48249999999999993
+    },
+    {
+      "test_id": "test_007",
+      "title": "Continue Shopping - enabled state",
+      "description": "Verify Continue Shopping is enabled and clickable",
+      "priority": "high",
+      "algorithm_used": "ep",
+      "elements_used": [
+        "elem_007"
+      ],
+      "test_steps": [
+        {
+          "step_number": 1,
+          "action": "Click Continue Shopping",
+          "element_id": "elem_007",
+          "element_label": "Continue Shopping",
+          "element_type": "button",
+          "locator": "button[name='Continue Shopping']",
+          "locator_strategy": "p1_role",
+          "locator_confidence": 0.95,
+          "input_value": null,
+          "validation": {
+            "type": "element_state",
+            "expected": "Button is enabled"
+          }
+        }
+      ],
+      "expected_result": "Button responds to click",
+      "edge_cases_covered": [
+        "enabled"
+      ],
+      "coverage_contribution": 1.0,
+      "importance_score": 0.9,
+      "risk_level": "medium",
+      "priority_score": 0.48249999999999993
+    },
+    {
+      "test_id": "test_008",
+      "title": " - enabled state",
+      "description": "Verify  is enabled and clickable",
+      "priority": "high",
+      "algorithm_used": "ep",
+      "elements_used": [
+        "elem_008"
+      ],
+      "test_steps": [
+        {
+          "step_number": 1,
+          "action": "Click ",
+          "element_id": "elem_008",
+          "element_label": "",
+          "element_type": "button",
+          "locator": "button",
+          "locator_strategy": "p1_role",
+          "locator_confidence": 0.95,
+          "input_value": null,
+          "validation": {
+            "type": "element_state",
+            "expected": "Button is enabled"
+          }
+        }
+      ],
+      "expected_result": "Button responds to click",
+      "edge_cases_covered": [
+        "enabled"
+      ],
+      "coverage_contribution": 1.0,
+      "importance_score": 0.9,
+      "risk_level": "medium",
+      "priority_score": 0.48249999999999993
+    }
+  ]
+}

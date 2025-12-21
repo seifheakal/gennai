@@ -106,8 +106,8 @@ def pytest_runtest_logreport(report):
     """Log test results"""
     if report.when == "call":
         if report.outcome == "passed":
-            print(f"✅ PASSED: {report.nodeid}")
+            print(f"[PASSED] {report.nodeid}")
         elif report.outcome == "failed":
-            print(f"❌ FAILED: {report.nodeid}")
+            print(f"[FAILED] {report.nodeid}")
         elif report.outcome == "skipped":
-            print(f"⏭️  SKIPPED: {report.nodeid}")
+            print(f"[SKIPPED] {report.nodeid}")

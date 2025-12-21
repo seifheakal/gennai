@@ -173,13 +173,13 @@ async def main_async(args: argparse.Namespace) -> int:
         log_file=args.log_file if args.save_file else None
     )
     
-    print(f"🚀 Phase 1: Web Accessibility Parser v{__version__}")
+    print(f"[PHASE 1] Web Accessibility Parser v{__version__}")
     print("=" * 60)
     
     # Determine target URL
     if args.test_fixture:
         # Test mode: use fixture HTML
-        print(f"📝 Test Mode: Using fixture '{args.test_fixture}'")
+        print(f"[TEST] Using fixture '{args.test_fixture}'")
         html = get_fixture(args.test_fixture)
         
         # Load HTML into temp file and open
@@ -189,18 +189,18 @@ async def main_async(args: argparse.Namespace) -> int:
             temp_file = f.name
         
         url = f"file://{temp_file}"
-        print(f"📍 Test HTML loaded: {temp_file}")
+        print(f"[LOADED] Test HTML loaded: {temp_file}")
     
     elif args.url:
         # URL mode
         url = args.url
         if not url.startswith(("http://", "https://", "file://")):
             url = f"https://{url}"
-        print(f"📍 Target URL: {url}")
+        print(f"[URL] Target URL: {url}")
     
     else:
         # No URL and no test mode
-        print("❌ Error: Please provide a URL or use --test with a fixture name")
+        print("[ERROR] Please provide a URL or use --test with a fixture name")
         print(f"   Available fixtures: {', '.join(list_fixtures())}")
         return 1
     
@@ -215,17 +215,17 @@ async def main_async(args: argparse.Namespace) -> int:
             log_level=args.log_level,
         )
         
-        print("\n⏳ Starting exploration...")
-        print(f"⚙️  Config: timeout={args.timeout}s, headless={args.headless}, coverage={args.coverage_threshold:.1%}")
+        print("\n[STARTING] Starting exploration...")
+        print(f"[CONFIG] Config: timeout={args.timeout}s, headless={args.headless}, coverage={args.coverage_threshold:.1%}")
         
         # Run exploration
         output = await parse_accessibility_tree(url, config)
         
         # Format output
-        print("\n✅ Exploration complete!")
-        print(f"📊 Discovered {output.total_elements} interactive elements")
-        print(f"📈 Coverage: {output.coverage_percentage:.1%}")
-        print(f"⏱️  Time: {output.exploration_statistics.total_time_seconds:.2f}s")
+        print("\n[COMPLETE] Exploration complete!")
+        print(f"[STATS] Discovered {output.total_elements} interactive elements")
+        print(f"[COVERAGE] Coverage: {output.coverage_percentage:.1%}")
+        print(f"[TIME] Time: {output.exploration_statistics.total_time_seconds:.2f}s")
         
         # Display summary
         if args.output_format == "summary" or args.output_format == "pretty":
@@ -244,16 +244,16 @@ async def main_async(args: argparse.Namespace) -> int:
             with open(output_path, 'w', encoding='utf-8') as f:
                 f.write(content)
             
-            print(f"\n💾 Output saved: {output_path.absolute()}")
+            print(f"\n[SAVED] Output saved: {output_path.absolute()}")
         
         return 0
     
     except KeyboardInterrupt:
-        print("\n⚠️  Exploration cancelled by user")
+        print("\n[CANCELLED] Exploration cancelled by user")
         return 130
     
     except Exception as e:
-        print(f"\n❌ Error during exploration: {str(e)}")
+        print(f"\n[ERROR] Error during exploration: {str(e)}")
         import traceback
         traceback.print_exc()
         return 1
@@ -274,7 +274,7 @@ def main() -> int:
         exit_code = asyncio.run(main_async(args))
         return exit_code
     except KeyboardInterrupt:
-        print("\n⚠️  Interrupted by user")
+        print("\n[INTERRUPTED] Interrupted by user")
         return 130
 
 

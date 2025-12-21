@@ -67,13 +67,13 @@ class Phase4Orchestrator:
             Complete execution result with all layers
         """
         print("\n" + "=" * 80)
-        print("🚀 PHASE 4: INTELLIGENT TEST EXECUTION PLATFORM")
+        print("[PHASE] PHASE 4: INTELLIGENT TEST EXECUTION PLATFORM")
         print("=" * 80)
 
         execution_id = f"exec_{int(datetime.now().timestamp())}"
 
         # ===== LAYER 1: EXECUTE TESTS =====
-        print("\n📝 LAYER 1: Test Execution Engine")
+        print("\n[INFO] LAYER 1: Test Execution Engine")
         print("-" * 80)
 
         if execution_type == "parallel":
@@ -85,19 +85,19 @@ class Phase4Orchestrator:
                 progress_callback=progress_callback
             )
 
-        print(f"✅ Layer 1 Complete: {len(results)} tests executed")
+        print(f"[OK] Layer 1 Complete: {len(results)} tests executed")
 
         # ===== LAYER 2: COLLECT RESULTS =====
-        print("\n📊 LAYER 2: Results Collector")
+        print("\n[DATA] LAYER 2: Results Collector")
         print("-" * 80)
 
         collected = self.results_collector.collect_test_results(str(self.output_dir))
         self.results_collector.store_results(collected, str(self.output_dir))
 
-        print(f"✅ Layer 2 Complete: Results collected and stored")
+        print(f"[OK] Layer 2 Complete: Results collected and stored")
 
         # ===== LAYER 3: ANALYZE RESULTS =====
-        print("\n🔍 LAYER 3: Results Analyzer")
+        print("\n[SEARCH] LAYER 3: Results Analyzer")
         print("-" * 80)
 
         # Get historical data
@@ -110,14 +110,14 @@ class Phase4Orchestrator:
 
         self.current_analysis = analysis
 
-        print(f"✅ Layer 3 Complete: Analysis generated")
+        print(f"[OK] Layer 3 Complete: Analysis generated")
         print(f"   - Flaky tests: {len(analysis.flaky_tests)}")
         print(f"   - Regressions: {len(analysis.regressions)}")
         for insight in analysis.insights:
             print(f"   - {insight}")
 
         # ===== LAYER 4: GENERATE DASHBOARD =====
-        print("\n📈 LAYER 4: Dashboard Generator")
+        print("\n[GROWTH] LAYER 4: Dashboard Generator")
         print("-" * 80)
 
         dashboard_html = self.dashboard_gen.generate_dashboard(
@@ -127,11 +127,11 @@ class Phase4Orchestrator:
         dashboard_path = self.output_dir / "dashboard.html"
         dashboard_path.write_text(dashboard_html)
 
-        print(f"✅ Layer 4 Complete: Dashboard generated")
+        print(f"[OK] Layer 4 Complete: Dashboard generated")
         print(f"   - Path: {dashboard_path}")
 
         # ===== LAYER 5: SEND NOTIFICATIONS =====
-        print("\n🔔 LAYER 5: Notification Engine")
+        print("\n[NOTIFY] LAYER 5: Notification Engine")
         print("-" * 80)
 
         self.notification_engine.notify_completion(collected.metrics, analysis)
@@ -139,16 +139,16 @@ class Phase4Orchestrator:
         if analysis.flaky_tests:
             self.notification_engine.notify_failures(analysis.flaky_tests)
 
-        print(f"✅ Layer 5 Complete: Notifications sent")
+        print(f"[OK] Layer 5 Complete: Notifications sent")
 
         # ===== LAYER 6: STORE HISTORY =====
-        print("\n📚 LAYER 6: Historical Tracker")
+        print("\n[BOOKS] LAYER 6: Historical Tracker")
         print("-" * 80)
 
         self.history_tracker.store_result(collected)
         self.current_results = collected
 
-        print(f"✅ Layer 6 Complete: History stored in database")
+        print(f"[OK] Layer 6 Complete: History stored in database")
 
         # ===== SUMMARY =====
         summary = {
@@ -179,7 +179,7 @@ class Phase4Orchestrator:
         }
 
         print("\n" + "=" * 80)
-        print("🏆 PHASE 4 EXECUTION COMPLETE")
+        print("[TROPHY] PHASE 4 EXECUTION COMPLETE")
         print("=" * 80)
         print(f"Execution ID: {execution_id}")
         print(f"Total Tests: {collected.metrics.get('total')}")
@@ -288,7 +288,7 @@ try:
         return app
 
 except ImportError:
-    print("⚠️  Flask not installed - web service unavailable")
+    print("[WARN]  Flask not installed - web service unavailable")
     app = None
 
 
@@ -327,7 +327,7 @@ def main():
 
     if args.web_server:
         if app is None:
-            print("❌ Flask not installed. Install with: pip install flask flask-cors")
+            print("[ERROR] Flask not installed. Install with: pip install flask flask-cors")
             return 1
 
         orchestrator_instance = Phase4Orchestrator(args.test_dir)

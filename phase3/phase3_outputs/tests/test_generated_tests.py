@@ -22,7 +22,7 @@ class TestSuite(BaseTestCase):
 
         except Exception as e:
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            screenshot_path = f"test_failures/{test_id}_{timestamp}.png"
+            screenshot_path = f"test_failures/{self._testMethodName}_{timestamp}.png"
             os.makedirs(os.path.dirname(screenshot_path), exist_ok=True)
             self.driver.save_screenshot(screenshot_path)
             raise AssertionError(f"Test failed: {str(e)}")
@@ -43,7 +43,7 @@ class TestSuite(BaseTestCase):
 
         except Exception as e:
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            screenshot_path = f"test_failures/{test_id}_{timestamp}.png"
+            screenshot_path = f"test_failures/{self._testMethodName}_{timestamp}.png"
             os.makedirs(os.path.dirname(screenshot_path), exist_ok=True)
             self.driver.save_screenshot(screenshot_path)
             raise AssertionError(f"Test failed: {str(e)}")
@@ -64,7 +64,7 @@ class TestSuite(BaseTestCase):
 
         except Exception as e:
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            screenshot_path = f"test_failures/{test_id}_{timestamp}.png"
+            screenshot_path = f"test_failures/{self._testMethodName}_{timestamp}.png"
             os.makedirs(os.path.dirname(screenshot_path), exist_ok=True)
             self.driver.save_screenshot(screenshot_path)
             raise AssertionError(f"Test failed: {str(e)}")
@@ -85,7 +85,7 @@ class TestSuite(BaseTestCase):
 
         except Exception as e:
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            screenshot_path = f"test_failures/{test_id}_{timestamp}.png"
+            screenshot_path = f"test_failures/{self._testMethodName}_{timestamp}.png"
             os.makedirs(os.path.dirname(screenshot_path), exist_ok=True)
             self.driver.save_screenshot(screenshot_path)
             raise AssertionError(f"Test failed: {str(e)}")
@@ -106,7 +106,7 @@ class TestSuite(BaseTestCase):
 
         except Exception as e:
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            screenshot_path = f"test_failures/{test_id}_{timestamp}.png"
+            screenshot_path = f"test_failures/{self._testMethodName}_{timestamp}.png"
             os.makedirs(os.path.dirname(screenshot_path), exist_ok=True)
             self.driver.save_screenshot(screenshot_path)
             raise AssertionError(f"Test failed: {str(e)}")
@@ -127,7 +127,7 @@ class TestSuite(BaseTestCase):
 
         except Exception as e:
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            screenshot_path = f"test_failures/{test_id}_{timestamp}.png"
+            screenshot_path = f"test_failures/{self._testMethodName}_{timestamp}.png"
             os.makedirs(os.path.dirname(screenshot_path), exist_ok=True)
             self.driver.save_screenshot(screenshot_path)
             raise AssertionError(f"Test failed: {str(e)}")
@@ -148,7 +148,7 @@ class TestSuite(BaseTestCase):
 
         except Exception as e:
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            screenshot_path = f"test_failures/{test_id}_{timestamp}.png"
+            screenshot_path = f"test_failures/{self._testMethodName}_{timestamp}.png"
             os.makedirs(os.path.dirname(screenshot_path), exist_ok=True)
             self.driver.save_screenshot(screenshot_path)
             raise AssertionError(f"Test failed: {str(e)}")
@@ -169,7 +169,7 @@ class TestSuite(BaseTestCase):
 
         except Exception as e:
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            screenshot_path = f"test_failures/{test_id}_{timestamp}.png"
+            screenshot_path = f"test_failures/{self._testMethodName}_{timestamp}.png"
             os.makedirs(os.path.dirname(screenshot_path), exist_ok=True)
             self.driver.save_screenshot(screenshot_path)
             raise AssertionError(f"Test failed: {str(e)}")

@@ -43,7 +43,7 @@ class TestCodeGenerator:
                 data = json.load(f)
                 return data.get("tests", [])
         except FileNotFoundError:
-            print(f"⚠️  Test cases file not found: {self.test_cases_json}")
+            print(f"[WARN]  Test cases file not found: {self.test_cases_json}")
             return []
 
     def _generate_imports(self) -> str:
@@ -273,12 +273,12 @@ def pytest_configure(config):
         # Write base class
         base_file = output_path / "base_test.py"
         base_file.write_text(self.generate_base_test_class())
-        print(f"✅ Created: {base_file}")
+        print(f"[OK] Created: {base_file}")
 
         # Write conftest
         conftest_file = output_path / "conftest.py"
         conftest_file.write_text(self.generate_pytest_conftest())
-        print(f"✅ Created: {conftest_file}")
+        print(f"[OK] Created: {conftest_file}")
 
         # Write test methods
         test_class = f'''from base_test import BaseTestCase
@@ -304,7 +304,7 @@ if __name__ == "__main__":
 
         test_file = output_path / "test_generated_tests.py"
         test_file.write_text(test_class)
-        print(f"✅ Created: {test_file} ({len(tests)} tests)")
+        print(f"[OK] Created: {test_file} ({len(tests)} tests)")
 
         return {
             "base_test": str(base_file),

@@ -1,0 +1,517 @@
+{
+  "page_url": "https://automationexercise.com/",
+  "exploration_timestamp": "2025-12-20T19:05:32.813202",
+  "total_states_discovered": 2,
+  "total_elements": 8,
+  "coverage_percentage": 0.95,
+  "exploration_graph": {
+    "nodes": [
+      {
+        "state_id": "state_1",
+        "label": "Page at depth 0",
+        "url": "https://automationexercise.com/",
+        "timestamp": 9.996794200000295
+      },
+      {
+        "state_id": "state_2",
+        "label": "Page at depth 1",
+        "url": "https://automationexercise.com/test_cases",
+        "timestamp": 19.571012400003383
+      }
+    ],
+    "edges": [
+      {
+        "from_state": "state_1",
+        "to_state": "state_2",
+        "action": "click",
+        "element_id": "elem_001",
+        "description": "click on elem_001",
+        "timestamp": 0.0
+      }
+    ]
+  },
+  "interactive_elements": [
+    {
+      "element_id": "elem_001",
+      "type": "button",
+      "label": "Test Cases",
+      "aria_role": "button",
+      "aria_label": "",
+      "visible": true,
+      "enabled": true,
+      "locators": {
+        "priority_1_role": "button[name='Test Cases']",
+        "priority_2_label": "label:has-text('Test Cases')",
+        "priority_4_text": ":text('Test Cases')"
+      },
+      "locator_confidence": {
+        "priority_1_role": 0.95,
+        "priority_2_label": 0.9,
+        "priority_3_placeholder": 0.0,
+        "priority_4_text": 0.85,
+        "priority_5_testid": 0.0,
+        "priority_6_css": 0.7,
+        "priority_7_xpath": 0.6
+      },
+      "accessibility_info": {
+        "role": "button",
+        "accessible_name": "Test Cases",
+        "accessible_description": "",
+        "aria_label": ""
+      },
+      "interactivity": {
+        "focusable": true,
+        "clickable": true,
+        "editable": false,
+        "submittable": false
+      },
+      "states": [],
+      "validation_evidence": {
+        "screenshot_confirmed": false,
+        "aria_confirmed": true,
+        "uniqueness_confirmed": true,
+        "false_positive_check": false,
+        "interactive_confirmed": false
+      },
+      "hierarchy_path": [
+        "body",
+        "section",
+        "div",
+        "div",
+        "div",
+        "div",
+        "div",
+        "div",
+        "div",
+        "a",
+        "button"
+      ],
+      "hierarchy_depth": 10
+    },
+    {
+      "element_id": "elem_002",
+      "type": "button",
+      "label": "APIs list for practice",
+      "aria_role": "button",
+      "aria_label": "",
+      "visible": true,
+      "enabled": true,
+      "locators": {
+        "priority_1_role": "button[name='APIs list for practice']",
+        "priority_2_label": "label:has-text('APIs list for practice')",
+        "priority_4_text": ":text('APIs list for practice')"
+      },
+      "locator_confidence": {
+        "priority_1_role": 0.95,
+        "priority_2_label": 0.9,
+        "priority_3_placeholder": 0.0,
+        "priority_4_text": 0.85,
+        "priority_5_testid": 0.0,
+        "priority_6_css": 0.7,
+        "priority_7_xpath": 0.6
+      },
+      "accessibility_info": {
+        "role": "button",
+        "accessible_name": "APIs list for practice",
+        "accessible_description": "",
+        "aria_label": ""
+      },
+      "interactivity": {
+        "focusable": true,
+        "clickable": true,
+        "editable": false,
+        "submittable": false
+      },
+      "states": [],
+      "validation_evidence": {
+        "screenshot_confirmed": false,
+        "aria_confirmed": true,
+        "uniqueness_confirmed": true,
+        "false_positive_check": false,
+        "interactive_confirmed": false
+      },
+      "hierarchy_path": [
+        "body",
+        "section",
+        "div",
+        "div",
+        "div",
+        "div",
+        "div",
+        "div",
+        "div",
+        "a",
+        "button"
+      ],
+      "hierarchy_depth": 10
+    },
+    {
+      "element_id": "elem_003",
+      "type": "button",
+      "label": "Test Cases",
+      "aria_role": "button",
+      "aria_label": "",
+      "visible": true,
+      "enabled": true,
+      "locators": {
+        "priority_1_role": "button[name='Test Cases']",
+        "priority_2_label": "label:has-text('Test Cases')",
+        "priority_4_text": ":text('Test Cases')"
+      },
+      "locator_confidence": {
+        "priority_1_role": 0.95,
+        "priority_2_label": 0.9,
+        "priority_3_placeholder": 0.0,
+        "priority_4_text": 0.85,
+        "priority_5_testid": 0.0,
+        "priority_6_css": 0.7,
+        "priority_7_xpath": 0.6
+      },
+      "accessibility_info": {
+        "role": "button",
+        "accessible_name": "Test Cases",
+        "accessible_description": "",
+        "aria_label": ""
+      },
+      "interactivity": {
+        "focusable": true,
+        "clickable": true,
+        "editable": false,
+        "submittable": false
+      },
+      "states": [],
+      "validation_evidence": {
+        "screenshot_confirmed": false,
+        "aria_confirmed": true,
+        "uniqueness_confirmed": true,
+        "false_positive_check": false,
+        "interactive_confirmed": false
+      },
+      "hierarchy_path": [
+        "body",
+        "section",
+        "div",
+        "div",
+        "div",
+        "div",
+        "div",
+        "div",
+        "div",
+        "a",
+        "button"
+      ],
+      "hierarchy_depth": 10
+    },
+    {
+      "element_id": "elem_004",
+      "type": "button",
+      "label": "APIs list for practice",
+      "aria_role": "button",
+      "aria_label": "",
+      "visible": true,
+      "enabled": true,
+      "locators": {
+        "priority_1_role": "button[name='APIs list for practice']",
+        "priority_2_label": "label:has-text('APIs list for practice')",
+        "priority_4_text": ":text('APIs list for practice')"
+      },
+      "locator_confidence": {
+        "priority_1_role": 0.95,
+        "priority_2_label": 0.9,
+        "priority_3_placeholder": 0.0,
+        "priority_4_text": 0.85,
+        "priority_5_testid": 0.0,
+        "priority_6_css": 0.7,
+        "priority_7_xpath": 0.6
+      },
+      "accessibility_info": {
+        "role": "button",
+        "accessible_name": "APIs list for practice",
+        "accessible_description": "",
+        "aria_label": ""
+      },
+      "interactivity": {
+        "focusable": true,
+        "clickable": true,
+        "editable": false,
+        "submittable": false
+      },
+      "states": [],
+      "validation_evidence": {
+        "screenshot_confirmed": false,
+        "aria_confirmed": true,
+        "uniqueness_confirmed": true,
+        "false_positive_check": false,
+        "interactive_confirmed": false
+      },
+      "hierarchy_path": [
+        "body",
+        "section",
+        "div",
+        "div",
+        "div",
+        "div",
+        "div",
+        "div",
+        "div",
+        "a",
+        "button"
+      ],
+      "hierarchy_depth": 10
+    },
+    {
+      "element_id": "elem_005",
+      "type": "button",
+      "label": "Test Cases",
+      "aria_role": "button",
+      "aria_label": "",
+      "visible": true,
+      "enabled": true,
+      "locators": {
+        "priority_1_role": "button[name='Test Cases']",
+        "priority_2_label": "label:has-text('Test Cases')",
+        "priority_4_text": ":text('Test Cases')"
+      },
+      "locator_confidence": {
+        "priority_1_role": 0.95,
+        "priority_2_label": 0.9,
+        "priority_3_placeholder": 0.0,
+        "priority_4_text": 0.85,
+        "priority_5_testid": 0.0,
+        "priority_6_css": 0.7,
+        "priority_7_xpath": 0.6
+      },
+      "accessibility_info": {
+        "role": "button",
+        "accessible_name": "Test Cases",
+        "accessible_description": "",
+        "aria_label": ""
+      },
+      "interactivity": {
+        "focusable": true,
+        "clickable": true,
+        "editable": false,
+        "submittable": false
+      },
+      "states": [],
+      "validation_evidence": {
+        "screenshot_confirmed": false,
+        "aria_confirmed": true,
+        "uniqueness_confirmed": true,
+        "false_positive_check": false,
+        "interactive_confirmed": false
+      },
+      "hierarchy_path": [
+        "body",
+        "section",
+        "div",
+        "div",
+        "div",
+        "div",
+        "div",
+        "div",
+        "div",
+        "a",
+        "button"
+      ],
+      "hierarchy_depth": 10
+    },
+    {
+      "element_id": "elem_006",
+      "type": "button",
+      "label": "APIs list for practice",
+      "aria_role": "button",
+      "aria_label": "",
+      "visible": true,
+      "enabled": true,
+      "locators": {
+        "priority_1_role": "button[name='APIs list for practice']",
+        "priority_2_label": "label:has-text('APIs list for practice')",
+        "priority_4_text": ":text('APIs list for practice')"
+      },
+      "locator_confidence": {
+        "priority_1_role": 0.95,
+        "priority_2_label": 0.9,
+        "priority_3_placeholder": 0.0,
+        "priority_4_text": 0.85,
+        "priority_5_testid": 0.0,
+        "priority_6_css": 0.7,
+        "priority_7_xpath": 0.6
+      },
+      "accessibility_info": {
+        "role": "button",
+        "accessible_name": "APIs list for practice",
+        "accessible_description": "",
+        "aria_label": ""
+      },
+      "interactivity": {
+        "focusable": true,
+        "clickable": true,
+        "editable": false,
+        "submittable": false
+      },
+      "states": [],
+      "validation_evidence": {
+        "screenshot_confirmed": false,
+        "aria_confirmed": true,
+        "uniqueness_confirmed": true,
+        "false_positive_check": false,
+        "interactive_confirmed": false
+      },
+      "hierarchy_path": [
+        "body",
+        "section",
+        "div",
+        "div",
+        "div",
+        "div",
+        "div",
+        "div",
+        "div",
+        "a",
+        "button"
+      ],
+      "hierarchy_depth": 10
+    },
+    {
+      "element_id": "elem_007",
+      "type": "button",
+      "label": "Continue Shopping",
+      "aria_role": "button",
+      "aria_label": "",
+      "visible": true,
+      "enabled": true,
+      "locators": {
+        "priority_1_role": "button[name='Continue Shopping']",
+        "priority_2_label": "label:has-text('Continue Shopping')",
+        "priority_4_text": ":text('Continue Shopping')"
+      },
+      "locator_confidence": {
+        "priority_1_role": 0.95,
+        "priority_2_label": 0.9,
+        "priority_3_placeholder": 0.0,
+        "priority_4_text": 0.85,
+        "priority_5_testid": 0.0,
+        "priority_6_css": 0.7,
+        "priority_7_xpath": 0.6
+      },
+      "accessibility_info": {
+        "role": "button",
+        "accessible_name": "Continue Shopping",
+        "accessible_description": "",
+        "aria_label": ""
+      },
+      "interactivity": {
+        "focusable": true,
+        "clickable": true,
+        "editable": false,
+        "submittable": false
+      },
+      "states": [],
+      "validation_evidence": {
+        "screenshot_confirmed": false,
+        "aria_confirmed": true,
+        "uniqueness_confirmed": true,
+        "false_positive_check": false,
+        "interactive_confirmed": false
+      },
+      "hierarchy_path": [
+        "body",
+        "section",
+        "div",
+        "div",
+        "div",
+        "div",
+        "div",
+        "div",
+        "div",
+        "div",
+        "button"
+      ],
+      "hierarchy_depth": 10
+    },
+    {
+      "element_id": "elem_008",
+      "type": "button",
+      "label": "",
+      "aria_role": "button",
+      "aria_label": "",
+      "visible": true,
+      "enabled": true,
+      "locators": {
+        "priority_1_role": "button"
+      },
+      "locator_confidence": {
+        "priority_1_role": 0.95,
+        "priority_2_label": 0.0,
+        "priority_3_placeholder": 0.0,
+        "priority_4_text": 0.0,
+        "priority_5_testid": 0.0,
+        "priority_6_css": 0.7,
+        "priority_7_xpath": 0.6
+      },
+      "accessibility_info": {
+        "role": "button",
+        "accessible_name": "",
+        "accessible_description": "",
+        "aria_label": ""
+      },
+      "interactivity": {
+        "focusable": true,
+        "clickable": true,
+        "editable": false,
+        "submittable": false
+      },
+      "states": [],
+      "validation_evidence": {
+        "screenshot_confirmed": false,
+        "aria_confirmed": true,
+        "uniqueness_confirmed": true,
+        "false_positive_check": false,
+        "interactive_confirmed": false
+      },
+      "hierarchy_path": [
+        "body",
+        "footer",
+        "div",
+        "div",
+        "div",
+        "div",
+        "div",
+        "form",
+        "button"
+      ],
+      "hierarchy_depth": 8
+    }
+  ],
+  "validation_checkpoints": [],
+  "exploration_statistics": {
+    "total_time_seconds": 82.3277734000003,
+    "screenshots_taken": 0,
+    "tokens_used_accessibility_tree": 1784,
+    "tokens_estimate_full_dom": 17840,
+    "efficiency_ratio": 10.0,
+    "elements_discovered": 8,
+    "elements_with_multiple_locators": 8,
+    "elements_with_fallback_xpath": 0,
+    "hallucinated_elements": 0,
+    "false_positives": 0,
+    "states_discovered": 2
+  },
+  "quality_metrics": {
+    "coverage_percentage": 0.95,
+    "accessibility_compliance": 0.95,
+    "locator_reliability_avg": 0.92,
+    "validation_pass_rate": 1.0,
+    "ready_for_phase2": true
+  },
+  "challenges": [
+    "Initial Phase 1 implementation"
+  ],
+  "recommendations": [
+    "Ready for Phase 2 test generation"
+  ],
+  "next_phase_hints": [
+    "8 elements ready for test case generation"
+  ]
+}

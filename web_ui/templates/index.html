@@ -577,6 +577,9 @@
                             <input type="checkbox" id="p1Headless" checked> Headless Mode
                         </label>
                         <label>
+                            <input type="checkbox" id="p1ShowBrowser"> Show Browser (Real-time Visualization)
+                        </label>
+                        <label>
                             <input type="checkbox" id="p1Screenshots" checked> Take Screenshots
                         </label>
                         <label>
@@ -650,6 +653,9 @@
                         </label>
                         <label>
                             <input type="checkbox" id="p4Dashboard" checked> Generate Dashboard
+                        </label>
+                        <label>
+                            <input type="checkbox" id="p4RecordVideo" checked> Record Execution Videos
                         </label>
                         <label>
                             Parallel Tests:
@@ -832,6 +838,40 @@
             <div class="chart-container">
                 <h2>Test Execution Results</h2>
                 <canvas id="executionChart"></canvas>
+            </div>
+
+            <!-- Metrics Dashboard -->
+            <div class="results-grid">
+                <div class="result-card">
+                    <h2>⏱️ Performance Metrics</h2>
+                    <div class="metric-row">
+                        <span class="metric-label">Phase 1 Duration</span>
+                        <span class="metric-value" id="metricP1Duration">-</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">Phase 2 Duration</span>
+                        <span class="metric-value" id="metricP2Duration">-</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">Phase 3 Duration</span>
+                        <span class="metric-value" id="metricP3Duration">-</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">Phase 4 Duration</span>
+                        <span class="metric-value" id="metricP4Duration">-</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">Total Time</span>
+                        <span class="metric-value success" id="metricTotalTime">-</span>
+                    </div>
+                </div>
+
+                <div class="result-card">
+                    <h2>📸 Evidence Files</h2>
+                    <div id="evidenceList">
+                        <p style="color: #999;">Evidence will appear after execution...</p>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -1081,8 +1121,93 @@
                     (results.phase4.pass_rate || 0).toFixed(1) + '%';
             }
 
+            // Update metrics
+            updateMetrics(data.metrics);
+
+            // Update evidence
+            updateEvidence(data.evidence);
+
             // Create charts
             createCharts(results);
+        }
+
+        function updateMetrics(metrics) {
+            if (!metrics) return;
+            
+            const durations = metrics.phase_durations || {};
+            document.getElementById('metricP1Duration').textContent = 
+                durations.phase1 ? durations.phase1.toFixed(2) + 's' : '-';
+            document.getElementById('metricP2Duration').textContent = 
+                durations.phase2 ? durations.phase2.toFixed(2) + 's' : '-';
+            document.getElementById('metricP3Duration').textContent = 
+                durations.phase3 ? durations.phase3.toFixed(2) + 's' : '-';
+            document.getElementById('metricP4Duration').textContent = 
+                durations.phase4 ? durations.phase4.toFixed(2) + 's' : '-';
+            
+            const total = Object.values(durations).reduce((a, b) => a + b, 0);
+            document.getElementById('metricTotalTime').textContent = 
+                total > 0 ? total.toFixed(2) + 's' : '-';
+        }
+
+        function updateEvidence(evidence) {
+            if (!evidence) return;
+            
+            const evidenceList = document.getElementById('evidenceList');
+            evidenceList.innerHTML = '';
+            
+            // Screenshots
+            if (evidence.screenshots && evidence.screenshots.length > 0) {
+                const screenshotSection = document.createElement('div');
+                screenshotSection.innerHTML = `<strong>📸 Screenshots (${evidence.screenshots.length}):</strong>`;
+                evidence.screenshots.forEach(file => {
+                    const link = document.createElement('a');
+                    link.href = `/outputs/${file}`;
+                    link.textContent = file;
+                    link.target = '_blank';
+                    link.style.display = 'block';
+                    link.style.color = '#667eea';
+                    screenshotSection.appendChild(link);
+                });
+                evidenceList.appendChild(screenshotSection);
+            }
+            
+            // Videos
+            if (evidence.videos && evidence.videos.length > 0) {
+                const videoSection = document.createElement('div');
+                videoSection.innerHTML = `<strong>🎥 Videos (${evidence.videos.length}):</strong>`;
+                videoSection.style.marginTop = '10px';
+                evidence.videos.forEach(file => {
+                    const link = document.createElement('a');
+                    link.href = `/outputs/${file}`;
+                    link.textContent = file;
+                    link.target = '_blank';
+                    link.style.display = 'block';
+                    link.style.color = '#667eea';
+                    videoSection.appendChild(link);
+                });
+                evidenceList.appendChild(videoSection);
+            }
+            
+            // Logs
+            if (evidence.logs_files && evidence.logs_files.length > 0) {
+                const logsSection = document.createElement('div');
+                logsSection.innerHTML = `<strong>📄 Logs (${evidence.logs_files.length}):</strong>`;
+                logsSection.style.marginTop = '10px';
+                evidence.logs_files.forEach(file => {
+                    const link = document.createElement('a');
+                    link.href = `/outputs/${file}`;
+                    link.textContent = file;
+                    link.target = '_blank';
+                    link.style.display = 'block';
+                    link.style.color = '#667eea';
+                    logsSection.appendChild(link);
+                });
+                evidenceList.appendChild(logsSection);
+            }
+            
+            if (evidenceList.innerHTML === '') {
+                evidenceList.innerHTML = '<p style="color: #999;">No evidence files found</p>';
+            }
         }
 
         function createCharts(results) {
@@ -1179,6 +1304,7 @@
                 phase1: {
                     browser: document.getElementById('p1Browser').value,
                     headless: document.getElementById('p1Headless').checked,
+                    show_browser: document.getElementById('p1ShowBrowser').checked,
                     screenshots: document.getElementById('p1Screenshots').checked,
                     crawling: document.getElementById('p1Crawling').checked,
                     max_depth: parseInt(document.getElementById('p1MaxDepth').value),
@@ -1198,6 +1324,7 @@
                 phase4: {
                     headless: document.getElementById('p4Headless').checked,
                     generate_dashboard: document.getElementById('p4Dashboard').checked,
+                    record_video: document.getElementById('p4RecordVideo').checked,
                     parallel: parseInt(document.getElementById('p4Parallel').value)
                 }
             };

@@ -56,27 +56,27 @@ class HITLManager:
         Returns:
             HITLResult with all feedback history
         """
-        print(f"\n🔄 Starting HITL 2.0 Loop ({rounds} rounds)")
+        print(f"\n[RETRY] Starting HITL 2.0 Loop ({rounds} rounds)")
         print("=" * 70)
 
         for round_num in range(1, rounds + 1):
-            print(f"\n📍 ROUND {round_num}/{rounds}")
+            print(f"\n[LAYER] ROUND {round_num}/{rounds}")
             print("-" * 70)
 
             # Step 1: Generate tests for this round
             tests = self.generator.generate_tests()
-            print(f"✅ Generated {len(tests)} tests")
+            print(f"[OK] Generated {len(tests)} tests")
 
             # Step 2: Present and collect feedback
             feedback_items = self._present_and_collect_feedback(tests, round_num)
 
             # Step 3: Calculate metrics
             approval_rate = self._calculate_approval_rate(feedback_items)
-            print(f"✅ Approval rate: {approval_rate:.1%}")
+            print(f"[OK] Approval rate: {approval_rate:.1%}")
 
             # Step 4: Extract patterns
             patterns = self._extract_patterns(feedback_items)
-            print(f"✅ Patterns learned: {len(patterns)}")
+            print(f"[OK] Patterns learned: {len(patterns)}")
             for pattern in patterns[:3]:  # Show first 3
                 print(f"   - {pattern}")
 
@@ -92,13 +92,13 @@ class HITLManager:
 
             # Step 6: Apply learning for next round
             if round_num < rounds:
-                print(f"🧠 Applying learning for next round...")
+                print(f"[LEARNING] Applying learning for next round...")
                 self._apply_learning(patterns)
 
         # Calculate overall metrics
         overall_approval = self._calculate_overall_approval()
 
-        print(f"\n🎉 HITL Loop Complete")
+        print(f"\n[COMPLETE] HITL Loop Complete")
         print(f"   Overall approval rate: {overall_approval:.1%}")
         print("=" * 70)
 
@@ -252,15 +252,15 @@ class HITLManager:
             if "high_approval" in pattern:
                 algo = pattern.split("_")[0]
                 self.algorithm_frequencies[algo] *= 1.2  # Increase
-                print(f"   ↑ Increased {algo} frequency")
+                print(f"   [UARROW] Increased {algo} frequency")
 
             if "low_approval" in pattern:
                 algo = pattern.split("_")[0]
                 self.algorithm_frequencies[algo] *= 0.8  # Decrease
-                print(f"   ↓ Decreased {algo} frequency")
+                print(f"   [DARROW] Decreased {algo} frequency")
 
             if "increase_workflow_tests" in pattern:
-                print(f"   📝 Will increase workflow tests in next round")
+                print(f"   [INFO] Will increase workflow tests in next round")
 
     def _calculate_overall_approval(self) -> float:
         """Calculate overall approval across all rounds"""
@@ -288,7 +288,7 @@ class HITLManager:
                 improvement = round2_approval - round1_approval
                 improvements.append(
                     f"Round 2 improved by {improvement:.1%} "
-                    f"({round1_approval:.1%} → {round2_approval:.1%})"
+                    f"({round1_approval:.1%} [ARROW] {round2_approval:.1%})"
                 )
 
             # Check for pattern-based improvements

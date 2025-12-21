@@ -1,7 +1,7 @@
 {
   "page_url": "https://automationexercise.com/",
-  "exploration_timestamp": "2025-12-20 16:58:38.443742",
-  "total_states_discovered": 3,
+  "exploration_timestamp": "2025-12-20 18:31:12.597672",
+  "total_states_discovered": 2,
   "total_elements": 8,
   "coverage_percentage": 0.95,
   "exploration_graph": {
@@ -11,21 +11,14 @@
         "label": "Page at depth 0",
         "url": "https://automationexercise.com/",
         "screenshot": null,
-        "timestamp": 0.926964099999168
+        "timestamp": 0.8863210999988951
       },
       {
         "state_id": "state_2",
         "label": "Page at depth 1",
         "url": "https://automationexercise.com/test_cases",
         "screenshot": null,
-        "timestamp": 16.54530479999812
-      },
-      {
-        "state_id": "state_3",
-        "label": "Page at depth 1",
-        "url": "https://automationexercise.com/api_list",
-        "screenshot": null,
-        "timestamp": 23.881334600002447
+        "timestamp": 9.063413600000786
       }
     ],
     "edges": [
@@ -35,14 +28,6 @@
         "action": "click",
         "element_id": "elem_001",
         "description": "click on elem_001",
-        "timestamp": 0.0
-      },
-      {
-        "from_state": "state_1",
-        "to_state": "state_3",
-        "action": "click",
-        "element_id": "elem_002",
-        "description": "click on elem_002",
         "timestamp": 0.0
       }
     ]
@@ -553,17 +538,17 @@
   ],
   "validation_checkpoints": [],
   "exploration_statistics": {
-    "total_time_seconds": 82.6464122000034,
+    "total_time_seconds": 71.75480770000286,
     "screenshots_taken": 0,
-    "tokens_used_accessibility_tree": 2940,
-    "tokens_estimate_full_dom": 29400,
+    "tokens_used_accessibility_tree": 1784,
+    "tokens_estimate_full_dom": 17840,
     "efficiency_ratio": 10.0,
     "elements_discovered": 8,
     "elements_with_multiple_locators": 8,
     "elements_with_fallback_xpath": 0,
     "hallucinated_elements": 0,
     "false_positives": 0,
-    "states_discovered": 3
+    "states_discovered": 2
   },
   "quality_metrics": {
     "coverage_percentage": 0.95,

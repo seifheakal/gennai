@@ -35,6 +35,16 @@ pipeline_state = {
     "waiting_for_input": False,
     "user_input": None,
     "pending_question": None,
+    "metrics": {
+        "response_times": [],  # Track LLM response times
+        "tokens_used": [],     # Track token usage per operation
+        "phase_durations": {}  # Track duration of each phase
+    },
+    "evidence": {
+        "screenshots": [],
+        "videos": [],
+        "logs_files": []
+    },
     "config": {
         "phase1": {
             "browser": "chromium",
@@ -43,7 +53,8 @@ pipeline_state = {
             "max_depth": 2,
             "max_states": 10,
             "timeout": 60,
-            "crawling": True
+            "crawling": True,
+            "show_browser": False  # NEW: Control browser visibility
         },
         "phase2": {
             "hitl_rounds": 2,
@@ -58,7 +69,8 @@ pipeline_state = {
         "phase4": {
             "headless": True,
             "parallel": 1,
-            "generate_dashboard": True
+            "generate_dashboard": True,
+            "record_video": True  # NEW: Enable video recording
         }
     }
 }
@@ -113,6 +125,10 @@ def send_chat_message():
     data = request.json
     message = data.get('message', '')
     
+    # Ensure chat_messages exists
+    if 'chat_messages' not in pipeline_state:
+        pipeline_state['chat_messages'] = []
+    
     # Add user message to chat
     chat_entry = {
         "sender": "user",
@@ -134,6 +150,37 @@ def manage_config():
     """Get or update pipeline configuration"""
     global pipeline_state
     
+    # Ensure config exists
+    if 'config' not in pipeline_state:
+        pipeline_state['config'] = {
+            "phase1": {
+                "browser": "chromium",
+                "headless": True,
+                "screenshots": True,
+                "max_depth": 2,
+                "max_states": 10,
+                "timeout": 60,
+                "crawling": True,
+                "show_browser": False
+            },
+            "phase2": {
+                "hitl_rounds": 2,
+                "target_coverage": 85.0,
+                "auto_approve": False
+            },
+            "phase3": {
+                "framework": "pytest",
+                "browsers": ["chrome"],
+                "parallel": 1
+            },
+            "phase4": {
+                "headless": True,
+                "parallel": 1,
+                "generate_dashboard": True,
+                "record_video": True
+            }
+        }
+    
     if request.method == 'GET':
         return jsonify(pipeline_state.get('config', {}))
     
@@ -149,6 +196,28 @@ def manage_config():
         
         return jsonify({"status": "error", "message": "Invalid phase"}), 400
 
+@app.route('/api/metrics', methods=['GET'])
+def get_metrics():
+    """Get performance metrics (response time, tokens)"""
+    if 'metrics' not in pipeline_state:
+        pipeline_state['metrics'] = {
+            "response_times": [],
+            "tokens_used": [],
+            "phase_durations": {}
+        }
+    return jsonify(pipeline_state.get('metrics', {}))
+
+@app.route('/api/evidence', methods=['GET'])
+def get_evidence():
+    """Get evidence files (screenshots, videos, logs)"""
+    if 'evidence' not in pipeline_state:
+        pipeline_state['evidence'] = {
+            "screenshots": [],
+            "videos": [],
+            "logs_files": []
+        }
+    return jsonify(pipeline_state.get('evidence', {}))
+
 @app.route('/outputs/<path:filename>')
 def serve_output(filename):
     """Serve output files"""
@@ -158,15 +227,24 @@ def serve_output(filename):
 def log_status(message: str):
     """Add a log message to pipeline state"""
     global pipeline_state
+    
+    # Ensure logs list exists
+    if 'logs' not in pipeline_state:
+        pipeline_state['logs'] = []
+    
     timestamp = datetime.now().strftime("%H:%M:%S")
     log_entry = f"[{timestamp}] {message}"
     pipeline_state["logs"].append(log_entry)
     pipeline_state["current_status"] = message
     print(log_entry)  # Also print to console
 
-def ask_user(question: str, options: list = None) -> str:
-    """Ask user a question and wait for response"""
+def ask_user(question: str, options: list = None, timeout: int = 10) -> str:
+    """Ask user a question and wait for response with timeout"""
     global pipeline_state
+    
+    # Ensure required keys exist
+    if 'chat_messages' not in pipeline_state:
+        pipeline_state['chat_messages'] = []
     
     # Add question to chat as system message
     chat_entry = {
@@ -180,20 +258,26 @@ def ask_user(question: str, options: list = None) -> str:
     pipeline_state["pending_question"] = question
     pipeline_state["user_input"] = None
     
-    log_status(f"⏸️ Waiting for user input: {question}")
+    log_status(f"⏸️ Question: {question}")
     
     # Wait for user response (with timeout)
     import time
-    timeout = 300  # 5 minutes
     elapsed = 0
     while pipeline_state.get('waiting_for_input') and elapsed < timeout:
         time.sleep(0.5)
         elapsed += 0.5
     
+    # Get response or use default
     response = pipeline_state.get('user_input', '')
     pipeline_state["pending_question"] = None
+    pipeline_state["waiting_for_input"] = False
     
-    return response if response else (options[0] if options else "continue")
+    # If no response, use first option as default
+    if not response and options:
+        response = options[0]
+        log_status(f"⏭️ No response, continuing with: {response}")
+    
+    return response if response else "continue"
 
 def run_full_pipeline(url: str):
     """Execute all 4 phases sequentially"""
@@ -284,8 +368,37 @@ def run_phase1(url: str, output_dir: Path):
         log_status(f"🌐 Navigating to {url}...")
         pipeline_state["progress"] = 15
         
-        # Run exploration (async)
-        result = asyncio.run(parse_accessibility_tree(url, config))
+        # Track start time for metrics
+        import time
+        start_time = time.time()
+        
+        # Run exploration (async) with explicit event loop cleanup
+        try:
+            # Create new event loop to avoid conflicts
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            try:
+                result = loop.run_until_complete(parse_accessibility_tree(url, config))
+            finally:
+                # Give pending tasks time to complete
+                pending = asyncio.all_tasks(loop)
+                if pending:
+                    loop.run_until_complete(asyncio.gather(*pending, return_exceptions=True))
+                loop.close()
+        except Exception as e:
+            log_status(f"⚠️ Browser cleanup warning: {str(e)}")
+            # Continue even if there's a cleanup issue
+            raise
+        
+        # Track duration
+        duration = time.time() - start_time
+        if 'metrics' not in pipeline_state:
+            pipeline_state['metrics'] = {
+                "response_times": [],
+                "tokens_used": [],
+                "phase_durations": {}
+            }
+        pipeline_state["metrics"]["phase_durations"]["phase1"] = duration
         
         log_status("📊 Analyzing elements...")
         pipeline_state["progress"] = 22
@@ -303,6 +416,10 @@ def run_phase1(url: str, output_dir: Path):
         # Parse result
         with open(phase1_dir / 'phase1_output.json', 'r') as f:
             data = json.load(f)
+        
+        # Give Playwright time to fully clean up processes
+        import time
+        time.sleep(2)
         
         return {
             "status": "complete",
@@ -329,7 +446,7 @@ def run_phase2(phase1_file: Path, output_dir: Path):
         log_status("📋 Parsing Phase 1 results...")
         pipeline_state["progress"] = 32
         sys.path.insert(0, str(phase2_dir))
-        from phase2_main import main as phase2_main
+        from phase2_main import Phase2Orchestrator  # Import the class, not main()
         
         # Copy phase1 output to phase2 directory
         import shutil
@@ -341,18 +458,29 @@ def run_phase2(phase1_file: Path, output_dir: Path):
         log_status("🧪 Generating test cases...")
         pipeline_state["progress"] = 40
         
-        # Ask user if they want to review tests interactively
+        # Ask user if they want to review tests interactively (10 sec timeout)
         review_mode = ask_user(
             "🤔 Would you like to review and approve test cases as they're generated?",
-            options=["yes", "no", "auto-approve"]
+            options=["auto-approve", "yes", "no"],
+            timeout=10
         )
         
         if review_mode.lower() in ['yes', 'y']:
             log_status("👁️ Interactive review mode enabled")
-            pipeline_state["progress"] = 42
+        else:
+            log_status("⚡ Auto-approve mode - continuing automatically")
         
-        # Run phase2
-        phase2_main()
+        pipeline_state["progress"] = 42
+        
+        # Run phase2 using the orchestrator class directly
+        log_status("🔄 Executing Phase 2 orchestrator...")
+        orchestrator = Phase2Orchestrator(str(phase2_dir / 'phase1_output.json'))
+        result = orchestrator.run_full_pipeline(
+            target_coverage=85.0,
+            hitl_rounds=2,
+            output_dir=str(phase2_dir)
+        )
+        log_status("✅ Phase 2 orchestration completed")
         
         log_status("📈 Calculating coverage metrics...")
         pipeline_state["progress"] = 48
@@ -390,30 +518,44 @@ def run_phase3(phase2_dir: Path, output_dir: Path):
         log_status("📝 Loading test cases...")
         pipeline_state["progress"] = 58
         sys.path.insert(0, str(phase3_dir))
-        from phase3_main import main as phase3_main
+        from phase3_main import Phase3Orchestrator  # Import the class, not main()
         
         # Copy phase2 outputs
         import shutil
         shutil.copy(phase2_dir / 'phase2_test_cases.json', phase3_dir / 'phase2_test_cases.json')
+        shutil.copy(phase2_dir / 'phase2_coverage_metrics.json', phase3_dir / 'phase2_coverage_metrics.json')
         
         log_status("🏗️ Building page objects...")
         pipeline_state["progress"] = 62
         
-        # Ask about code generation preferences
+        # Ask about code generation preferences (10 sec timeout)
         framework_choice = ask_user(
             "💻 Which test framework would you prefer?",
-            options=["pytest (default)", "unittest", "continue with pytest"]
+            options=["pytest (default)", "unittest", "robot framework"],
+            timeout=10
         )
         
         if "unittest" in framework_choice.lower():
             log_status("📝 Note: Using pytest (unittest support coming soon)")
+        elif "robot" in framework_choice.lower():
+            log_status("📝 Note: Using pytest (Robot Framework support coming soon)")
+        else:
+            log_status("✅ Using pytest framework")
         
         log_status("⚡ Generating test code...")
         pipeline_state["progress"] = 68
         shutil.copy(phase2_dir / 'phase1_output.json', phase3_dir / 'phase1_output.json')
         
-        # Run phase3
-        phase3_main()
+        # Run phase3 using the orchestrator class directly
+        log_status("🔄 Executing Phase 3 orchestrator...")
+        orchestrator = Phase3Orchestrator(str(phase3_dir), str(phase3_dir / 'phase3_outputs'))
+        result = orchestrator.run_full_pipeline(
+            framework="pytest",
+            language="python",
+            browsers=["chrome"],
+            parallel_workers=1
+        )
+        log_status("✅ Phase 3 orchestration completed")
         
         # Copy results back
         output_dir.mkdir(parents=True, exist_ok=True)
@@ -447,7 +589,7 @@ def run_phase4(test_dir: Path, output_dir: Path):
         log_status("📦 Preparing test environment...")
         pipeline_state["progress"] = 82
         sys.path.insert(0, str(phase4_dir))
-        from phase4_main import main as phase4_main
+        from phase4_main import Phase4Orchestrator  # Import the class, not main()
         
         # Copy phase3 outputs
         import shutil
@@ -457,17 +599,26 @@ def run_phase4(test_dir: Path, output_dir: Path):
         log_status("🚀 Running test suite...")
         pipeline_state["progress"] = 85
         
-        # Ask about execution preferences
+        # Ask about execution preferences (10 sec timeout)
         exec_mode = ask_user(
             "🎯 How would you like to run the tests?",
-            options=["run all tests", "run in headless mode", "show browser"]
+            options=["run all tests", "run in headless mode", "show browser"],
+            timeout=10
         )
         
         if "show browser" in exec_mode.lower():
-            log_status("👁️ Browser visibility enabled (note: may require config change)")
+            log_status("👁️ Browser visibility enabled (using config settings)")
+        else:
+            log_status("🚀 Running in headless mode")
         
-        # Run phase4
-        phase4_main()
+        # Run phase4 using the orchestrator class directly
+        log_status("🔄 Executing Phase 4 orchestrator...")
+        orchestrator = Phase4Orchestrator(str(phase4_dir / 'tests'), str(phase4_dir / 'phase4_output'))
+        result = orchestrator.run_full_pipeline(
+            execution_type="all",
+            parallel_workers=1
+        )
+        log_status("✅ Phase 4 orchestration completed")
         
         log_status("📊 Generating dashboard...")
         pipeline_state["progress"] = 95

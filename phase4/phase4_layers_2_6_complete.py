@@ -240,7 +240,7 @@ class ResultsAnalyzer:
 
         if flaky:
             insights.append(
-                f"⚠️  {len(flaky)} flaky test(s) detected - review locators"
+                f"[WARN]  {len(flaky)} flaky test(s) detected - review locators"
             )
 
         if regressions:
@@ -336,7 +336,7 @@ class NotificationEngine:
     def notify_completion(self, metrics: Dict, analysis: Analysis) -> bool:
         """Send completion notification"""
         message = f"""
-        ✅ Test Execution Complete
+        [OK] Test Execution Complete
         Total: {metrics.get('total')}
         Passed: {metrics.get('passed')}
         Failed: {metrics.get('failed')}

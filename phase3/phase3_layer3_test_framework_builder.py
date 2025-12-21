@@ -144,9 +144,9 @@ def pytest_runtest_logreport(report):
     """Log test results"""
     if report.when == "call":
         if report.outcome == "passed":
-            print(f"✅ PASSED: {report.nodeid}")
+            print(f"[OK] PASSED: {report.nodeid}")
         elif report.outcome == "failed":
-            print(f"❌ FAILED: {report.nodeid}")
+            print(f"[ERROR] FAILED: {report.nodeid}")
         elif report.outcome == "skipped":
             print(f"⏭️  SKIPPED: {report.nodeid}")
 '''
@@ -348,7 +348,7 @@ def main():
         pytest_args.extend(["--json-report", "--json-report-file=report.json"])
     
     # Run tests
-    print(f"🚀 Running tests with: {' '.join(pytest_args)}")
+    print(f"[PHASE] Running tests with: {' '.join(pytest_args)}")
     exit_code = pytest.main(pytest_args)
     
     return exit_code
@@ -403,7 +403,7 @@ allure-pytest==2.13.2
         for file_name, content in files.items():
             file_path = output_path / file_name
             file_path.write_text(content, encoding='utf-8')
-            print(f"✅ Created: {file_path}")
+            print(f"[OK] Created: {file_path}")
 
         # Create directories
         (output_path / "tests").mkdir(exist_ok=True)
@@ -412,7 +412,7 @@ allure-pytest==2.13.2
         (output_path / "screenshots").mkdir(exist_ok=True)
         (output_path / "test_failures").mkdir(exist_ok=True)
 
-        print(f"\n✅ Test framework created in: {output_path}")
+        print(f"\n[OK] Test framework created in: {output_path}")
 
         return {
             "framework": str(output_path),

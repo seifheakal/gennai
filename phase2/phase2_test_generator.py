@@ -156,7 +156,7 @@ class TestGenerator:
         Returns:
             List of selected TestCase objects
         """
-        print("🔧 Generating candidate tests...")
+        print("[WRENCH] Generating candidate tests...")
 
         # Step 1: Generate candidates
         ep_tests = self.ep.generate_ep_tests()
@@ -196,13 +196,13 @@ class TestGenerator:
         print(f"  Selected: {len(selected_tests)} tests")
 
         # Step 5: Validate (zero hallucinations)
-        print("🔍 Validating tests...")
+        print("[SEARCH] Validating tests...")
         validation_result = self.detector.validate_test_batch(selected_tests)
         print(f"  Valid: {validation_result['valid_tests']}")
         print(f"  Hallucinations: {validation_result['invalid_tests']}")
 
         if validation_result["hallucination_rate"] > 0:
-            print("  ⚠️  Found hallucinated tests, removing...")
+            print("  [WARN]  Found hallucinated tests, removing...")
             selected_tests = [
                 t for t in selected_tests
                 if t.test_id not in validation_result["errors_by_test"]

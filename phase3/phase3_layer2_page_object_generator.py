@@ -334,7 +334,7 @@ class {class_name}:
             )
 
             file_path.write_text(final_code)
-            print(f"✅ Created: {file_path}")
+            print(f"[OK] Created: {file_path}")
 
     def _to_file_name(self, page_name: str) -> str:
         """Convert page name to file name"""

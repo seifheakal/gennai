@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-12-20T18:27:46.310766",
+  "timestamp": "2025-12-20T20:31:26.390851",
   "framework": "pytest",
   "language": "python",
   "status": "complete",
@@ -7,19 +7,19 @@
     "layer_1": {
       "status": "complete",
       "tests_generated": 8,
-      "output_dir": "phase3_outputs\\tests"
+      "output_dir": "C:\\Users\\seift\\Downloads\\genai\\gennai\\phase3\\phase3_outputs\\tests"
     },
     "layer_2": {
       "status": "complete",
       "page_objects_generated": 1,
-      "output_dir": "phase3_outputs\\pages"
+      "output_dir": "C:\\Users\\seift\\Downloads\\genai\\gennai\\phase3\\phase3_outputs\\pages"
     },
     "layer_3": {
       "status": "complete",
       "framework": "pytest",
       "files_created": 5,
       "directories_created": 5,
-      "output_dir": "phase3_outputs"
+      "output_dir": "C:\\Users\\seift\\Downloads\\genai\\gennai\\phase3\\phase3_outputs"
     },
     "layer_4": {
       "status": "complete",
@@ -29,7 +29,7 @@
         "excel",
         "json"
       ],
-      "output_dir": "phase3_outputs\\test_data"
+      "output_dir": "C:\\Users\\seift\\Downloads\\genai\\gennai\\phase3\\phase3_outputs\\test_data"
     },
     "layer_5": {
       "status": "complete",
@@ -39,7 +39,7 @@
         "gitlab_ci"
       ],
       "docker_enabled": true,
-      "output_dir": "phase3_outputs"
+      "output_dir": "C:\\Users\\seift\\Downloads\\genai\\gennai\\phase3\\phase3_outputs"
     },
     "layer_6": {
       "status": "complete",
@@ -49,7 +49,7 @@
         "pdf"
       ],
       "dashboards": 1,
-      "output_dir": "phase3_outputs\\reports"
+      "output_dir": "C:\\Users\\seift\\Downloads\\genai\\gennai\\phase3\\phase3_outputs\\reports"
     },
     "layer_7": {
       "status": "complete",

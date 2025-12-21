@@ -52,7 +52,7 @@ class Phase3Orchestrator:
                     self.phase1_parser = Phase1Parser(str(phase1_path))
                     self.phase1_parser.parse()
             except Exception as e:
-                print(f"⚠️  Could not load Phase 1 parser: {e}")
+                print(f"[WARN]  Could not load Phase 1 parser: {e}")
 
     def _load_json(self, filename: str) -> Dict:
         """Load JSON file from Phase 2 outputs"""
@@ -61,7 +61,7 @@ class Phase3Orchestrator:
             with open(file_path) as f:
                 return json.load(f)
         except FileNotFoundError:
-            print(f"⚠️  {filename} not found in {self.phase2_dir}")
+            print(f"[WARN]  {filename} not found in {self.phase2_dir}")
             return {}
 
     def run_full_pipeline(
@@ -87,7 +87,7 @@ class Phase3Orchestrator:
             browsers = ["chrome"]
 
         print("\n" + "=" * 80)
-        print("🚀 PHASE 3: EXECUTABLE TEST CODE GENERATION")
+        print("[PHASE] PHASE 3: EXECUTABLE TEST CODE GENERATION")
         print("=" * 80)
 
         results = {
@@ -99,37 +99,37 @@ class Phase3Orchestrator:
         }
 
         # LAYER 1: Generate test code
-        print("\n📝 LAYER 1: Test Code Generator")
+        print("\n[INFO] LAYER 1: Test Code Generator")
         print("-" * 80)
         results["layers"]["layer_1"] = self._run_layer_1(language, framework)
 
         # LAYER 2: Generate Page Object Model
-        print("\n📄 LAYER 2: Page Object Model Generator")
+        print("\n[FILE] LAYER 2: Page Object Model Generator")
         print("-" * 80)
         results["layers"]["layer_2"] = self._run_layer_2(language)
 
         # LAYER 3: Build test framework
-        print("\n🏗️  LAYER 3: Test Framework Builder")
+        print("\n[BUILD]  LAYER 3: Test Framework Builder")
         print("-" * 80)
         results["layers"]["layer_3"] = self._run_layer_3(framework, language)
 
         # LAYER 4: Data-driven tests
-        print("\n📊 LAYER 4: Data-Driven Testing")
+        print("\n[STATS] LAYER 4: Data-Driven Testing")
         print("-" * 80)
         results["layers"]["layer_4"] = self._run_layer_4()
 
         # LAYER 5: CI/CD Integration
-        print("\n🔄 LAYER 5: CI/CD Integration")
+        print("\n[RETRY] LAYER 5: CI/CD Integration")
         print("-" * 80)
         results["layers"]["layer_5"] = self._run_layer_5(framework, language)
 
         # LAYER 6: Test Reporting
-        print("\n📈 LAYER 6: Test Reporting")
+        print("\n[GROWTH] LAYER 6: Test Reporting")
         print("-" * 80)
         results["layers"]["layer_6"] = self._run_layer_6()
 
         # LAYER 7: Performance Optimization
-        print("\n⚡ LAYER 7: Performance Optimization")
+        print("\n[BOLT] LAYER 7: Performance Optimization")
         print("-" * 80)
         results["layers"]["layer_7"] = self._run_layer_7()
 
@@ -144,21 +144,21 @@ class Phase3Orchestrator:
 
     def _run_layer_1(self, language: str, framework: str) -> Dict:
         """Run Layer 1: Test Code Generator"""
-        print("✓ Initializing test code generator...")
+        print("[OK] Initializing test code generator...")
         generator = TestCodeGenerator(
             str(self.phase2_dir / "phase2_test_cases.json"),
             framework=framework.lower(),
             language=language
         )
 
-        print("✓ Generating test code...")
+        print("[OK] Generating test code...")
         test_code = generator.generate_all_tests()
 
-        print("✓ Writing test files...")
+        print("[OK] Writing test files...")
         output_path = self.output_dir / "tests"
         generator.write_tests_to_files(str(output_path))
 
-        print(f"✅ Layer 1 Complete: {len(test_code)} tests generated")
+        print(f"[OK] Layer 1 Complete: {len(test_code)} tests generated")
 
         return {
             "status": "complete",
@@ -168,11 +168,11 @@ class Phase3Orchestrator:
 
     def _run_layer_2(self, language: str) -> Dict:
         """Run Layer 2: Page Object Model Generator"""
-        print("✓ Initializing POM generator...")
+        print("[OK] Initializing POM generator...")
         
         # Skip if no Phase 1 parser available
         if not self.phase1_parser:
-            print("⚠️  Skipping Layer 2: Phase 1 parser not available")
+            print("[WARN]  Skipping Layer 2: Phase 1 parser not available")
             return {
                 "status": "skipped",
                 "reason": "Phase 1 parser not loaded",
@@ -181,14 +181,14 @@ class Phase3Orchestrator:
         
         generator = PageObjectGenerator(self.phase1_parser, language)
 
-        print("✓ Generating page objects...")
+        print("[OK] Generating page objects...")
         page_objects = generator.generate_page_objects()
 
-        print("✓ Writing page object files...")
+        print("[OK] Writing page object files...")
         output_path = self.output_dir / "pages"
         generator.write_page_objects_to_files(str(output_path))
 
-        print(f"✅ Layer 2 Complete: {len(page_objects)} page objects generated")
+        print(f"[OK] Layer 2 Complete: {len(page_objects)} page objects generated")
 
         return {
             "status": "complete",
@@ -198,13 +198,13 @@ class Phase3Orchestrator:
 
     def _run_layer_3(self, framework_type: str, language: str) -> Dict:
         """Run Layer 3: Test Framework Builder"""
-        print("✓ Initializing framework builder...")
+        print("[OK] Initializing framework builder...")
         builder = TestFrameworkBuilder(framework_type, language)
 
-        print("✓ Building test framework structure...")
+        print("[OK] Building test framework structure...")
         framework_result = builder.write_framework_to_files(str(self.output_dir))
 
-        print(f"✅ Layer 3 Complete: Framework built")
+        print(f"[OK] Layer 3 Complete: Framework built")
 
         return {
             "status": "complete",
@@ -216,8 +216,8 @@ class Phase3Orchestrator:
 
     def _run_layer_4(self) -> Dict:
         """Run Layer 4: Data-Driven Testing"""
-        print("✓ Generating parameterized tests...")
-        print("✓ Creating test data files (CSV, Excel, JSON)...")
+        print("[OK] Generating parameterized tests...")
+        print("[OK] Creating test data files (CSV, Excel, JSON)...")
 
         output_path = self.output_dir / "test_data"
         output_path.mkdir(parents=True, exist_ok=True)
@@ -227,7 +227,7 @@ class Phase3Orchestrator:
             "email,password,expected\ntest@example.com,Pass123!,success\n"
         )
 
-        print(f"✅ Layer 4 Complete: Data-driven tests generated")
+        print(f"[OK] Layer 4 Complete: Data-driven tests generated")
 
         return {
             "status": "complete",
@@ -238,10 +238,10 @@ class Phase3Orchestrator:
 
     def _run_layer_5(self, framework: str, language: str) -> Dict:
         """Run Layer 5: CI/CD Integration"""
-        print("✓ Generating GitHub Actions workflow...")
-        print("✓ Generating Jenkinsfile...")
-        print("✓ Generating GitLab CI config...")
-        print("✓ Generating Docker configuration...")
+        print("[OK] Generating GitHub Actions workflow...")
+        print("[OK] Generating Jenkinsfile...")
+        print("[OK] Generating GitLab CI config...")
+        print("[OK] Generating Docker configuration...")
 
         ci_path = self.output_dir / ".github" / "workflows"
         ci_path.mkdir(parents=True, exist_ok=True)
@@ -251,7 +251,7 @@ class Phase3Orchestrator:
             "name: E2E Tests\non: [push, pull_request]\njobs:\n  test:\n    runs-on: ubuntu-latest\n"
         )
 
-        print(f"✅ Layer 5 Complete: CI/CD pipelines generated")
+        print(f"[OK] Layer 5 Complete: CI/CD pipelines generated")
 
         return {
             "status": "complete",
@@ -262,9 +262,9 @@ class Phase3Orchestrator:
 
     def _run_layer_6(self) -> Dict:
         """Run Layer 6: Test Reporting"""
-        print("✓ Generating HTML report template...")
-        print("✓ Generating JSON report schema...")
-        print("✓ Creating dashboard...")
+        print("[OK] Generating HTML report template...")
+        print("[OK] Generating JSON report schema...")
+        print("[OK] Creating dashboard...")
 
         reports_path = self.output_dir / "reports"
         reports_path.mkdir(parents=True, exist_ok=True)
@@ -274,7 +274,7 @@ class Phase3Orchestrator:
             "<html><body><h1>Test Report</h1></body></html>"
         )
 
-        print(f"✅ Layer 6 Complete: Reporting structure created")
+        print(f"[OK] Layer 6 Complete: Reporting structure created")
 
         return {
             "status": "complete",
@@ -285,11 +285,11 @@ class Phase3Orchestrator:
 
     def _run_layer_7(self) -> Dict:
         """Run Layer 7: Performance Optimization"""
-        print("✓ Analyzing flaky tests...")
-        print("✓ Generating optimization recommendations...")
-        print("✓ Establishing performance baseline...")
+        print("[OK] Analyzing flaky tests...")
+        print("[OK] Generating optimization recommendations...")
+        print("[OK] Establishing performance baseline...")
 
-        print(f"✅ Layer 7 Complete: Optimization analysis complete")
+        print(f"[OK] Layer 7 Complete: Optimization analysis complete")
 
         return {
             "status": "complete",
@@ -317,7 +317,7 @@ class Phase3Orchestrator:
         output_file = self.output_dir / "phase3_results.json"
         with open(output_file, "w") as f:
             json.dump(results, f, indent=2)
-        print(f"\n✅ Results saved to: {output_file}")
+        print(f"\n[OK] Results saved to: {output_file}")
 
     def print_report(self, results: Dict):
         """Print final report"""
@@ -326,20 +326,20 @@ class Phase3Orchestrator:
         print("=" * 80)
 
         summary = results.get("summary", {})
-        print(f"\n📊 Statistics:")
+        print(f"\n[STATS] Statistics:")
         print(f"   Tests Generated: {summary.get('tests_generated', 0)}")
         print(f"   Page Objects: {summary.get('page_objects', 0)}")
         print(f"   Frameworks: {', '.join(summary.get('frameworks_supported', []))}")
         print(f"   Languages: {', '.join(summary.get('languages_supported', []))}")
         print(f"   CI Platforms: {', '.join(summary.get('ci_platforms', []))}")
 
-        print(f"\n✅ Layer Results:")
+        print(f"\n[OK] Layer Results:")
         for layer, result in results.get("layers", {}).items():
-            status = "✅" if result.get("status") == "complete" else "❌"
+            status = "[OK]" if result.get("status") == "complete" else "[ERROR]"
             print(f"   {status} {layer}: {result.get('status', 'unknown')}")
 
-        print(f"\n🎯 Quality: {summary.get('quality', 'N/A')}")
-        print(f"🚀 Ready for Execution: {summary.get('ready_for_execution', False)}")
+        print(f"\n[TARGET] Quality: {summary.get('quality', 'N/A')}")
+        print(f"[PHASE] Ready for Execution: {summary.get('ready_for_execution', False)}")
 
         print(f"\n📁 Output Directory: {self.output_dir}")
         print("=" * 80)
