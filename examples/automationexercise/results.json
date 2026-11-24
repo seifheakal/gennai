@@ -1,0 +1,251 @@
+{
+  "url": "https://automationexercise.com",
+  "started": "2026-11-24T11:18:34",
+  "finished": "2026-11-24T11:19:38",
+  "total_s": 64.5,
+  "durations": {
+    "explore": 10.92,
+    "generate": 0.0,
+    "codegen": 0.0,
+    "execute": 53.62
+  },
+  "elements": 18,
+  "tests_per_technique": {
+    "ep": 3,
+    "click": 17
+  },
+  "llm": "not used: no LLM key configured (set GEMINI_API_KEY or OPENROUTER_API_KEY in .env)",
+  "llm_stats": {
+    "status": "not used: no LLM key configured (set GEMINI_API_KEY or OPENROUTER_API_KEY in .env)"
+  },
+  "summary": {
+    "passed": 18,
+    "failed": 2,
+    "failures_per_class": {
+      "page_unavailable": 1,
+      "locator_not_found": 1
+    }
+  },
+  "tests": [
+    {
+      "id": "t01",
+      "title": "Your email address: valid partition",
+      "technique": "ep",
+      "priority": 0.91,
+      "status": "passed",
+      "duration": 2.66,
+      "failure_class": null,
+      "message": "",
+      "screenshot": null
+    },
+    {
+      "id": "t02",
+      "title": "Your email address: invalid partition (not an email)",
+      "technique": "ep",
+      "priority": 0.91,
+      "status": "passed",
+      "duration": 2.58,
+      "failure_class": null,
+      "message": "",
+      "screenshot": null
+    },
+    {
+      "id": "t03",
+      "title": "Your email address: required left empty",
+      "technique": "ep",
+      "priority": 0.91,
+      "status": "passed",
+      "duration": 2.07,
+      "failure_class": null,
+      "message": "",
+      "screenshot": null
+    },
+    {
+      "id": "t04",
+      "title": "subscribe: is clickable",
+      "technique": "click",
+      "priority": 0.74,
+      "status": "passed",
+      "duration": 2.02,
+      "failure_class": null,
+      "message": "",
+      "screenshot": null
+    },
+    {
+      "id": "t05",
+      "title": "Test Cases: is clickable",
+      "technique": "click",
+      "priority": 0.54,
+      "status": "passed",
+      "duration": 2.08,
+      "failure_class": null,
+      "message": "",
+      "screenshot": null
+    },
+    {
+      "id": "t06",
+      "title": "APIs list for practice: is clickable",
+      "technique": "click",
+      "priority": 0.54,
+      "status": "passed",
+      "duration": 2.59,
+      "failure_class": null,
+      "message": "",
+      "screenshot": null
+    },
+    {
+      "id": "t07",
+      "title": "Home: is clickable",
+      "technique": "click",
+      "priority": 0.36,
+      "status": "passed",
+      "duration": 2.74,
+      "failure_class": null,
+      "message": "",
+      "screenshot": null
+    },
+    {
+      "id": "t08",
+      "title": "\ue8f8 Products: is clickable",
+      "technique": "click",
+      "priority": 0.36,
+      "status": "passed",
+      "duration": 1.73,
+      "failure_class": null,
+      "message": "",
+      "screenshot": null
+    },
+    {
+      "id": "t09",
+      "title": "Cart: is clickable",
+      "technique": "click",
+      "priority": 0.36,
+      "status": "passed",
+      "duration": 2.53,
+      "failure_class": null,
+      "message": "",
+      "screenshot": null
+    },
+    {
+      "id": "t10",
+      "title": "Signup / Login: is clickable",
+      "technique": "click",
+      "priority": 0.36,
+      "status": "failed",
+      "duration": 0.68,
+      "failure_class": "page_unavailable",
+      "message": "failed on setup with \"conftest.PageUnavailable: https://automationexercise.com returned HTTP 503\"",
+      "screenshot": null
+    },
+    {
+      "id": "t11",
+      "title": "Test Cases: is clickable",
+      "technique": "click",
+      "priority": 0.36,
+      "status": "passed",
+      "duration": 2.23,
+      "failure_class": null,
+      "message": "",
+      "screenshot": null
+    },
+    {
+      "id": "t12",
+      "title": "API Testing: is clickable",
+      "technique": "click",
+      "priority": 0.36,
+      "status": "passed",
+      "duration": 3.3,
+      "failure_class": null,
+      "message": "",
+      "screenshot": null
+    },
+    {
+      "id": "t13",
+      "title": "Video Tutorials: is clickable",
+      "technique": "click",
+      "priority": 0.36,
+      "status": "passed",
+      "duration": 1.88,
+      "failure_class": null,
+      "message": "",
+      "screenshot": null
+    },
+    {
+      "id": "t14",
+      "title": "Contact us: is clickable",
+      "technique": "click",
+      "priority": 0.36,
+      "status": "passed",
+      "duration": 2.71,
+      "failure_class": null,
+      "message": "",
+      "screenshot": null
+    },
+    {
+      "id": "t15",
+      "title": "Test Cases: is clickable",
+      "technique": "click",
+      "priority": 0.36,
+      "status": "passed",
+      "duration": 2.28,
+      "failure_class": null,
+      "message": "",
+      "screenshot": null
+    },
+    {
+      "id": "t16",
+      "title": "APIs list for practice: is clickable",
+      "technique": "click",
+      "priority": 0.36,
+      "status": "passed",
+      "duration": 2.72,
+      "failure_class": null,
+      "message": "",
+      "screenshot": null
+    },
+    {
+      "id": "t17",
+      "title": "(5) H&M: is clickable",
+      "technique": "click",
+      "priority": 0.36,
+      "status": "passed",
+      "duration": 2.16,
+      "failure_class": null,
+      "message": "",
+      "screenshot": null
+    },
+    {
+      "id": "t18",
+      "title": "Tshirt: is clickable",
+      "technique": "click",
+      "priority": 0.36,
+      "status": "failed",
+      "duration": 6.8,
+      "failure_class": "locator_not_found",
+      "message": "pages.site_automationexercise_c_page.LocatorNotFound: e16: no unique match among [('role:link', 'Tshirt'), ('text', 'Tshirt')]",
+      "screenshot": "screenshots/test_t18.png"
+    },
+    {
+      "id": "t19",
+      "title": "Dress: is clickable",
+      "technique": "click",
+      "priority": 0.36,
+      "status": "passed",
+      "duration": 2.06,
+      "failure_class": null,
+      "message": "",
+      "screenshot": null
+    },
+    {
+      "id": "t20",
+      "title": "Outfits: is clickable",
+      "technique": "click",
+      "priority": 0.36,
+      "status": "passed",
+      "duration": 4.7,
+      "failure_class": null,
+      "message": "",
+      "screenshot": null
+    }
+  ]
+}

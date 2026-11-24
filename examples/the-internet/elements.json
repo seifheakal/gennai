@@ -1,0 +1,1282 @@
+[
+  {
+    "id": "e01",
+    "tag": "input",
+    "type": "search",
+    "dom_id": "example-filter",
+    "name": null,
+    "placeholder": "Type a name or a word from the description",
+    "aria_label": null,
+    "label": "Filter examples",
+    "text": "",
+    "required": false,
+    "minlength": null,
+    "maxlength": null,
+    "min": null,
+    "max": null,
+    "pattern": null,
+    "testid": null,
+    "role": null,
+    "form": -1,
+    "options": null,
+    "kind": "text",
+    "locators": [
+      [
+        "css",
+        "#example-filter"
+      ],
+      [
+        "label",
+        "Filter examples"
+      ],
+      [
+        "placeholder",
+        "Type a name or a word from the description"
+      ]
+    ]
+  },
+  {
+    "id": "e02",
+    "tag": "a",
+    "type": "",
+    "dom_id": null,
+    "name": null,
+    "placeholder": null,
+    "aria_label": "The Internet: home",
+    "label": "",
+    "text": "",
+    "required": false,
+    "minlength": null,
+    "maxlength": null,
+    "min": null,
+    "max": null,
+    "pattern": null,
+    "testid": null,
+    "role": null,
+    "form": -1,
+    "options": null,
+    "kind": "link",
+    "locators": [
+      [
+        "role:link",
+        "The Internet: home"
+      ]
+    ]
+  },
+  {
+    "id": "e03",
+    "tag": "a",
+    "type": "",
+    "dom_id": null,
+    "name": null,
+    "placeholder": null,
+    "aria_label": null,
+    "label": "",
+    "text": "A/B Testing",
+    "required": false,
+    "minlength": null,
+    "maxlength": null,
+    "min": null,
+    "max": null,
+    "pattern": null,
+    "testid": null,
+    "role": null,
+    "form": -1,
+    "options": null,
+    "kind": "link",
+    "locators": [
+      [
+        "role:link",
+        "A/B Testing"
+      ],
+      [
+        "text",
+        "A/B Testing"
+      ]
+    ]
+  },
+  {
+    "id": "e04",
+    "tag": "a",
+    "type": "",
+    "dom_id": null,
+    "name": null,
+    "placeholder": null,
+    "aria_label": null,
+    "label": "",
+    "text": "Accessibility Issues",
+    "required": false,
+    "minlength": null,
+    "maxlength": null,
+    "min": null,
+    "max": null,
+    "pattern": null,
+    "testid": null,
+    "role": null,
+    "form": -1,
+    "options": null,
+    "kind": "link",
+    "locators": [
+      [
+        "role:link",
+        "Accessibility Issues"
+      ],
+      [
+        "text",
+        "Accessibility Issues"
+      ]
+    ]
+  },
+  {
+    "id": "e05",
+    "tag": "a",
+    "type": "",
+    "dom_id": null,
+    "name": null,
+    "placeholder": null,
+    "aria_label": null,
+    "label": "",
+    "text": "Add/Remove Elements",
+    "required": false,
+    "minlength": null,
+    "maxlength": null,
+    "min": null,
+    "max": null,
+    "pattern": null,
+    "testid": null,
+    "role": null,
+    "form": -1,
+    "options": null,
+    "kind": "link",
+    "locators": [
+      [
+        "role:link",
+        "Add/Remove Elements"
+      ],
+      [
+        "text",
+        "Add/Remove Elements"
+      ]
+    ]
+  },
+  {
+    "id": "e06",
+    "tag": "a",
+    "type": "",
+    "dom_id": null,
+    "name": null,
+    "placeholder": null,
+    "aria_label": null,
+    "label": "",
+    "text": "Advanced Iframes",
+    "required": false,
+    "minlength": null,
+    "maxlength": null,
+    "min": null,
+    "max": null,
+    "pattern": null,
+    "testid": null,
+    "role": null,
+    "form": -1,
+    "options": null,
+    "kind": "link",
+    "locators": [
+      [
+        "role:link",
+        "Advanced Iframes"
+      ],
+      [
+        "text",
+        "Advanced Iframes"
+      ]
+    ]
+  },
+  {
+    "id": "e07",
+    "tag": "a",
+    "type": "",
+    "dom_id": null,
+    "name": null,
+    "placeholder": null,
+    "aria_label": null,
+    "label": "",
+    "text": "Advanced Shadow DOM",
+    "required": false,
+    "minlength": null,
+    "maxlength": null,
+    "min": null,
+    "max": null,
+    "pattern": null,
+    "testid": null,
+    "role": null,
+    "form": -1,
+    "options": null,
+    "kind": "link",
+    "locators": [
+      [
+        "role:link",
+        "Advanced Shadow DOM"
+      ],
+      [
+        "text",
+        "Advanced Shadow DOM"
+      ]
+    ]
+  },
+  {
+    "id": "e08",
+    "tag": "a",
+    "type": "",
+    "dom_id": null,
+    "name": null,
+    "placeholder": null,
+    "aria_label": null,
+    "label": "",
+    "text": "Autocomplete",
+    "required": false,
+    "minlength": null,
+    "maxlength": null,
+    "min": null,
+    "max": null,
+    "pattern": null,
+    "testid": null,
+    "role": null,
+    "form": -1,
+    "options": null,
+    "kind": "link",
+    "locators": [
+      [
+        "role:link",
+        "Autocomplete"
+      ],
+      [
+        "text",
+        "Autocomplete"
+      ]
+    ]
+  },
+  {
+    "id": "e09",
+    "tag": "a",
+    "type": "",
+    "dom_id": null,
+    "name": null,
+    "placeholder": null,
+    "aria_label": null,
+    "label": "",
+    "text": "Basic Auth",
+    "required": false,
+    "minlength": null,
+    "maxlength": null,
+    "min": null,
+    "max": null,
+    "pattern": null,
+    "testid": null,
+    "role": null,
+    "form": -1,
+    "options": null,
+    "kind": "link",
+    "locators": [
+      [
+        "role:link",
+        "Basic Auth"
+      ],
+      [
+        "text",
+        "Basic Auth"
+      ]
+    ]
+  },
+  {
+    "id": "e10",
+    "tag": "a",
+    "type": "",
+    "dom_id": null,
+    "name": null,
+    "placeholder": null,
+    "aria_label": null,
+    "label": "",
+    "text": "Broken Images",
+    "required": false,
+    "minlength": null,
+    "maxlength": null,
+    "min": null,
+    "max": null,
+    "pattern": null,
+    "testid": null,
+    "role": null,
+    "form": -1,
+    "options": null,
+    "kind": "link",
+    "locators": [
+      [
+        "role:link",
+        "Broken Images"
+      ],
+      [
+        "text",
+        "Broken Images"
+      ]
+    ]
+  },
+  {
+    "id": "e11",
+    "tag": "a",
+    "type": "",
+    "dom_id": null,
+    "name": null,
+    "placeholder": null,
+    "aria_label": null,
+    "label": "",
+    "text": "Browser Permissions",
+    "required": false,
+    "minlength": null,
+    "maxlength": null,
+    "min": null,
+    "max": null,
+    "pattern": null,
+    "testid": null,
+    "role": null,
+    "form": -1,
+    "options": null,
+    "kind": "link",
+    "locators": [
+      [
+        "role:link",
+        "Browser Permissions"
+      ],
+      [
+        "text",
+        "Browser Permissions"
+      ]
+    ]
+  },
+  {
+    "id": "e12",
+    "tag": "a",
+    "type": "",
+    "dom_id": null,
+    "name": null,
+    "placeholder": null,
+    "aria_label": null,
+    "label": "",
+    "text": "Canvas",
+    "required": false,
+    "minlength": null,
+    "maxlength": null,
+    "min": null,
+    "max": null,
+    "pattern": null,
+    "testid": null,
+    "role": null,
+    "form": -1,
+    "options": null,
+    "kind": "link",
+    "locators": [
+      [
+        "role:link",
+        "Canvas"
+      ],
+      [
+        "text",
+        "Canvas"
+      ]
+    ]
+  },
+  {
+    "id": "e13",
+    "tag": "a",
+    "type": "",
+    "dom_id": null,
+    "name": null,
+    "placeholder": null,
+    "aria_label": null,
+    "label": "",
+    "text": "Challenging DOM",
+    "required": false,
+    "minlength": null,
+    "maxlength": null,
+    "min": null,
+    "max": null,
+    "pattern": null,
+    "testid": null,
+    "role": null,
+    "form": -1,
+    "options": null,
+    "kind": "link",
+    "locators": [
+      [
+        "role:link",
+        "Challenging DOM"
+      ],
+      [
+        "text",
+        "Challenging DOM"
+      ]
+    ]
+  },
+  {
+    "id": "e14",
+    "tag": "a",
+    "type": "",
+    "dom_id": null,
+    "name": null,
+    "placeholder": null,
+    "aria_label": null,
+    "label": "",
+    "text": "Chat",
+    "required": false,
+    "minlength": null,
+    "maxlength": null,
+    "min": null,
+    "max": null,
+    "pattern": null,
+    "testid": null,
+    "role": null,
+    "form": -1,
+    "options": null,
+    "kind": "link",
+    "locators": [
+      [
+        "role:link",
+        "Chat"
+      ],
+      [
+        "text",
+        "Chat"
+      ]
+    ]
+  },
+  {
+    "id": "e15",
+    "tag": "a",
+    "type": "",
+    "dom_id": null,
+    "name": null,
+    "placeholder": null,
+    "aria_label": null,
+    "label": "",
+    "text": "Checkboxes",
+    "required": false,
+    "minlength": null,
+    "maxlength": null,
+    "min": null,
+    "max": null,
+    "pattern": null,
+    "testid": null,
+    "role": null,
+    "form": -1,
+    "options": null,
+    "kind": "link",
+    "locators": [
+      [
+        "role:link",
+        "Checkboxes"
+      ],
+      [
+        "text",
+        "Checkboxes"
+      ]
+    ]
+  },
+  {
+    "id": "e16",
+    "tag": "a",
+    "type": "",
+    "dom_id": null,
+    "name": null,
+    "placeholder": null,
+    "aria_label": null,
+    "label": "",
+    "text": "Context Menu",
+    "required": false,
+    "minlength": null,
+    "maxlength": null,
+    "min": null,
+    "max": null,
+    "pattern": null,
+    "testid": null,
+    "role": null,
+    "form": -1,
+    "options": null,
+    "kind": "link",
+    "locators": [
+      [
+        "role:link",
+        "Context Menu"
+      ],
+      [
+        "text",
+        "Context Menu"
+      ]
+    ]
+  },
+  {
+    "id": "e17",
+    "tag": "a",
+    "type": "",
+    "dom_id": null,
+    "name": null,
+    "placeholder": null,
+    "aria_label": null,
+    "label": "",
+    "text": "Cookie Consent",
+    "required": false,
+    "minlength": null,
+    "maxlength": null,
+    "min": null,
+    "max": null,
+    "pattern": null,
+    "testid": null,
+    "role": null,
+    "form": -1,
+    "options": null,
+    "kind": "link",
+    "locators": [
+      [
+        "role:link",
+        "Cookie Consent"
+      ],
+      [
+        "text",
+        "Cookie Consent"
+      ]
+    ]
+  },
+  {
+    "id": "e18",
+    "tag": "a",
+    "type": "",
+    "dom_id": null,
+    "name": null,
+    "placeholder": null,
+    "aria_label": null,
+    "label": "",
+    "text": "Custom Dropdown",
+    "required": false,
+    "minlength": null,
+    "maxlength": null,
+    "min": null,
+    "max": null,
+    "pattern": null,
+    "testid": null,
+    "role": null,
+    "form": -1,
+    "options": null,
+    "kind": "link",
+    "locators": [
+      [
+        "role:link",
+        "Custom Dropdown"
+      ],
+      [
+        "text",
+        "Custom Dropdown"
+      ]
+    ]
+  },
+  {
+    "id": "e19",
+    "tag": "a",
+    "type": "",
+    "dom_id": null,
+    "name": null,
+    "placeholder": null,
+    "aria_label": null,
+    "label": "",
+    "text": "Date & Time Pickers",
+    "required": false,
+    "minlength": null,
+    "maxlength": null,
+    "min": null,
+    "max": null,
+    "pattern": null,
+    "testid": null,
+    "role": null,
+    "form": -1,
+    "options": null,
+    "kind": "link",
+    "locators": [
+      [
+        "role:link",
+        "Date & Time Pickers"
+      ],
+      [
+        "text",
+        "Date & Time Pickers"
+      ]
+    ]
+  },
+  {
+    "id": "e20",
+    "tag": "a",
+    "type": "",
+    "dom_id": null,
+    "name": null,
+    "placeholder": null,
+    "aria_label": null,
+    "label": "",
+    "text": "Digest Authentication",
+    "required": false,
+    "minlength": null,
+    "maxlength": null,
+    "min": null,
+    "max": null,
+    "pattern": null,
+    "testid": null,
+    "role": null,
+    "form": -1,
+    "options": null,
+    "kind": "link",
+    "locators": [
+      [
+        "role:link",
+        "Digest Authentication"
+      ],
+      [
+        "text",
+        "Digest Authentication"
+      ]
+    ]
+  },
+  {
+    "id": "e21",
+    "tag": "a",
+    "type": "",
+    "dom_id": null,
+    "name": null,
+    "placeholder": null,
+    "aria_label": null,
+    "label": "",
+    "text": "Disappearing Elements",
+    "required": false,
+    "minlength": null,
+    "maxlength": null,
+    "min": null,
+    "max": null,
+    "pattern": null,
+    "testid": null,
+    "role": null,
+    "form": -1,
+    "options": null,
+    "kind": "link",
+    "locators": [
+      [
+        "role:link",
+        "Disappearing Elements"
+      ],
+      [
+        "text",
+        "Disappearing Elements"
+      ]
+    ]
+  },
+  {
+    "id": "e22",
+    "tag": "a",
+    "type": "",
+    "dom_id": null,
+    "name": null,
+    "placeholder": null,
+    "aria_label": null,
+    "label": "",
+    "text": "Drag and Drop",
+    "required": false,
+    "minlength": null,
+    "maxlength": null,
+    "min": null,
+    "max": null,
+    "pattern": null,
+    "testid": null,
+    "role": null,
+    "form": -1,
+    "options": null,
+    "kind": "link",
+    "locators": [
+      [
+        "role:link",
+        "Drag and Drop"
+      ],
+      [
+        "text",
+        "Drag and Drop"
+      ]
+    ]
+  },
+  {
+    "id": "e23",
+    "tag": "a",
+    "type": "",
+    "dom_id": null,
+    "name": null,
+    "placeholder": null,
+    "aria_label": null,
+    "label": "",
+    "text": "Dropdown",
+    "required": false,
+    "minlength": null,
+    "maxlength": null,
+    "min": null,
+    "max": null,
+    "pattern": null,
+    "testid": null,
+    "role": null,
+    "form": -1,
+    "options": null,
+    "kind": "link",
+    "locators": [
+      [
+        "role:link",
+        "Dropdown"
+      ],
+      [
+        "text",
+        "Dropdown"
+      ]
+    ]
+  },
+  {
+    "id": "e24",
+    "tag": "a",
+    "type": "",
+    "dom_id": null,
+    "name": null,
+    "placeholder": null,
+    "aria_label": null,
+    "label": "",
+    "text": "Dynamic Content",
+    "required": false,
+    "minlength": null,
+    "maxlength": null,
+    "min": null,
+    "max": null,
+    "pattern": null,
+    "testid": null,
+    "role": null,
+    "form": -1,
+    "options": null,
+    "kind": "link",
+    "locators": [
+      [
+        "role:link",
+        "Dynamic Content"
+      ],
+      [
+        "text",
+        "Dynamic Content"
+      ]
+    ]
+  },
+  {
+    "id": "e25",
+    "tag": "a",
+    "type": "",
+    "dom_id": null,
+    "name": null,
+    "placeholder": null,
+    "aria_label": null,
+    "label": "",
+    "text": "Dynamic Controls",
+    "required": false,
+    "minlength": null,
+    "maxlength": null,
+    "min": null,
+    "max": null,
+    "pattern": null,
+    "testid": null,
+    "role": null,
+    "form": -1,
+    "options": null,
+    "kind": "link",
+    "locators": [
+      [
+        "role:link",
+        "Dynamic Controls"
+      ],
+      [
+        "text",
+        "Dynamic Controls"
+      ]
+    ]
+  },
+  {
+    "id": "e26",
+    "tag": "a",
+    "type": "",
+    "dom_id": null,
+    "name": null,
+    "placeholder": null,
+    "aria_label": null,
+    "label": "",
+    "text": "Dynamic Loading",
+    "required": false,
+    "minlength": null,
+    "maxlength": null,
+    "min": null,
+    "max": null,
+    "pattern": null,
+    "testid": null,
+    "role": null,
+    "form": -1,
+    "options": null,
+    "kind": "link",
+    "locators": [
+      [
+        "role:link",
+        "Dynamic Loading"
+      ],
+      [
+        "text",
+        "Dynamic Loading"
+      ]
+    ]
+  },
+  {
+    "id": "e27",
+    "tag": "a",
+    "type": "",
+    "dom_id": null,
+    "name": null,
+    "placeholder": null,
+    "aria_label": null,
+    "label": "",
+    "text": "Entry Ad",
+    "required": false,
+    "minlength": null,
+    "maxlength": null,
+    "min": null,
+    "max": null,
+    "pattern": null,
+    "testid": null,
+    "role": null,
+    "form": -1,
+    "options": null,
+    "kind": "link",
+    "locators": [
+      [
+        "role:link",
+        "Entry Ad"
+      ],
+      [
+        "text",
+        "Entry Ad"
+      ]
+    ]
+  },
+  {
+    "id": "e28",
+    "tag": "a",
+    "type": "",
+    "dom_id": null,
+    "name": null,
+    "placeholder": null,
+    "aria_label": null,
+    "label": "",
+    "text": "Exit Intent",
+    "required": false,
+    "minlength": null,
+    "maxlength": null,
+    "min": null,
+    "max": null,
+    "pattern": null,
+    "testid": null,
+    "role": null,
+    "form": -1,
+    "options": null,
+    "kind": "link",
+    "locators": [
+      [
+        "role:link",
+        "Exit Intent"
+      ],
+      [
+        "text",
+        "Exit Intent"
+      ]
+    ]
+  },
+  {
+    "id": "e29",
+    "tag": "a",
+    "type": "",
+    "dom_id": null,
+    "name": null,
+    "placeholder": null,
+    "aria_label": null,
+    "label": "",
+    "text": "File Download",
+    "required": false,
+    "minlength": null,
+    "maxlength": null,
+    "min": null,
+    "max": null,
+    "pattern": null,
+    "testid": null,
+    "role": null,
+    "form": -1,
+    "options": null,
+    "kind": "link",
+    "locators": [
+      [
+        "role:link",
+        "File Download"
+      ],
+      [
+        "text",
+        "File Download"
+      ]
+    ]
+  },
+  {
+    "id": "e30",
+    "tag": "a",
+    "type": "",
+    "dom_id": null,
+    "name": null,
+    "placeholder": null,
+    "aria_label": null,
+    "label": "",
+    "text": "File Upload",
+    "required": false,
+    "minlength": null,
+    "maxlength": null,
+    "min": null,
+    "max": null,
+    "pattern": null,
+    "testid": null,
+    "role": null,
+    "form": -1,
+    "options": null,
+    "kind": "link",
+    "locators": [
+      [
+        "role:link",
+        "File Upload"
+      ],
+      [
+        "text",
+        "File Upload"
+      ]
+    ]
+  },
+  {
+    "id": "e31",
+    "tag": "a",
+    "type": "",
+    "dom_id": null,
+    "name": null,
+    "placeholder": null,
+    "aria_label": null,
+    "label": "",
+    "text": "Floating Menu",
+    "required": false,
+    "minlength": null,
+    "maxlength": null,
+    "min": null,
+    "max": null,
+    "pattern": null,
+    "testid": null,
+    "role": null,
+    "form": -1,
+    "options": null,
+    "kind": "link",
+    "locators": [
+      [
+        "role:link",
+        "Floating Menu"
+      ],
+      [
+        "text",
+        "Floating Menu"
+      ]
+    ]
+  },
+  {
+    "id": "e32",
+    "tag": "a",
+    "type": "",
+    "dom_id": null,
+    "name": null,
+    "placeholder": null,
+    "aria_label": null,
+    "label": "",
+    "text": "Forgot Password",
+    "required": false,
+    "minlength": null,
+    "maxlength": null,
+    "min": null,
+    "max": null,
+    "pattern": null,
+    "testid": null,
+    "role": null,
+    "form": -1,
+    "options": null,
+    "kind": "link",
+    "locators": [
+      [
+        "role:link",
+        "Forgot Password"
+      ],
+      [
+        "text",
+        "Forgot Password"
+      ]
+    ]
+  },
+  {
+    "id": "e33",
+    "tag": "a",
+    "type": "",
+    "dom_id": null,
+    "name": null,
+    "placeholder": null,
+    "aria_label": null,
+    "label": "",
+    "text": "Form Authentication",
+    "required": false,
+    "minlength": null,
+    "maxlength": null,
+    "min": null,
+    "max": null,
+    "pattern": null,
+    "testid": null,
+    "role": null,
+    "form": -1,
+    "options": null,
+    "kind": "link",
+    "locators": [
+      [
+        "role:link",
+        "Form Authentication"
+      ],
+      [
+        "text",
+        "Form Authentication"
+      ]
+    ]
+  },
+  {
+    "id": "e34",
+    "tag": "a",
+    "type": "",
+    "dom_id": null,
+    "name": null,
+    "placeholder": null,
+    "aria_label": null,
+    "label": "",
+    "text": "Form Validation",
+    "required": false,
+    "minlength": null,
+    "maxlength": null,
+    "min": null,
+    "max": null,
+    "pattern": null,
+    "testid": null,
+    "role": null,
+    "form": -1,
+    "options": null,
+    "kind": "link",
+    "locators": [
+      [
+        "role:link",
+        "Form Validation"
+      ],
+      [
+        "text",
+        "Form Validation"
+      ]
+    ]
+  },
+  {
+    "id": "e35",
+    "tag": "a",
+    "type": "",
+    "dom_id": null,
+    "name": null,
+    "placeholder": null,
+    "aria_label": null,
+    "label": "",
+    "text": "Frames",
+    "required": false,
+    "minlength": null,
+    "maxlength": null,
+    "min": null,
+    "max": null,
+    "pattern": null,
+    "testid": null,
+    "role": null,
+    "form": -1,
+    "options": null,
+    "kind": "link",
+    "locators": [
+      [
+        "role:link",
+        "Frames"
+      ],
+      [
+        "text",
+        "Frames"
+      ]
+    ]
+  },
+  {
+    "id": "e36",
+    "tag": "a",
+    "type": "",
+    "dom_id": null,
+    "name": null,
+    "placeholder": null,
+    "aria_label": null,
+    "label": "",
+    "text": "Geolocation",
+    "required": false,
+    "minlength": null,
+    "maxlength": null,
+    "min": null,
+    "max": null,
+    "pattern": null,
+    "testid": null,
+    "role": null,
+    "form": -1,
+    "options": null,
+    "kind": "link",
+    "locators": [
+      [
+        "role:link",
+        "Geolocation"
+      ],
+      [
+        "text",
+        "Geolocation"
+      ]
+    ]
+  },
+  {
+    "id": "e37",
+    "tag": "a",
+    "type": "",
+    "dom_id": null,
+    "name": null,
+    "placeholder": null,
+    "aria_label": null,
+    "label": "",
+    "text": "Horizontal Slider",
+    "required": false,
+    "minlength": null,
+    "maxlength": null,
+    "min": null,
+    "max": null,
+    "pattern": null,
+    "testid": null,
+    "role": null,
+    "form": -1,
+    "options": null,
+    "kind": "link",
+    "locators": [
+      [
+        "role:link",
+        "Horizontal Slider"
+      ],
+      [
+        "text",
+        "Horizontal Slider"
+      ]
+    ]
+  },
+  {
+    "id": "e38",
+    "tag": "a",
+    "type": "",
+    "dom_id": null,
+    "name": null,
+    "placeholder": null,
+    "aria_label": null,
+    "label": "",
+    "text": "Hovers",
+    "required": false,
+    "minlength": null,
+    "maxlength": null,
+    "min": null,
+    "max": null,
+    "pattern": null,
+    "testid": null,
+    "role": null,
+    "form": -1,
+    "options": null,
+    "kind": "link",
+    "locators": [
+      [
+        "role:link",
+        "Hovers"
+      ],
+      [
+        "text",
+        "Hovers"
+      ]
+    ]
+  },
+  {
+    "id": "e39",
+    "tag": "a",
+    "type": "",
+    "dom_id": null,
+    "name": null,
+    "placeholder": null,
+    "aria_label": null,
+    "label": "",
+    "text": "Infinite Scroll",
+    "required": false,
+    "minlength": null,
+    "maxlength": null,
+    "min": null,
+    "max": null,
+    "pattern": null,
+    "testid": null,
+    "role": null,
+    "form": -1,
+    "options": null,
+    "kind": "link",
+    "locators": [
+      [
+        "role:link",
+        "Infinite Scroll"
+      ],
+      [
+        "text",
+        "Infinite Scroll"
+      ]
+    ]
+  },
+  {
+    "id": "e40",
+    "tag": "a",
+    "type": "",
+    "dom_id": null,
+    "name": null,
+    "placeholder": null,
+    "aria_label": null,
+    "label": "",
+    "text": "Inputs",
+    "required": false,
+    "minlength": null,
+    "maxlength": null,
+    "min": null,
+    "max": null,
+    "pattern": null,
+    "testid": null,
+    "role": null,
+    "form": -1,
+    "options": null,
+    "kind": "link",
+    "locators": [
+      [
+        "role:link",
+        "Inputs"
+      ],
+      [
+        "text",
+        "Inputs"
+      ]
+    ]
+  }
+]

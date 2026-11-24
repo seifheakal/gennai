@@ -1,0 +1,253 @@
+{
+  "url": "http://127.0.0.1:52391/",
+  "started": "2026-11-24T11:20:07",
+  "finished": "2026-11-24T11:20:23",
+  "total_s": 16.1,
+  "durations": {
+    "explore": 3.68,
+    "generate": 0.0,
+    "codegen": 0.0,
+    "execute": 12.46
+  },
+  "elements": 7,
+  "tests_per_technique": {
+    "state": 3,
+    "bva": 7,
+    "ep": 8,
+    "click": 2
+  },
+  "llm": "not used: no LLM key configured (set GEMINI_API_KEY or OPENROUTER_API_KEY in .env)",
+  "llm_stats": {
+    "status": "not used: no LLM key configured (set GEMINI_API_KEY or OPENROUTER_API_KEY in .env)"
+  },
+  "summary": {
+    "passed": 18,
+    "failed": 2,
+    "failures_per_class": {
+      "element_intercepted": 1,
+      "assertion": 1
+    }
+  },
+  "tests": [
+    {
+      "id": "t01",
+      "title": "Form 1: all fields valid",
+      "technique": "state",
+      "priority": 0.91,
+      "status": "passed",
+      "duration": 1.53,
+      "failure_class": null,
+      "message": "",
+      "screenshot": null
+    },
+    {
+      "id": "t02",
+      "title": "Form 1: required 'Name' left empty",
+      "technique": "state",
+      "priority": 0.91,
+      "status": "passed",
+      "duration": 0.16,
+      "failure_class": null,
+      "message": "",
+      "screenshot": null
+    },
+    {
+      "id": "t03",
+      "title": "Form 1: required 'I accept the terms' left empty",
+      "technique": "state",
+      "priority": 0.91,
+      "status": "passed",
+      "duration": 0.13,
+      "failure_class": null,
+      "message": "",
+      "screenshot": null
+    },
+    {
+      "id": "t04",
+      "title": "Name: length 1 (below minlength)",
+      "technique": "bva",
+      "priority": 0.85,
+      "status": "passed",
+      "duration": 0.12,
+      "failure_class": null,
+      "message": "",
+      "screenshot": null
+    },
+    {
+      "id": "t05",
+      "title": "Name: length 2 (minlength)",
+      "technique": "bva",
+      "priority": 0.85,
+      "status": "passed",
+      "duration": 0.11,
+      "failure_class": null,
+      "message": "",
+      "screenshot": null
+    },
+    {
+      "id": "t06",
+      "title": "Name: length 30 (maxlength)",
+      "technique": "bva",
+      "priority": 0.85,
+      "status": "passed",
+      "duration": 0.11,
+      "failure_class": null,
+      "message": "",
+      "screenshot": null
+    },
+    {
+      "id": "t07",
+      "title": "Name: length 31 is limited",
+      "technique": "bva",
+      "priority": 0.85,
+      "status": "passed",
+      "duration": 0.1,
+      "failure_class": null,
+      "message": "",
+      "screenshot": null
+    },
+    {
+      "id": "t08",
+      "title": "Name: valid partition",
+      "technique": "ep",
+      "priority": 0.82,
+      "status": "passed",
+      "duration": 0.11,
+      "failure_class": null,
+      "message": "",
+      "screenshot": null
+    },
+    {
+      "id": "t09",
+      "title": "Name: required left empty",
+      "technique": "ep",
+      "priority": 0.82,
+      "status": "passed",
+      "duration": 0.1,
+      "failure_class": null,
+      "message": "",
+      "screenshot": null
+    },
+    {
+      "id": "t10",
+      "title": "I accept the terms: valid partition",
+      "technique": "ep",
+      "priority": 0.79,
+      "status": "passed",
+      "duration": 0.12,
+      "failure_class": null,
+      "message": "",
+      "screenshot": null
+    },
+    {
+      "id": "t11",
+      "title": "I accept the terms: required left empty",
+      "technique": "ep",
+      "priority": 0.79,
+      "status": "passed",
+      "duration": 0.11,
+      "failure_class": null,
+      "message": "",
+      "screenshot": null
+    },
+    {
+      "id": "t12",
+      "title": "Submit: is clickable",
+      "technique": "click",
+      "priority": 0.74,
+      "status": "failed",
+      "duration": 5.11,
+      "failure_class": "element_intercepted",
+      "message": "<div id=\"cookie\" role=\"region\" aria-label=\"Cookie notice\">We use cookies to improve this site.</div> intercepts pointer events\nplaywright._impl._errors.TimeoutError: Locator.click: Timeout 5000ms exceeded.\nCall log:\n  - waiting for get_by_role(\"button\", name=\"Submit\", exact=True)\n    - locator resolved to <button type=\"submit\">Submit</button>\n  - attempting click action (trial run)\n    2 \u00d7 waiting for element to be visible, enabled and stable\n      - element is visible, enabled and stable\n      - scrolling into view if needed\n      - done scrolling\n[+17 more lines; full report in element text]",
+      "screenshot": "screenshots/test_t12.png"
+    },
+    {
+      "id": "t13",
+      "title": "Email: valid partition",
+      "technique": "ep",
+      "priority": 0.71,
+      "status": "passed",
+      "duration": 0.11,
+      "failure_class": null,
+      "message": "",
+      "screenshot": null
+    },
+    {
+      "id": "t14",
+      "title": "Email: invalid partition (not an email)",
+      "technique": "ep",
+      "priority": 0.71,
+      "status": "failed",
+      "duration": 0.12,
+      "failure_class": "assertion",
+      "message": "AssertionError: expected the field to be invalid\nassert True is False\n +  where True = evaluate('el => el.checkValidity()')\n +    where evaluate = <Locator frame=<Frame name= url='http://127.0.0.1:52391/'> selector='#email'>.evaluate\n +      where <Locator frame=<Frame name= url='http://127.0.0.1:52391/'> selector='#email'> = e02_email()\n +        where e02_email = <pages.site_127_0_0_1_page.Page object at 0x000002AF580C33F0>.e02_email",
+      "screenshot": "screenshots/test_t14.png"
+    },
+    {
+      "id": "t15",
+      "title": "Age: 17 (below min)",
+      "technique": "bva",
+      "priority": 0.68,
+      "status": "passed",
+      "duration": 0.11,
+      "failure_class": null,
+      "message": "",
+      "screenshot": null
+    },
+    {
+      "id": "t16",
+      "title": "Age: 120 (max)",
+      "technique": "bva",
+      "priority": 0.68,
+      "status": "passed",
+      "duration": 0.11,
+      "failure_class": null,
+      "message": "",
+      "screenshot": null
+    },
+    {
+      "id": "t17",
+      "title": "Age: 121 (above max)",
+      "technique": "bva",
+      "priority": 0.68,
+      "status": "passed",
+      "duration": 0.11,
+      "failure_class": null,
+      "message": "",
+      "screenshot": null
+    },
+    {
+      "id": "t18",
+      "title": "Age: valid partition",
+      "technique": "ep",
+      "priority": 0.65,
+      "status": "passed",
+      "duration": 0.11,
+      "failure_class": null,
+      "message": "",
+      "screenshot": null
+    },
+    {
+      "id": "t19",
+      "title": "Country: valid partition",
+      "technique": "ep",
+      "priority": 0.59,
+      "status": "passed",
+      "duration": 0.09,
+      "failure_class": null,
+      "message": "",
+      "screenshot": null
+    },
+    {
+      "id": "t20",
+      "title": "Load offers: is clickable",
+      "technique": "click",
+      "priority": 0.54,
+      "status": "passed",
+      "duration": 2.63,
+      "failure_class": null,
+      "message": "",
+      "screenshot": null
+    }
+  ]
+}

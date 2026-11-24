@@ -1,0 +1,214 @@
+[
+  {
+    "id": "t01",
+    "title": "Your email address: valid partition",
+    "technique": "ep",
+    "steps": [
+      {
+        "element": "e01",
+        "action": "fill",
+        "value": "test.user@example.com"
+      }
+    ],
+    "target": "e01",
+    "expect": "valid",
+    "limit": null,
+    "priority": 0.91
+  },
+  {
+    "id": "t02",
+    "title": "Your email address: invalid partition (not an email)",
+    "technique": "ep",
+    "steps": [
+      {
+        "element": "e01",
+        "action": "fill",
+        "value": "not-an-email"
+      }
+    ],
+    "target": "e01",
+    "expect": "invalid",
+    "limit": null,
+    "priority": 0.91
+  },
+  {
+    "id": "t03",
+    "title": "Your email address: required left empty",
+    "technique": "ep",
+    "steps": [],
+    "target": "e01",
+    "expect": "invalid",
+    "limit": null,
+    "priority": 0.91
+  },
+  {
+    "id": "t04",
+    "title": "subscribe: is clickable",
+    "technique": "click",
+    "steps": [],
+    "target": "e04",
+    "expect": "clickable",
+    "limit": null,
+    "priority": 0.74
+  },
+  {
+    "id": "t05",
+    "title": "Test Cases: is clickable",
+    "technique": "click",
+    "steps": [],
+    "target": "e02",
+    "expect": "clickable",
+    "limit": null,
+    "priority": 0.54
+  },
+  {
+    "id": "t06",
+    "title": "APIs list for practice: is clickable",
+    "technique": "click",
+    "steps": [],
+    "target": "e03",
+    "expect": "clickable",
+    "limit": null,
+    "priority": 0.54
+  },
+  {
+    "id": "t07",
+    "title": "Home: is clickable",
+    "technique": "click",
+    "steps": [],
+    "target": "e05",
+    "expect": "clickable",
+    "limit": null,
+    "priority": 0.36
+  },
+  {
+    "id": "t08",
+    "title": "\ue8f8 Products: is clickable",
+    "technique": "click",
+    "steps": [],
+    "target": "e06",
+    "expect": "clickable",
+    "limit": null,
+    "priority": 0.36
+  },
+  {
+    "id": "t09",
+    "title": "Cart: is clickable",
+    "technique": "click",
+    "steps": [],
+    "target": "e07",
+    "expect": "clickable",
+    "limit": null,
+    "priority": 0.36
+  },
+  {
+    "id": "t10",
+    "title": "Signup / Login: is clickable",
+    "technique": "click",
+    "steps": [],
+    "target": "e08",
+    "expect": "clickable",
+    "limit": null,
+    "priority": 0.36
+  },
+  {
+    "id": "t11",
+    "title": "Test Cases: is clickable",
+    "technique": "click",
+    "steps": [],
+    "target": "e09",
+    "expect": "clickable",
+    "limit": null,
+    "priority": 0.36
+  },
+  {
+    "id": "t12",
+    "title": "API Testing: is clickable",
+    "technique": "click",
+    "steps": [],
+    "target": "e10",
+    "expect": "clickable",
+    "limit": null,
+    "priority": 0.36
+  },
+  {
+    "id": "t13",
+    "title": "Video Tutorials: is clickable",
+    "technique": "click",
+    "steps": [],
+    "target": "e11",
+    "expect": "clickable",
+    "limit": null,
+    "priority": 0.36
+  },
+  {
+    "id": "t14",
+    "title": "Contact us: is clickable",
+    "technique": "click",
+    "steps": [],
+    "target": "e12",
+    "expect": "clickable",
+    "limit": null,
+    "priority": 0.36
+  },
+  {
+    "id": "t15",
+    "title": "Test Cases: is clickable",
+    "technique": "click",
+    "steps": [],
+    "target": "e13",
+    "expect": "clickable",
+    "limit": null,
+    "priority": 0.36
+  },
+  {
+    "id": "t16",
+    "title": "APIs list for practice: is clickable",
+    "technique": "click",
+    "steps": [],
+    "target": "e14",
+    "expect": "clickable",
+    "limit": null,
+    "priority": 0.36
+  },
+  {
+    "id": "t17",
+    "title": "(5) H&M: is clickable",
+    "technique": "click",
+    "steps": [],
+    "target": "e15",
+    "expect": "clickable",
+    "limit": null,
+    "priority": 0.36
+  },
+  {
+    "id": "t18",
+    "title": "Tshirt: is clickable",
+    "technique": "click",
+    "steps": [],
+    "target": "e16",
+    "expect": "clickable",
+    "limit": null,
+    "priority": 0.36
+  },
+  {
+    "id": "t19",
+    "title": "Dress: is clickable",
+    "technique": "click",
+    "steps": [],
+    "target": "e17",
+    "expect": "clickable",
+    "limit": null,
+    "priority": 0.36
+  },
+  {
+    "id": "t20",
+    "title": "Outfits: is clickable",
+    "technique": "click",
+    "steps": [],
+    "target": "e18",
+    "expect": "clickable",
+    "limit": null,
+    "priority": 0.36
+  }
+]

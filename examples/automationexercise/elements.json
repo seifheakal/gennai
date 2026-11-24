@@ -1,0 +1,522 @@
+[
+  {
+    "id": "e01",
+    "tag": "input",
+    "type": "email",
+    "dom_id": "susbscribe_email",
+    "name": null,
+    "placeholder": "Your email address",
+    "aria_label": null,
+    "label": "",
+    "text": "",
+    "required": true,
+    "minlength": null,
+    "maxlength": null,
+    "min": null,
+    "max": null,
+    "pattern": null,
+    "testid": null,
+    "role": null,
+    "form": 0,
+    "options": null,
+    "kind": "email",
+    "locators": [
+      [
+        "css",
+        "#susbscribe_email"
+      ],
+      [
+        "placeholder",
+        "Your email address"
+      ]
+    ]
+  },
+  {
+    "id": "e02",
+    "tag": "button",
+    "type": "button",
+    "dom_id": null,
+    "name": null,
+    "placeholder": null,
+    "aria_label": null,
+    "label": "",
+    "text": "Test Cases",
+    "required": false,
+    "minlength": null,
+    "maxlength": null,
+    "min": null,
+    "max": null,
+    "pattern": null,
+    "testid": null,
+    "role": null,
+    "form": -1,
+    "options": null,
+    "kind": "button",
+    "locators": [
+      [
+        "role:button",
+        "Test Cases"
+      ]
+    ]
+  },
+  {
+    "id": "e03",
+    "tag": "button",
+    "type": "button",
+    "dom_id": null,
+    "name": null,
+    "placeholder": null,
+    "aria_label": null,
+    "label": "",
+    "text": "APIs list for practice",
+    "required": false,
+    "minlength": null,
+    "maxlength": null,
+    "min": null,
+    "max": null,
+    "pattern": null,
+    "testid": null,
+    "role": null,
+    "form": -1,
+    "options": null,
+    "kind": "button",
+    "locators": [
+      [
+        "role:button",
+        "APIs list for practice"
+      ]
+    ]
+  },
+  {
+    "id": "e04",
+    "tag": "button",
+    "type": "submit",
+    "dom_id": "subscribe",
+    "name": null,
+    "placeholder": null,
+    "aria_label": null,
+    "label": "",
+    "text": "",
+    "required": false,
+    "minlength": null,
+    "maxlength": null,
+    "min": null,
+    "max": null,
+    "pattern": null,
+    "testid": null,
+    "role": null,
+    "form": 0,
+    "options": null,
+    "kind": "button",
+    "locators": [
+      [
+        "css",
+        "#subscribe"
+      ]
+    ]
+  },
+  {
+    "id": "e05",
+    "tag": "a",
+    "type": "",
+    "dom_id": null,
+    "name": null,
+    "placeholder": null,
+    "aria_label": null,
+    "label": "",
+    "text": "Home",
+    "required": false,
+    "minlength": null,
+    "maxlength": null,
+    "min": null,
+    "max": null,
+    "pattern": null,
+    "testid": null,
+    "role": null,
+    "form": -1,
+    "options": null,
+    "kind": "link",
+    "locators": [
+      [
+        "text",
+        "Home"
+      ]
+    ]
+  },
+  {
+    "id": "e06",
+    "tag": "a",
+    "type": "",
+    "dom_id": null,
+    "name": null,
+    "placeholder": null,
+    "aria_label": null,
+    "label": "",
+    "text": "\ue8f8 Products",
+    "required": false,
+    "minlength": null,
+    "maxlength": null,
+    "min": null,
+    "max": null,
+    "pattern": null,
+    "testid": null,
+    "role": null,
+    "form": -1,
+    "options": null,
+    "kind": "link",
+    "locators": [
+      [
+        "role:link",
+        "\ue8f8 Products"
+      ],
+      [
+        "text",
+        "\ue8f8 Products"
+      ]
+    ]
+  },
+  {
+    "id": "e07",
+    "tag": "a",
+    "type": "",
+    "dom_id": null,
+    "name": null,
+    "placeholder": null,
+    "aria_label": null,
+    "label": "",
+    "text": "Cart",
+    "required": false,
+    "minlength": null,
+    "maxlength": null,
+    "min": null,
+    "max": null,
+    "pattern": null,
+    "testid": null,
+    "role": null,
+    "form": -1,
+    "options": null,
+    "kind": "link",
+    "locators": [
+      [
+        "text",
+        "Cart"
+      ]
+    ]
+  },
+  {
+    "id": "e08",
+    "tag": "a",
+    "type": "",
+    "dom_id": null,
+    "name": null,
+    "placeholder": null,
+    "aria_label": null,
+    "label": "",
+    "text": "Signup / Login",
+    "required": false,
+    "minlength": null,
+    "maxlength": null,
+    "min": null,
+    "max": null,
+    "pattern": null,
+    "testid": null,
+    "role": null,
+    "form": -1,
+    "options": null,
+    "kind": "link",
+    "locators": [
+      [
+        "text",
+        "Signup / Login"
+      ]
+    ]
+  },
+  {
+    "id": "e09",
+    "tag": "a",
+    "type": "",
+    "dom_id": null,
+    "name": null,
+    "placeholder": null,
+    "aria_label": null,
+    "label": "",
+    "text": "Test Cases",
+    "required": false,
+    "minlength": null,
+    "maxlength": null,
+    "min": null,
+    "max": null,
+    "pattern": null,
+    "testid": null,
+    "role": null,
+    "form": -1,
+    "options": null,
+    "kind": "link",
+    "locators": [
+      [
+        "role:link",
+        "Test Cases"
+      ]
+    ]
+  },
+  {
+    "id": "e10",
+    "tag": "a",
+    "type": "",
+    "dom_id": null,
+    "name": null,
+    "placeholder": null,
+    "aria_label": null,
+    "label": "",
+    "text": "API Testing",
+    "required": false,
+    "minlength": null,
+    "maxlength": null,
+    "min": null,
+    "max": null,
+    "pattern": null,
+    "testid": null,
+    "role": null,
+    "form": -1,
+    "options": null,
+    "kind": "link",
+    "locators": [
+      [
+        "text",
+        "API Testing"
+      ]
+    ]
+  },
+  {
+    "id": "e11",
+    "tag": "a",
+    "type": "",
+    "dom_id": null,
+    "name": null,
+    "placeholder": null,
+    "aria_label": null,
+    "label": "",
+    "text": "Video Tutorials",
+    "required": false,
+    "minlength": null,
+    "maxlength": null,
+    "min": null,
+    "max": null,
+    "pattern": null,
+    "testid": null,
+    "role": null,
+    "form": -1,
+    "options": null,
+    "kind": "link",
+    "locators": [
+      [
+        "text",
+        "Video Tutorials"
+      ]
+    ]
+  },
+  {
+    "id": "e12",
+    "tag": "a",
+    "type": "",
+    "dom_id": null,
+    "name": null,
+    "placeholder": null,
+    "aria_label": null,
+    "label": "",
+    "text": "Contact us",
+    "required": false,
+    "minlength": null,
+    "maxlength": null,
+    "min": null,
+    "max": null,
+    "pattern": null,
+    "testid": null,
+    "role": null,
+    "form": -1,
+    "options": null,
+    "kind": "link",
+    "locators": [
+      [
+        "text",
+        "Contact us"
+      ]
+    ]
+  },
+  {
+    "id": "e13",
+    "tag": "a",
+    "type": "",
+    "dom_id": null,
+    "name": null,
+    "placeholder": null,
+    "aria_label": null,
+    "label": "",
+    "text": "Test Cases",
+    "required": false,
+    "minlength": null,
+    "maxlength": null,
+    "min": null,
+    "max": null,
+    "pattern": null,
+    "testid": null,
+    "role": null,
+    "form": -1,
+    "options": null,
+    "kind": "link",
+    "locators": [
+      [
+        "role:link",
+        "Test Cases"
+      ]
+    ]
+  },
+  {
+    "id": "e14",
+    "tag": "a",
+    "type": "",
+    "dom_id": null,
+    "name": null,
+    "placeholder": null,
+    "aria_label": null,
+    "label": "",
+    "text": "APIs list for practice",
+    "required": false,
+    "minlength": null,
+    "maxlength": null,
+    "min": null,
+    "max": null,
+    "pattern": null,
+    "testid": null,
+    "role": null,
+    "form": -1,
+    "options": null,
+    "kind": "link",
+    "locators": [
+      [
+        "role:link",
+        "APIs list for practice"
+      ]
+    ]
+  },
+  {
+    "id": "e15",
+    "tag": "a",
+    "type": "",
+    "dom_id": null,
+    "name": null,
+    "placeholder": null,
+    "aria_label": null,
+    "label": "",
+    "text": "(5) H&M",
+    "required": false,
+    "minlength": null,
+    "maxlength": null,
+    "min": null,
+    "max": null,
+    "pattern": null,
+    "testid": null,
+    "role": null,
+    "form": -1,
+    "options": null,
+    "kind": "link",
+    "locators": [
+      [
+        "role:link",
+        "(5) H&M"
+      ]
+    ]
+  },
+  {
+    "id": "e16",
+    "tag": "a",
+    "type": "",
+    "dom_id": null,
+    "name": null,
+    "placeholder": null,
+    "aria_label": null,
+    "label": "",
+    "text": "Tshirt",
+    "required": false,
+    "minlength": null,
+    "maxlength": null,
+    "min": null,
+    "max": null,
+    "pattern": null,
+    "testid": null,
+    "role": null,
+    "form": -1,
+    "options": null,
+    "kind": "link",
+    "locators": [
+      [
+        "role:link",
+        "Tshirt"
+      ],
+      [
+        "text",
+        "Tshirt"
+      ]
+    ]
+  },
+  {
+    "id": "e17",
+    "tag": "a",
+    "type": "",
+    "dom_id": null,
+    "name": null,
+    "placeholder": null,
+    "aria_label": null,
+    "label": "",
+    "text": "Dress",
+    "required": false,
+    "minlength": null,
+    "maxlength": null,
+    "min": null,
+    "max": null,
+    "pattern": null,
+    "testid": null,
+    "role": null,
+    "form": -1,
+    "options": null,
+    "kind": "link",
+    "locators": [
+      [
+        "role:link",
+        "Dress"
+      ]
+    ]
+  },
+  {
+    "id": "e18",
+    "tag": "a",
+    "type": "",
+    "dom_id": null,
+    "name": null,
+    "placeholder": null,
+    "aria_label": null,
+    "label": "",
+    "text": "Outfits",
+    "required": false,
+    "minlength": null,
+    "maxlength": null,
+    "min": null,
+    "max": null,
+    "pattern": null,
+    "testid": null,
+    "role": null,
+    "form": -1,
+    "options": null,
+    "kind": "link",
+    "locators": [
+      [
+        "role:link",
+        "Outfits"
+      ],
+      [
+        "text",
+        "Outfits"
+      ]
+    ]
+  }
+]

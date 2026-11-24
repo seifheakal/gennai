@@ -1,0 +1,348 @@
+[
+  {
+    "id": "t01",
+    "title": "Form 1: all fields valid",
+    "technique": "state",
+    "steps": [
+      {
+        "element": "e01",
+        "action": "fill",
+        "value": "Test User"
+      },
+      {
+        "element": "e02",
+        "action": "fill",
+        "value": "test.user@example.com"
+      },
+      {
+        "element": "e03",
+        "action": "fill",
+        "value": "18"
+      },
+      {
+        "element": "e04",
+        "action": "select",
+        "value": "eg"
+      },
+      {
+        "element": "e05",
+        "action": "check",
+        "value": ""
+      }
+    ],
+    "target": "e01",
+    "expect": "form_valid",
+    "limit": null,
+    "priority": 0.91
+  },
+  {
+    "id": "t02",
+    "title": "Form 1: required 'Name' left empty",
+    "technique": "state",
+    "steps": [
+      {
+        "element": "e02",
+        "action": "fill",
+        "value": "test.user@example.com"
+      },
+      {
+        "element": "e03",
+        "action": "fill",
+        "value": "18"
+      },
+      {
+        "element": "e04",
+        "action": "select",
+        "value": "eg"
+      },
+      {
+        "element": "e05",
+        "action": "check",
+        "value": ""
+      }
+    ],
+    "target": "e01",
+    "expect": "form_invalid",
+    "limit": null,
+    "priority": 0.91
+  },
+  {
+    "id": "t03",
+    "title": "Form 1: required 'I accept the terms' left empty",
+    "technique": "state",
+    "steps": [
+      {
+        "element": "e01",
+        "action": "fill",
+        "value": "Test User"
+      },
+      {
+        "element": "e02",
+        "action": "fill",
+        "value": "test.user@example.com"
+      },
+      {
+        "element": "e03",
+        "action": "fill",
+        "value": "18"
+      },
+      {
+        "element": "e04",
+        "action": "select",
+        "value": "eg"
+      }
+    ],
+    "target": "e01",
+    "expect": "form_invalid",
+    "limit": null,
+    "priority": 0.91
+  },
+  {
+    "id": "t04",
+    "title": "Name: length 1 (below minlength)",
+    "technique": "bva",
+    "steps": [
+      {
+        "element": "e01",
+        "action": "fill",
+        "value": "a"
+      }
+    ],
+    "target": "e01",
+    "expect": "invalid",
+    "limit": null,
+    "priority": 0.85
+  },
+  {
+    "id": "t05",
+    "title": "Name: length 2 (minlength)",
+    "technique": "bva",
+    "steps": [
+      {
+        "element": "e01",
+        "action": "fill",
+        "value": "aa"
+      }
+    ],
+    "target": "e01",
+    "expect": "valid",
+    "limit": null,
+    "priority": 0.85
+  },
+  {
+    "id": "t06",
+    "title": "Name: length 30 (maxlength)",
+    "technique": "bva",
+    "steps": [
+      {
+        "element": "e01",
+        "action": "fill",
+        "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      }
+    ],
+    "target": "e01",
+    "expect": "valid",
+    "limit": null,
+    "priority": 0.85
+  },
+  {
+    "id": "t07",
+    "title": "Name: length 31 is limited",
+    "technique": "bva",
+    "steps": [
+      {
+        "element": "e01",
+        "action": "fill",
+        "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      }
+    ],
+    "target": "e01",
+    "expect": "max_length",
+    "limit": 30,
+    "priority": 0.85
+  },
+  {
+    "id": "t08",
+    "title": "Name: valid partition",
+    "technique": "ep",
+    "steps": [
+      {
+        "element": "e01",
+        "action": "fill",
+        "value": "Test User"
+      }
+    ],
+    "target": "e01",
+    "expect": "valid",
+    "limit": null,
+    "priority": 0.82
+  },
+  {
+    "id": "t09",
+    "title": "Name: required left empty",
+    "technique": "ep",
+    "steps": [],
+    "target": "e01",
+    "expect": "invalid",
+    "limit": null,
+    "priority": 0.82
+  },
+  {
+    "id": "t10",
+    "title": "I accept the terms: valid partition",
+    "technique": "ep",
+    "steps": [
+      {
+        "element": "e05",
+        "action": "check",
+        "value": ""
+      }
+    ],
+    "target": "e05",
+    "expect": "checked",
+    "limit": null,
+    "priority": 0.79
+  },
+  {
+    "id": "t11",
+    "title": "I accept the terms: required left empty",
+    "technique": "ep",
+    "steps": [],
+    "target": "e05",
+    "expect": "invalid",
+    "limit": null,
+    "priority": 0.79
+  },
+  {
+    "id": "t12",
+    "title": "Submit: is clickable",
+    "technique": "click",
+    "steps": [],
+    "target": "e07",
+    "expect": "clickable",
+    "limit": null,
+    "priority": 0.74
+  },
+  {
+    "id": "t13",
+    "title": "Email: valid partition",
+    "technique": "ep",
+    "steps": [
+      {
+        "element": "e02",
+        "action": "fill",
+        "value": "test.user@example.com"
+      }
+    ],
+    "target": "e02",
+    "expect": "valid",
+    "limit": null,
+    "priority": 0.71
+  },
+  {
+    "id": "t14",
+    "title": "Email: invalid partition (not an email)",
+    "technique": "ep",
+    "steps": [
+      {
+        "element": "e02",
+        "action": "fill",
+        "value": "not-an-email"
+      }
+    ],
+    "target": "e02",
+    "expect": "invalid",
+    "limit": null,
+    "priority": 0.71
+  },
+  {
+    "id": "t15",
+    "title": "Age: 17 (below min)",
+    "technique": "bva",
+    "steps": [
+      {
+        "element": "e03",
+        "action": "fill",
+        "value": "17"
+      }
+    ],
+    "target": "e03",
+    "expect": "invalid",
+    "limit": null,
+    "priority": 0.68
+  },
+  {
+    "id": "t16",
+    "title": "Age: 120 (max)",
+    "technique": "bva",
+    "steps": [
+      {
+        "element": "e03",
+        "action": "fill",
+        "value": "120"
+      }
+    ],
+    "target": "e03",
+    "expect": "valid",
+    "limit": null,
+    "priority": 0.68
+  },
+  {
+    "id": "t17",
+    "title": "Age: 121 (above max)",
+    "technique": "bva",
+    "steps": [
+      {
+        "element": "e03",
+        "action": "fill",
+        "value": "121"
+      }
+    ],
+    "target": "e03",
+    "expect": "invalid",
+    "limit": null,
+    "priority": 0.68
+  },
+  {
+    "id": "t18",
+    "title": "Age: valid partition",
+    "technique": "ep",
+    "steps": [
+      {
+        "element": "e03",
+        "action": "fill",
+        "value": "18"
+      }
+    ],
+    "target": "e03",
+    "expect": "valid",
+    "limit": null,
+    "priority": 0.65
+  },
+  {
+    "id": "t19",
+    "title": "Country: valid partition",
+    "technique": "ep",
+    "steps": [
+      {
+        "element": "e04",
+        "action": "select",
+        "value": "eg"
+      }
+    ],
+    "target": "e04",
+    "expect": "selected",
+    "limit": null,
+    "priority": 0.59
+  },
+  {
+    "id": "t20",
+    "title": "Load offers: is clickable",
+    "technique": "click",
+    "steps": [],
+    "target": "e06",
+    "expect": "clickable",
+    "limit": null,
+    "priority": 0.54
+  }
+]

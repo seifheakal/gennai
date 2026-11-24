@@ -1,0 +1,258 @@
+[
+  {
+    "id": "t01",
+    "title": "Filter examples: valid partition",
+    "technique": "ep",
+    "steps": [
+      {
+        "element": "e01",
+        "action": "fill",
+        "value": "Test User"
+      }
+    ],
+    "target": "e01",
+    "expect": "valid",
+    "limit": null,
+    "priority": 0.42
+  },
+  {
+    "id": "t02",
+    "title": "The Internet: home: is clickable",
+    "technique": "click",
+    "steps": [],
+    "target": "e02",
+    "expect": "clickable",
+    "limit": null,
+    "priority": 0.36
+  },
+  {
+    "id": "t03",
+    "title": "A/B Testing: is clickable",
+    "technique": "click",
+    "steps": [],
+    "target": "e03",
+    "expect": "clickable",
+    "limit": null,
+    "priority": 0.36
+  },
+  {
+    "id": "t04",
+    "title": "Accessibility Issues: is clickable",
+    "technique": "click",
+    "steps": [],
+    "target": "e04",
+    "expect": "clickable",
+    "limit": null,
+    "priority": 0.36
+  },
+  {
+    "id": "t05",
+    "title": "Add/Remove Elements: is clickable",
+    "technique": "click",
+    "steps": [],
+    "target": "e05",
+    "expect": "clickable",
+    "limit": null,
+    "priority": 0.36
+  },
+  {
+    "id": "t06",
+    "title": "Advanced Iframes: is clickable",
+    "technique": "click",
+    "steps": [],
+    "target": "e06",
+    "expect": "clickable",
+    "limit": null,
+    "priority": 0.36
+  },
+  {
+    "id": "t07",
+    "title": "Advanced Shadow DOM: is clickable",
+    "technique": "click",
+    "steps": [],
+    "target": "e07",
+    "expect": "clickable",
+    "limit": null,
+    "priority": 0.36
+  },
+  {
+    "id": "t08",
+    "title": "Autocomplete: is clickable",
+    "technique": "click",
+    "steps": [],
+    "target": "e08",
+    "expect": "clickable",
+    "limit": null,
+    "priority": 0.36
+  },
+  {
+    "id": "t09",
+    "title": "Basic Auth: is clickable",
+    "technique": "click",
+    "steps": [],
+    "target": "e09",
+    "expect": "clickable",
+    "limit": null,
+    "priority": 0.36
+  },
+  {
+    "id": "t10",
+    "title": "Broken Images: is clickable",
+    "technique": "click",
+    "steps": [],
+    "target": "e10",
+    "expect": "clickable",
+    "limit": null,
+    "priority": 0.36
+  },
+  {
+    "id": "t11",
+    "title": "Browser Permissions: is clickable",
+    "technique": "click",
+    "steps": [],
+    "target": "e11",
+    "expect": "clickable",
+    "limit": null,
+    "priority": 0.36
+  },
+  {
+    "id": "t12",
+    "title": "Canvas: is clickable",
+    "technique": "click",
+    "steps": [],
+    "target": "e12",
+    "expect": "clickable",
+    "limit": null,
+    "priority": 0.36
+  },
+  {
+    "id": "t13",
+    "title": "Challenging DOM: is clickable",
+    "technique": "click",
+    "steps": [],
+    "target": "e13",
+    "expect": "clickable",
+    "limit": null,
+    "priority": 0.36
+  },
+  {
+    "id": "t14",
+    "title": "Chat: is clickable",
+    "technique": "click",
+    "steps": [],
+    "target": "e14",
+    "expect": "clickable",
+    "limit": null,
+    "priority": 0.36
+  },
+  {
+    "id": "t15",
+    "title": "Checkboxes: is clickable",
+    "technique": "click",
+    "steps": [],
+    "target": "e15",
+    "expect": "clickable",
+    "limit": null,
+    "priority": 0.36
+  },
+  {
+    "id": "t16",
+    "title": "Context Menu: is clickable",
+    "technique": "click",
+    "steps": [],
+    "target": "e16",
+    "expect": "clickable",
+    "limit": null,
+    "priority": 0.36
+  },
+  {
+    "id": "t17",
+    "title": "Cookie Consent: is clickable",
+    "technique": "click",
+    "steps": [],
+    "target": "e17",
+    "expect": "clickable",
+    "limit": null,
+    "priority": 0.36
+  },
+  {
+    "id": "t18",
+    "title": "Custom Dropdown: is clickable",
+    "technique": "click",
+    "steps": [],
+    "target": "e18",
+    "expect": "clickable",
+    "limit": null,
+    "priority": 0.36
+  },
+  {
+    "id": "t19",
+    "title": "Date & Time Pickers: is clickable",
+    "technique": "click",
+    "steps": [],
+    "target": "e19",
+    "expect": "clickable",
+    "limit": null,
+    "priority": 0.36
+  },
+  {
+    "id": "t20",
+    "title": "Digest Authentication: is clickable",
+    "technique": "click",
+    "steps": [],
+    "target": "e20",
+    "expect": "clickable",
+    "limit": null,
+    "priority": 0.36
+  },
+  {
+    "id": "t21",
+    "title": "Disappearing Elements: is clickable",
+    "technique": "click",
+    "steps": [],
+    "target": "e21",
+    "expect": "clickable",
+    "limit": null,
+    "priority": 0.36
+  },
+  {
+    "id": "t22",
+    "title": "Drag and Drop: is clickable",
+    "technique": "click",
+    "steps": [],
+    "target": "e22",
+    "expect": "clickable",
+    "limit": null,
+    "priority": 0.36
+  },
+  {
+    "id": "t23",
+    "title": "Dropdown: is clickable",
+    "technique": "click",
+    "steps": [],
+    "target": "e23",
+    "expect": "clickable",
+    "limit": null,
+    "priority": 0.36
+  },
+  {
+    "id": "t24",
+    "title": "Dynamic Content: is clickable",
+    "technique": "click",
+    "steps": [],
+    "target": "e24",
+    "expect": "clickable",
+    "limit": null,
+    "priority": 0.36
+  },
+  {
+    "id": "t25",
+    "title": "Dynamic Controls: is clickable",
+    "technique": "click",
+    "steps": [],
+    "target": "e25",
+    "expect": "clickable",
+    "limit": null,
+    "priority": 0.36
+  }
+]

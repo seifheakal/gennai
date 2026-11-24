@@ -1,0 +1,283 @@
+[
+  {
+    "id": "e01",
+    "tag": "input",
+    "type": "text",
+    "dom_id": "name",
+    "name": "name",
+    "placeholder": null,
+    "aria_label": null,
+    "label": "Name",
+    "text": "",
+    "required": true,
+    "minlength": "2",
+    "maxlength": "30",
+    "min": null,
+    "max": null,
+    "pattern": null,
+    "testid": null,
+    "role": null,
+    "form": 0,
+    "options": null,
+    "kind": "text",
+    "locators": [
+      [
+        "css",
+        "#name"
+      ],
+      [
+        "css",
+        "input[name=\"name\"]"
+      ],
+      [
+        "role:textbox",
+        "Name"
+      ],
+      [
+        "label",
+        "Name"
+      ]
+    ]
+  },
+  {
+    "id": "e02",
+    "tag": "input",
+    "type": "text",
+    "dom_id": "email",
+    "name": "email",
+    "placeholder": null,
+    "aria_label": null,
+    "label": "Email",
+    "text": "",
+    "required": false,
+    "minlength": null,
+    "maxlength": null,
+    "min": null,
+    "max": null,
+    "pattern": null,
+    "testid": null,
+    "role": null,
+    "form": 0,
+    "options": null,
+    "kind": "email",
+    "locators": [
+      [
+        "css",
+        "#email"
+      ],
+      [
+        "css",
+        "input[name=\"email\"]"
+      ],
+      [
+        "role:textbox",
+        "Email"
+      ],
+      [
+        "label",
+        "Email"
+      ]
+    ]
+  },
+  {
+    "id": "e03",
+    "tag": "input",
+    "type": "number",
+    "dom_id": "age",
+    "name": "age",
+    "placeholder": null,
+    "aria_label": null,
+    "label": "Age",
+    "text": "",
+    "required": false,
+    "minlength": null,
+    "maxlength": null,
+    "min": "18",
+    "max": "120",
+    "pattern": null,
+    "testid": null,
+    "role": null,
+    "form": 0,
+    "options": null,
+    "kind": "number",
+    "locators": [
+      [
+        "css",
+        "#age"
+      ],
+      [
+        "css",
+        "input[name=\"age\"]"
+      ],
+      [
+        "role:spinbutton",
+        "Age"
+      ],
+      [
+        "label",
+        "Age"
+      ]
+    ]
+  },
+  {
+    "id": "e04",
+    "tag": "select",
+    "type": "",
+    "dom_id": "country",
+    "name": "country",
+    "placeholder": null,
+    "aria_label": null,
+    "label": "Country",
+    "text": "",
+    "required": false,
+    "minlength": null,
+    "maxlength": null,
+    "min": null,
+    "max": null,
+    "pattern": null,
+    "testid": null,
+    "role": null,
+    "form": 0,
+    "options": [
+      {
+        "value": "",
+        "text": "Select a country"
+      },
+      {
+        "value": "eg",
+        "text": "Egypt"
+      },
+      {
+        "value": "de",
+        "text": "Germany"
+      },
+      {
+        "value": "us",
+        "text": "United States"
+      }
+    ],
+    "kind": "select",
+    "locators": [
+      [
+        "css",
+        "#country"
+      ],
+      [
+        "css",
+        "select[name=\"country\"]"
+      ],
+      [
+        "role:combobox",
+        "Country"
+      ],
+      [
+        "label",
+        "Country"
+      ]
+    ]
+  },
+  {
+    "id": "e05",
+    "tag": "input",
+    "type": "checkbox",
+    "dom_id": "terms",
+    "name": "terms",
+    "placeholder": null,
+    "aria_label": null,
+    "label": "I accept the terms",
+    "text": "on",
+    "required": true,
+    "minlength": null,
+    "maxlength": null,
+    "min": null,
+    "max": null,
+    "pattern": null,
+    "testid": null,
+    "role": null,
+    "form": 0,
+    "options": null,
+    "kind": "checkbox",
+    "locators": [
+      [
+        "css",
+        "#terms"
+      ],
+      [
+        "css",
+        "input[name=\"terms\"]"
+      ],
+      [
+        "role:checkbox",
+        "I accept the terms"
+      ],
+      [
+        "label",
+        "I accept the terms"
+      ]
+    ]
+  },
+  {
+    "id": "e06",
+    "tag": "button",
+    "type": "button",
+    "dom_id": null,
+    "name": null,
+    "placeholder": null,
+    "aria_label": null,
+    "label": "",
+    "text": "Load offers",
+    "required": false,
+    "minlength": null,
+    "maxlength": null,
+    "min": null,
+    "max": null,
+    "pattern": null,
+    "testid": null,
+    "role": null,
+    "form": -1,
+    "options": null,
+    "kind": "button",
+    "locators": [
+      [
+        "role:button",
+        "Load offers"
+      ],
+      [
+        "text",
+        "Load offers"
+      ]
+    ]
+  },
+  {
+    "id": "e07",
+    "tag": "button",
+    "type": "submit",
+    "dom_id": null,
+    "name": null,
+    "placeholder": null,
+    "aria_label": null,
+    "label": "",
+    "text": "Submit",
+    "required": false,
+    "minlength": null,
+    "maxlength": null,
+    "min": null,
+    "max": null,
+    "pattern": null,
+    "testid": null,
+    "role": null,
+    "form": 0,
+    "options": null,
+    "kind": "button",
+    "locators": [
+      [
+        "role:button",
+        "Submit"
+      ],
+      [
+        "text",
+        "Submit"
+      ]
+    ]
+  }
+]
