@@ -51,3 +51,23 @@ def test_demo_with_review(tmp_path):
     assert results["tests"][0]["title"] == "renamed by the reviewer"
     code = (tmp_path / "tests" / "test_generated.py").read_text(encoding="utf-8")
     assert f"def test_{seen['ids'][0]}(" not in code
+
+
+def test_demo_history_marks_flaky(tmp_path):
+    history = tmp_path / "history" / "demo.jsonl"
+    with serve_dir() as url:
+        first = run_pipeline(url, tmp_path / "r1", Settings(), allow_local=True, history=history)
+        passing = next(t["key"] for t in first["tests"] if t["status"] == "passed")
+        # a record from an earlier run in which that test failed, as a flaky test would
+        with history.open("a", encoding="utf-8") as f:
+            f.write(json.dumps({"tests": {passing: "failed"}}) + "\n")
+    with serve_dir() as url:  # a new port: tests are matched by content, not host
+        second = run_pipeline(url, tmp_path / "r2", Settings(), allow_local=True, history=history)
+    assert second["history"]["runs"] == 3
+    flaky = [t for t in second["tests"] if t["flaky"]]
+    assert [t["key"] for t in flaky] == [passing]
+    assert flaky[0]["history"] == ["passed", "failed", "passed"]
+    assert second["summary"]["flaky"] == 1
+    assert "flaky</span>" in (tmp_path / "r2" / "report.html").read_text(encoding="utf-8")
+    steady = [t for t in second["tests"] if not t["flaky"]]
+    assert all(t["history"][0] == t["history"][2] for t in steady)  # the demo is deterministic

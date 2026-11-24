@@ -5,11 +5,10 @@ Features and ideas that were left out on purpose, one line each: what, where it 
 ## Removed from the course version (did not work or was simulated)
 
 - **Web chat UI**: a browser interface over the same pipeline. The course's Flask UI ran the old phases by changing directories and copying files between them, and it broke once the phases were rebuilt.
-- **Run history and flaky-test detection**: an append-only record of runs, with status computed at render time, to tell real regressions from flake across runs (`gennai/phase4_execute.py`). The course version's SQLite history never stored a non-empty result.
 - **Notifications**: Slack or email when a run finishes. The course version's functions only logged "sent" and sent nothing.
 - **Authenticated flows**: login fixtures in Phase 1 and in the generated `conftest.py`, with credentials read from `.env` and never logged. Left out because auth needs secret handling.
 
-Rebuilt since: multi-page crawling (`--max-pages`) and human review of generated tests (`--review`), both described in the README. The course's reviewer was simulated with `random.random()`; the rebuilt one waits for a person.
+Rebuilt since, and described in the README: multi-page crawling (`--max-pages`), human review of generated tests (`--review`), and run history with flaky-test marking (`runs/history/<site>.jsonl`). The course's reviewer was simulated with `random.random()`; the rebuilt one waits for a person. The course's SQLite history never stored a non-empty result; the rebuilt one is an append-only JSONL file.
 
 ## Ideas to build next
 
@@ -25,4 +24,4 @@ Rebuilt since: multi-page crawling (`--max-pages`) and human review of generated
 - **Sandboxed test execution**: run the generated suite in a container with no host filesystem access (`gennai/phase4_execute.py`).
 - **MCP server or Claude Code slash command**: expose `run` as a tool (for example `/run-gennai <url>`) so an agent can test a page it just changed.
 - **Generated architecture map**: a small script that draws the module and data-flow diagram from the code so it can't drift from the README.
-- **Structured logging and error tracking**: JSON logs with a run id. Only worth it if run history is added.
+- **Structured logging and error tracking**: JSON logs with a run id that matches the run's line in the history file.

@@ -26,6 +26,13 @@ def _positive(text: str) -> int:
     return value
 
 
+def _site(url: str) -> str:
+    """Folder-safe site name: the host, plus the port if one is given."""
+    parts = urlparse(url)
+    name = parts.hostname + (f"_{parts.port}" if parts.port else "")
+    return re.sub(r"[^\w.-]", "_", name)
+
+
 def _max_pages(text: str) -> int:
     value = _positive(text)
     if value > MAX_PAGES:
@@ -50,6 +57,10 @@ def _parser() -> argparse.ArgumentParser:
         p.add_argument("--headed", action="store_true", help="show the browser")
         p.add_argument("--max-tests", type=_positive, help="cap on generated tests")
         p.add_argument(
+            "--no-history", action="store_true",
+            help="do not append this run to runs/history/<site>.jsonl (used for flaky tests)",
+        )  # fmt: skip
+        p.add_argument(
             "--review", action="store_true",
             help="pause after generating test cases so you can approve or edit them",
         )  # fmt: skip
@@ -70,6 +81,10 @@ def _summary(r: dict, out: Path) -> None:
               f"{v['rejected']} rejected")  # fmt: skip
     print(f"  results:   {s['passed']} passed, {s['failed']} failed")
     print(f"  failures:  {failures}")
+    if r.get("history"):
+        h = r["history"]
+        print(f"  history:   run {h['runs']} of this site; {s['flaky']} flaky in the last "
+              f"{h['window']} runs ({h['file']})")  # fmt: skip
     print(f"  llm:       {r['llm']}")
     print(f"  time:      {r['total_s']}s")
     print(f"  report:    {out / 'report.html'}")
@@ -85,19 +100,22 @@ def main(argv: list[str] | None = None) -> int:
             settings = replace(settings, max_tests=args.max_tests)
         stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         review = ask_in_terminal if args.review else None
+        if args.command == "run":
+            check_url(args.url, args.allow_local)  # fail with exit 2 before urlparse can raise
+        site = "demo" if args.command == "demo" else _site(args.url)
+        out = (args.out or Path("runs") / f"{site}_{stamp}").resolve()
+        history = None if args.no_history else Path(settings.history_dir, f"{site}.jsonl")
+        history = history.resolve() if history else None
         if args.command == "demo":
             with serve_dir() as url:
-                out = (args.out or Path("runs") / f"demo_{stamp}").resolve()
                 results = run_pipeline(
-                    url, out, settings, args.headed, True, args.max_pages, review
+                    url, out, settings, args.headed, True, args.max_pages, review, history
                 )
         else:
-            check_url(args.url, args.allow_local)  # fail with exit 2 before urlparse can raise
-            host = re.sub(r"[^\w.-]", "_", urlparse(args.url).hostname or "site")
-            out = (args.out or Path("runs") / f"{host}_{stamp}").resolve()
             results = run_pipeline(
-                args.url, out, settings, args.headed, args.allow_local, args.max_pages, review
-            )
+                args.url, out, settings, args.headed, args.allow_local, args.max_pages,
+                review, history,
+            )  # fmt: skip
     except GennaiError as e:
         log.debug("failure details", exc_info=True)
         log.error("%s", e)

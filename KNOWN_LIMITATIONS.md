@@ -33,8 +33,8 @@ Real flaws in the current version that were too expensive or risky to fix within
 
 6. **Third-party pages are not deterministic.**
    - **What:** ads, carousels and A/B content change between loads, and busy servers sometimes shed load. The course-era run on automationexercise.com caught an ad iframe covering the Subscribe button. The runs for this version did not see that overlay, but they did get HTTP 503 "queue full" pages on some test loads (reported as `page_unavailable`).
-   - **Impact:** results on public sites vary between runs. No flaky-test detection exists to separate flake from regressions.
-   - **Why left:** the course version's history and flaky-detection layer never produced data and was removed.
+   - **Impact:** results on public sites vary between runs. Run history marks a test flaky when it both passed and failed within the last few runs (see item 16), which shows inconsistency but cannot say why.
+   - **Why left:** telling flake from a real change needs repeated runs against a page known not to change.
 
 7. **The test run is not sandboxed.**
    - **What:** generated tests run as a normal `pytest` subprocess with the user's permissions and network access. Code comes only from fixed templates with every value embedded via `repr()`, so page content and model output can't inject Python. The browser still executes the target site's JavaScript (inside Chromium's sandbox).
@@ -79,3 +79,9 @@ Real flaws in the current version that were too expensive or risky to fix within
     - **Impact:** a careless edit produces a false failure. A review cannot be handed to someone else to do later.
     - **Why left:** recomputing expectations needs the same semantic check the LLM gate lacks (item 9). Resuming needs the staged pipeline in FUTURE_WORK.
     - **Needed for production:** recompute or confirm the expectation for edited values, and a `--from codegen` resume that reads an approved `test_cases.json`.
+
+16. **"Flaky" means inconsistent, not proven flake.**
+    - **What:** a test is flaky if it both passed and failed within the last `GENNAI_FLAKY_WINDOW` runs (default 5). A real regression followed by a fix inside that window is marked flaky too. Tests are matched by page path, element attributes, actions, values and expectation, so if a label or button text changes, the test counts as a new one and its history starts over. The history file grows by one line per run and is never trimmed. Two runs of the same site at the same time are not coordinated: both append, and neither sees the other's result.
+    - **Impact:** treat "flaky" as "look at this test's recent runs", not as a verdict. Its evidence is only as long as the window.
+    - **Why left:** the history is one append-only file on purpose, so it stays easy to inspect.
+    - **Needed for production:** a minimum number of runs before judging, retries inside a run to confirm flake, file locking or a database for concurrent runs, and rotation of old records.

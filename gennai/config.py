@@ -35,6 +35,8 @@ class Settings:
     llm_max_output_tokens: int = 4096
     llm_timeout_s: int = 120  # thinking models (e.g. Gemma) can take a minute
     llm_max_input_chars: int = 12000
+    history_dir: str = "runs/history"  # one append-only <site>.jsonl per site
+    flaky_window: int = 5  # a test is flaky if it passed and failed within this many runs
 
 
 def _positive_int(name: str, default: int) -> int:
@@ -94,4 +96,6 @@ def load_settings() -> Settings:
         ),
         llm_timeout_s=_positive_int("GENNAI_LLM_TIMEOUT_S", d.llm_timeout_s),
         llm_max_input_chars=_positive_int("GENNAI_LLM_MAX_INPUT_CHARS", d.llm_max_input_chars),
+        history_dir=os.environ.get("GENNAI_HISTORY_DIR", "").strip() or d.history_dir,
+        flaky_window=_positive_int("GENNAI_FLAKY_WINDOW", d.flaky_window),
     )

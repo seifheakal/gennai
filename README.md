@@ -84,7 +84,7 @@ python gennai.py demo
 python gennai.py run https://the-internet.herokuapp.com
 ```
 
-Flags: `--out DIR` (default `runs/<host>_<timestamp>/`), `--headed` (show the browser), `--max-tests N` (default 25), `--max-pages N` (default 1, at most 20), `--review` (approve tests before they run), `--allow-local` (`run` only).
+Flags: `--out DIR` (default `runs/<host>_<timestamp>/`, or `runs/<host>_<port>_<timestamp>/` when the URL has a port), `--headed` (show the browser), `--max-tests N` (default 25), `--max-pages N` (default 1, at most 20), `--review` (approve tests before they run), `--no-history` (don't record this run), `--allow-local` (`run` only).
 
 **Multi-page crawling.** `--max-pages N` also tests up to N-1 pages that the start page links to:
 
@@ -110,6 +110,13 @@ python gennai.py run https://the-internet.herokuapp.com --review
 - Press Enter to continue. Only approved cases are turned into code and run. The summary, `results.json` (`"review"`) and the report show how many were approved, edited and rejected.
 - Any other change is refused with an error naming the case: ids, targets, expectations and which elements a case touches decide the generated code, so they must stay as generated. Ctrl+C or closed input cancels the run (exit 2) before any test is generated.
 - Nobody is simulated: without `--review` every generated case runs, as before.
+
+**Run history and flaky tests.** Every run is appended as one JSON line to `runs/history/<site>.jsonl` (`demo.jsonl` for the demo). The file is only ever appended to, never rewritten:
+
+- A test is matched across runs by what it does: the page path, the attributes of the elements it touches, its actions and values, and its expectation. Its `t01`-style id is only a priority rank and is not used, and neither is the host, so the demo's random port doesn't matter.
+- A test is marked **flaky** when it both passed and failed within the last `GENNAI_FLAKY_WINDOW` runs of that site (default 5, this run included).
+- The report has a "Recent runs" column (for example `✓ ✓ ✗ ✓ flaky`, with `·` where the test did not run) and a history line in its header. `results.json` has `history` and `flaky` on each test and `summary.flaky`; the terminal summary has a `history:` line.
+- `GENNAI_HISTORY_DIR` moves the history folder; `--no-history` skips recording a run.
 
 Each run writes `elements.json` (Phase 1), `test_cases.json` (Phase 2), `tests/` (Phase 3), `results.json`, `report.html` and `screenshots/` (Phase 4). The terminal shows a short summary and the report path.
 
@@ -189,14 +196,19 @@ The remaining `locator_not_found`, on a "Tshirt" category link, appeared in 2 of
 - the-internet.herokuapp.com, `--max-pages 2`: 25 offered, 3 rejected, 22 run and passed. The LLM step was unavailable on that run (Gemini timed out, Gemma answered HTTP 503), so only algorithmic tests were offered.
 - On the demo, the edited value turned a "length 1 (below minlength)" case into a failing `assertion`. An edited value is run as-is against the original expectation (see [KNOWN_LIMITATIONS.md](KNOWN_LIMITATIONS.md)).
 
+**Run history** (measured 2026-11-24, through the CLI):
+- Demo, `--max-pages 2`, twice: every test was matched across the two runs (24 passed both times, 1 failed both times), 0 flaky. That is expected: the demo is deterministic.
+- the-internet.herokuapp.com, `--max-pages 2`, three times: 24 tests matched in all three runs and passed each time, 0 flaky. The third run's LLM answered and added 1 new test, shown as not run in the first two. In the first two runs the LLM step was unavailable (HTTP 503 from both providers).
+- No real flake showed up on these sites, so the flaky marker was checked by appending to the demo's history a run in which one passing test had failed. The next run marked exactly that test (`✓ ✓ ✗ ✓ flaky`). An integration test does the same.
+
 **The tool itself.**
-- 61 tests pass in about 51 s. They include:
-  - three end-to-end runs against the local demo: single-page, multi-page crawl, and with a review that rejects and edits cases;
+- 65 tests pass in about 84 s. They include:
+  - four end-to-end runs against the local demo: single-page, multi-page crawl, a review that rejects and edits cases, and run history marking a flaky test;
   - tests that the review step refuses structural edits, including an id that would inject code into a test function name;
   - a test that feeds hostile strings through code generation and parses every generated file;
   - a test that a spec referencing a non-existent element is rejected.
 - `ruff check` and `ruff format --check` are clean.
-- The code is 1,526 lines of Python in `gennai.py` and `gennai/`. The course version had about 11,700 lines of Python across the phase folders and the web UI.
+- The code is 1,624 lines of Python in `gennai.py` and `gennai/`. The course version had about 11,700 lines of Python across the phase folders and the web UI.
 
 ## Course constraints and what changed for the demo
 
@@ -230,7 +242,7 @@ GenNAI was my first serious AI project. Since then I have built AI tooling profe
 | Basic prompt-injection defence | The mailbox assistant sanitises the model's Markdown output with `bleach` and a tag allow-list before rendering it. A test covers this. |
 | The gate checks references, not meaning | In the knowledge-base pipeline the model only appends proposals to a staging file. A script allocates ids and checks required fields, then runs the full integrity checker against a shadow copy, and applies the proposals only if it comes back clean. Dedicated tests cover the gate. |
 | Small test suite | The mailbox assistant has 181 mocked test functions. They include tests that fail if any delete or move call appears in the source. |
-| No run history, no resumable stages | The knowledge-base pipeline has 15 stages with `--dry-run`, `--only` and `--from`. Records are append-only and carry their source on every row, status is computed rather than stored, and corrections are new superseding records. |
+| No resumable stages, and run history is one plain file | The knowledge-base pipeline has 15 stages with `--dry-run`, `--only` and `--from`. Records are append-only and carry their source on every row, status is computed rather than stored, and corrections are new superseding records. |
 | No integrity checks over output | The knowledge-base pipeline has 34 integrity checks that run as a pipeline stage. Running them before every commit is a written rule there, not an enforced hook. |
 
 That later work has its own open list. The mailbox assistant still lacks CSRF protection, cost and quota guardrails before large scans, structured logging and schema migrations. For the knowledge-base pipeline, config-only onboarding of a second workspace and an MCP server are still plans.

@@ -18,7 +18,7 @@ from gennai.llm import propose_cases
 from gennai.phase1_explore import explore
 from gennai.phase2_generate import generate
 from gennai.phase3_codegen import write_project
-from gennai.phase4_execute import execute, write_results
+from gennai.phase4_execute import case_key, execute, write_results
 from gennai.review import load_reviewed, write_for_review
 from gennai.safety import check_url
 
@@ -47,11 +47,13 @@ def serve_dir(directory: Path = DEMO_DIR) -> Iterator[str]:
 def run_pipeline(
     url: str, out: Path, settings: Settings, headed: bool = False, allow_local: bool = False,
     max_pages: int = 1, review: Callable[[Path], None] | None = None,
+    history: Path | None = None,
 ) -> dict:  # fmt: skip
     """Explore, generate, write and run tests; return the results dict (also on disk).
 
     With `review`, the cases are written for a person to approve and `review(path)` is called;
     it must block until they are done. Only approved cases are generated and run.
+    With `history`, the run is appended to that JSONL file and flaky tests are marked.
     """
     started = datetime.now().isoformat(timespec="seconds")
     t0 = last = time.perf_counter()
@@ -89,6 +91,9 @@ def run_pipeline(
     write_project(url, elements, cases, out, settings)
     lap("codegen")
     rows = execute(out, settings, cases, headed)
+    by_id = {e["id"]: e for e in elements}
+    for row, case in zip(rows, cases, strict=True):
+        row["key"] = case_key(case, by_id)
     lap("execute")
     meta = {
         "url": url,
@@ -103,4 +108,4 @@ def run_pipeline(
         "llm_stats": llm,
         "review": review_stats,
     }
-    return write_results(out, meta, rows)
+    return write_results(out, meta, rows, history, settings.flaky_window)
