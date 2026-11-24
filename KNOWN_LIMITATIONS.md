@@ -53,8 +53,8 @@ Real flaws in the current version that were too expensive or risky to fix within
    - **Needed for production:** check expectations against the field's own constraints deterministically, or require human review of model-proposed tests.
 
 10. **Cost controls are per run only.**
-    - **What:** there is a hard cap on LLM calls per run (`GENNAI_LLM_MAX_CALLS`), plus input and output token caps, timeouts, client-side spacing and fallback on 429.
-    - **Impact:** there are no per-user quotas, token accounting or cost reporting.
+    - **What:** there is a hard cap on LLM calls per run (`GENNAI_LLM_MAX_CALLS`), plus input and output token caps, timeouts, client-side spacing and fallback on 429. Each run records response time and token usage per call, as the provider reports them.
+    - **Impact:** there are no per-user quotas, no totals across runs and no cost in money (the default models are free).
     - **Why left:** the tool is a single-user CLI.
 
 11. **Local-target guard.**
@@ -64,7 +64,7 @@ Real flaws in the current version that were too expensive or risky to fix within
 
 12. **Free models are often overloaded, and the LLM evidence is thin.**
     - **What:** during live testing, `gemini-3.8-flash`, `gemini-3.6-flash` and `gemma-4-31b-it` often answered HTTP 503 ("high demand"). The default is therefore `gemini-3.5-flash-lite`. The Gemma fallback never returned a full answer live. Its `<thought>` reasoning prefix is stripped by the gate, but that is tested only with a mocked response. Google does not publish per-model free-tier limits (they appear per project in AI Studio), so the default spacing of 10 requests per minute is a conservative guess.
-    - **Impact:** on a busy day the LLM step may add nothing, and the run says so. The live measurement covers 3 pages and 19 proposed specs, with 0 rejected, which is too small to estimate a hallucination rate.
+    - **Impact:** on a busy day the LLM step may add nothing, and the run says so. The final live measurement covers 3 pages and 20 proposed specs, with 0 rejected, which is too small to estimate a hallucination rate.
 
 13. **Free-tier data use.**
     - **What:** with an LLM key configured, element labels and texts from the tested page are sent to the provider. Google's pricing page says free-tier content is used to improve its products.

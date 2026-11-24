@@ -1,7 +1,5 @@
 """Phase 4: run the generated suite, classify failures, write results.json and report.html."""
 
-import base64
-import html
 import json
 import logging
 import os
@@ -14,6 +12,7 @@ from pathlib import Path
 from gennai import GennaiError
 from gennai.config import Settings
 from gennai.phase2_generate import Case
+from gennai.report import render
 
 log = logging.getLogger(__name__)
 MESSAGE_LIMIT = 500
@@ -93,43 +92,5 @@ def write_results(out: Path, meta: dict, rows: list[dict]) -> dict:
         "failed": sum(r["status"] == "failed" for r in rows),
         "failures_per_class": dict(failures)}, "tests": rows}  # fmt: skip
     (out / "results.json").write_text(json.dumps(results, indent=2), encoding="utf-8")
-    (out / "report.html").write_text(_html(out, results), encoding="utf-8")
+    (out / "report.html").write_text(render(out, results), encoding="utf-8")
     return results
-
-
-_CSS = """body{font:14px system-ui,sans-serif;margin:24px;color:#222}
-table{border-collapse:collapse;width:100%}
-td,th{border:1px solid #ccc;padding:6px;vertical-align:top;text-align:left}
-.passed{color:#0a7d27}.failed{color:#b3261e;font-weight:600}
-img{max-width:480px;border:1px solid #ccc}code{white-space:pre-wrap}"""
-
-
-def _html(out: Path, r: dict) -> str:
-    esc = lambda v: html.escape(str(v))  # noqa: E731
-    rows = []
-    for t in r["tests"]:
-        shot = ""
-        if t["screenshot"]:
-            data = base64.b64encode((out / t["screenshot"]).read_bytes()).decode()
-            shot = (
-                "<details><summary>screenshot</summary>"
-                f'<img src="data:image/png;base64,{data}" alt="failure screenshot"></details>'
-            )
-        rows.append(
-            f"<tr><td>{esc(t['id'])}</td><td>{esc(t['title'])}</td><td>{esc(t['technique'])}</td>"
-            f"<td>{t['priority']}</td><td class='{esc(t['status'])}'>{esc(t['status'])}</td>"
-            f"<td>{esc(t['failure_class'] or '')}</td><td>{t['duration']}s</td>"
-            f"<td><code>{esc(t['message'])}</code>{shot}</td></tr>"
-        )
-    s = r["summary"]
-    return (
-        f"<!doctype html><html lang='en'><meta charset='utf-8'><title>GenNAI report</title>"
-        f"<style>{_CSS}</style><h1>GenNAI report</h1>"
-        f"<p>URL: {esc(r['url'])}<br>Started: {esc(r['started'])}"
-        f" &middot; total {esc(r['total_s'])}s"
-        f"<br>Elements: {esc(r['elements'])} &middot; tests: {esc(r['tests_per_technique'])}"
-        f"<br>Passed: {s['passed']} &middot; failed: {s['failed']} {esc(s['failures_per_class'])}"
-        f"<br>LLM: {esc(r['llm'])}<br>Phase durations: {esc(r['durations'])}</p>"
-        "<table><tr><th>ID</th><th>Test</th><th>Technique</th><th>Priority</th><th>Status</th>"
-        f"<th>Failure class</th><th>Time</th><th>Details</th></tr>{''.join(rows)}</table></html>"
-    )

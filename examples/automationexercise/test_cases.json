@@ -1,7 +1,7 @@
 [
   {
     "id": "t01",
-    "title": "Fill email address",
+    "title": "Fill valid email address",
     "technique": "llm",
     "steps": [
       {

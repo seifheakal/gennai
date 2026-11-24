@@ -29,8 +29,8 @@ flowchart LR
 |---|---|---|
 | 1 | `gennai/phase1_explore.py` | Loads the page once in Chromium and collects visible inputs, selects, checkboxes, buttons and links. It infers a semantic kind for each one: a text field named or labelled "email" is treated as an email field. It builds locator candidates (`data-testid`, `#id`, `[name]`, role plus accessible name, label, placeholder, text) and keeps only those that match exactly one element. |
 | 2 | `gennai/phase2_generate.py` | Builds the test cases (see the list below the table), removes duplicates, scores each test by element importance, required flag, form membership and technique, and keeps the top N. |
-| 3 | `gennai/phase3_codegen.py` | Writes `tests/` from fixed templates: `conftest.py` (browser fixtures, screenshot on failure), a Page Object whose fallback locator list is tried in order, and one test function per case. Every value is embedded with `repr()`. The generated folder runs with plain `pytest`. |
-| 4 | `gennai/phase4_execute.py` | Runs the suite in a subprocess with a timeout and parses the JUnit XML. It classifies failures as `page_unavailable` (HTTP error on load), `element_intercepted`, `locator_not_found`, `timeout`, `assertion` or `other`, then writes `results.json` and `report.html` with the screenshots embedded. |
+| 3 | `gennai/phase3_codegen.py` | Writes `tests/` from fixed templates: `conftest.py` (browser fixtures, screenshot on failure), a Page Object whose fallback locator list is tried in order, and one test function per case. Every value is embedded with `repr()`. Every generated file is compiled as a self-check before Phase 4 runs it. The generated folder runs with plain `pytest`. |
+| 4 | `gennai/phase4_execute.py` | Runs the suite in a subprocess with a timeout and parses the JUnit XML. It classifies failures as `page_unavailable` (HTTP error on load), `element_intercepted`, `locator_not_found`, `timeout`, `assertion` or `other`, then writes `results.json` and `report.html` (rendered by `gennai/report.py`). The report is one self-contained file with clickable summary cards and five tabs: **Overview** (findings with steps, error and screenshot, and what each failure class means), **Tests** (search, filter by status, technique and failure class, sort, expand a row for its steps, locators and re-run command), **Coverage** (element × technique, coloured by result; click a cell to see those tests), **Elements** (what Phase 1 found, with constraints and every locator) and **Metrics** (time per phase; LLM response time, tokens and gate counts; slowest tests). |
 | - | `gennai/llm.py`, `gennai/safety.py` | Optional LLM step, prompt building, the gate and the URL guard (see below). |
 
 Phase 2 generates these test cases:
@@ -86,7 +86,7 @@ python gennai.py run https://the-internet.herokuapp.com
 
 Flags: `--out DIR` (default `runs/<host>_<timestamp>/`), `--headed` (show the browser), `--max-tests N` (default 25), `--allow-local` (`run` only).
 
-Each run writes `elements.json` (Phase 1), `test_cases.json` (Phase 2), `tests/` (Phase 3), `results.json`, `report.html` and `screenshots/` (Phase 4). The terminal shows a short summary and the report path.
+Each run writes `elements.json` (Phase 1), `test_cases.json` (Phase 2), `tests/` (Phase 3), `results.json`, `report.html` and `screenshots/` (Phase 4). The terminal shows a short summary: results, time per phase, LLM calls with average response time and tokens, and the report path.
 
 Exit codes:
 - `0`: the pipeline finished. Failed generated tests are findings, not errors.
@@ -110,7 +110,15 @@ python -m ruff check .
 - **Email: invalid partition (not an email) → `assertion`.** The field is labelled "Email" but is `type="text"` with no validation, so `not-an-email` is accepted. Phase 1 inferred the email kind from the label.
 - The "Load offers" button is added by script 1.5 s after load. It is still found and its test passes.
 
-Full outputs from all three runs are in [`examples/`](examples/): reports, JSON, generated test code and screenshots.
+The Coverage tab shows every element against every technique. The two red cells are the two planted bugs, and clicking one lists its tests:
+
+![Coverage tab for the demo page](examples/demo/report-coverage.png)
+
+The Metrics tab shows time per phase, the LLM call with its response time and tokens, and what the gate accepted:
+
+![Metrics tab for the demo page](examples/demo/report-metrics.png)
+
+Full outputs from all three runs are in [`examples/`](examples/): reports, JSON, generated test code and screenshots. [SHOWCASE.md](SHOWCASE.md) maps each course requirement to where the tool shows it.
 
 ## Results
 
@@ -118,43 +126,44 @@ Measured on 2026-11-24 on Windows 11, Python 3.13, headless Chromium, with the L
 
 | Site | Elements | Tests (ep / bva / state / click / llm) | Passed | Failed | Failures by class | Run time |
 |---|---|---|---|---|---|---|
-| `demo/` (local) | 7 | 25 (8 / 7 / 3 / 1 / 6) | 23 | 2 | element_intercepted 1, assertion 1 | 16.3 s |
-| automationexercise.com | 18 | 21 (3 / 0 / 0 / 17 / 1) | 20 | 1 | page_unavailable 1 (HTTP 520) | 46.1 s |
-| the-internet.herokuapp.com | 40 | 25 (1 / 0 / 0 / 23 / 1) | 25 | 0 | none | 56.2 s |
+| `demo/` (local) | 7 | 24 (8 / 7 / 3 / 2 / 4) | 22 | 2 | element_intercepted 1, assertion 1 | 21.7 s |
+| automationexercise.com | 18 | 21 (3 / 0 / 0 / 17 / 1) | 20 | 1 | locator_not_found 1 | 49.0 s |
+| the-internet.herokuapp.com | 40 | 25 (1 / 0 / 0 / 23 / 1) | 25 | 0 | none | 48.2 s |
 
 Without a key, the same pages give 20 / 20 / 25 tests. On the demo that run had 18 passed with the same 2 failures.
 
-**LLM step, live.**
+**LLM step, live.** Response time and tokens are the provider's own `usage` numbers, recorded per call in `results.json` and shown in the report.
 
-| Site | Calls | Proposed | Accepted by the gate | Rejected (hallucination / schema) | In final suite | Passed |
-|---|---|---|---|---|---|---|
-| `demo/` | 1 | 9 | 9 | 0 / 0 | 6 | 6 |
-| automationexercise.com | 1 | 4 | 4 | 0 / 0 | 1 | 1 |
-| the-internet.herokuapp.com | 1 | 6 | 6 | 0 / 0 | 1 | 1 |
+| Site | Calls | Response time | Tokens in / out | Proposed | Accepted by the gate | Rejected (hallucination / schema) | In final suite | Passed |
+|---|---|---|---|---|---|---|---|---|
+| `demo/` | 1 | 1.73 s | 577 / 256 | 7 | 7 | 0 / 0 | 4 | 4 |
+| automationexercise.com | 1 | 1.23 s | 1,133 / 222 | 6 | 6 | 0 / 0 | 1 | 1 |
+| the-internet.herokuapp.com | 1 | 1.55 s | 2,309 / 375 | 7 | 7 | 0 / 0 | 1 | 1 |
 
 - Accepted specs that duplicate an algorithmic test are removed, and the rest compete for the 25-test cap by priority. That is why fewer model tests reach the final suite.
 - The gate rejected nothing on these three pages. That is a small sample, not evidence that the model never hallucinates. The rejection path is covered by the tests.
-- Each call took about 1.5 s.
-- During testing, `gemini-3.8-flash`, `gemini-3.6-flash` and the Gemma fallback (`gemma-4-31b-it`) often answered HTTP 503 ("high demand"). A Gemma-only demo run hit 503 twice (one call, then the retry pass) and fell back cleanly to the algorithmic tests.
+- Free models are often overloaded. During testing, `gemini-3.8-flash`, `gemini-3.6-flash` and the Gemma fallback (`gemma-4-31b-it`) often answered HTTP 503 ("high demand"), and one `gemini-3.5-flash-lite` call hung until the timeout. Those runs fell back cleanly to the algorithmic tests, and the report lists every failed call with its outcome. The per-call timeout is now 45 s, so a hung call costs less than a minute.
 
 **Demo.** Both planted issues are caught on every run, with the same classes. The demo page is static, so the result is deterministic.
 
-**automationexercise.com.** Five runs that day gave 19, 20, 17, 18 and 18 passed out of 20, in that order. The failures exposed two tool bugs, both fixed and listed in the git log:
+**automationexercise.com.** Five earlier runs that day gave 19, 20, 17, 18 and 18 passed out of 20, in that order. The failures exposed two tool bugs, both fixed and listed in the git log:
 - Generated tests navigated with the 5 s action timeout. That caused 2 setup timeouts on a slow load.
 - The site sometimes answers with HTTP 503 and a "heavy load (queue full)" page. Tests reported that as `locator_not_found`; they now report `page_unavailable` with the status code.
 
-The remaining `locator_not_found`, on a "Tshirt" category link, appeared in 2 of the 5 runs. The link's locators were unique during exploration but had no unique match on the test's own page load. That is real locator instability on a changing page (see [KNOWN_LIMITATIONS.md](KNOWN_LIMITATIONS.md)). The course-era ad-iframe interception of the Subscribe button did not occur in these runs.
+The remaining `locator_not_found`, on a "Tshirt" category link, appeared in 2 of the 5 runs, and on a "Dress" category link in the final run. The link's locators were unique during exploration but had no unique match on the test's own page load. That is real locator instability on a changing page (see [KNOWN_LIMITATIONS.md](KNOWN_LIMITATIONS.md)). The course-era ad-iframe interception of the Subscribe button did not occur in these runs.
 
 **the-internet.herokuapp.com.** The first run flagged the "Skip to content" link as a `timeout`. That was a false positive: the link sits off-screen until it is focused. Phase 1 now skips elements that lie entirely off-screen, and the later runs passed 25 of 25.
 
 
 **The tool itself.**
-- 36 tests pass in about 17 s. They include:
+- 40 tests pass in about 21 s. They include:
   - one end-to-end run against the local demo;
   - a test that feeds hostile strings through code generation and parses every generated file;
-  - a test that a spec referencing a non-existent element is rejected.
+  - a test that a spec referencing a non-existent element is rejected;
+  - a test that response time, tokens and failed calls are recorded;
+  - a test that page text containing `<script>` is escaped in the report.
 - `ruff check` and `ruff format --check` are clean.
-- The code is 1,281 lines of Python in `gennai.py` and `gennai/`. The course version had about 11,700 lines of Python across the phase folders and the web UI.
+- The code is 1,733 lines of Python in `gennai.py` and `gennai/`, plus 140 lines of CSS and JavaScript that are inlined into the report. The course version had about 11,700 lines of Python across the phase folders and the web UI.
 
 ## Course constraints and what changed for the demo
 
@@ -195,9 +204,10 @@ That later work has its own open list. The mailbox assistant still lacks CSRF pr
 
 ## Limitations and future work
 
-- [KNOWN_LIMITATIONS.md](KNOWN_LIMITATIONS.md) covers real flaws: heuristic locators, single page with no login, shallow assertions, an unsandboxed test run, basic injection defence, a reference-only hallucination gate, and an LLM path that has not been verified live.
+- [KNOWN_LIMITATIONS.md](KNOWN_LIMITATIONS.md) covers real flaws: heuristic locators, single page with no login, shallow assertions, an unsandboxed test run, basic injection defence, a reference-only hallucination gate, and thin live evidence for the LLM step.
 - [FUTURE_WORK.md](FUTURE_WORK.md) covers features that were left out or removed, and what to build next.
 - [DEMO_SCRIPT.md](DEMO_SCRIPT.md) is a 2-3 minute walkthrough.
+- [SHOWCASE.md](SHOWCASE.md) is the longer presentation guide: what to highlight in each phase, where each course requirement shows, and answers for the likely questions.
 
 ## Responsible use
 

@@ -16,18 +16,20 @@ Run:
 python gennai.py demo --headed
 ```
 
-Point at the browser window while it runs. Then point at the terminal summary. With the key our run showed 7 elements, 25 tests (6 from the model; the number varies with the model's answer), 23 passed and 2 failed. Without it, 20 tests, 18 passed and 2 failed.
+Point at the browser window while it runs. Then point at the terminal summary. With the key our run showed 7 elements, 24 tests (4 from the model; the number varies with the model's answer), 22 passed and 2 failed, and one LLM call of 1.73 s using 577 tokens in and 256 out. Without it, 20 tests, 18 passed and 2 failed.
 
 Say: "`demo` serves a small local sign-up page and runs the same pipeline as `run <url>`. The page has two planted problems, and the tool found both."
 
 ## 3. The findings (40 s)
 
-Open the `report.html` path printed at the end. Expand the two failed rows.
+Open the `report.html` path printed at the end. The Overview tab shows the two failures as findings, each with its steps, the error and a screenshot.
 
 - **Submit: is clickable** is classified as `element_intercepted`. The screenshot shows the cookie banner covering the Submit button. Say: "This is the same kind of bug the course version found on a real site, where an ad iframe covered a Subscribe button. The click is a trial click, so nothing is actually submitted."
 - **Email: invalid partition** is classified as `assertion`. Say: "The field is labelled Email but accepts `not-an-email`. The tool inferred from the label that it is an email field and used an equivalence-partitioning test to catch it."
 
-Optionally open `examples/automationexercise/report.html` to show a run on a public practice site.
+Open the Coverage tab (every element against every technique, red where a test failed; click a red cell to list its tests) and the Metrics tab (time per phase, the LLM call with its response time and tokens, the gate counts).
+
+Optionally open `examples/the-internet/report.html` to show a run on a public practice site. For a longer demo, follow [SHOWCASE.md](SHOWCASE.md).
 
 ## 4. How it was built (40 s)
 

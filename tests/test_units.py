@@ -119,3 +119,35 @@ def test_codegen_keeps_hostile_text_inside_literals(tmp_path):
         names = {n.func.id for n in ast.walk(tree) if isinstance(n, ast.Call)
                  and isinstance(n.func, ast.Name)}  # fmt: skip
         assert "__import__" not in names  # the payload stayed inside a string
+
+
+def test_codegen_self_check_stops_broken_output(tmp_path):
+    from gennai.phase3_codegen import _self_check
+
+    (tmp_path / "test_generated.py").write_text("def test_x(page):\n    p.(\n", encoding="utf-8")
+    with pytest.raises(GennaiError, match="self-check: test_generated.py:2"):
+        _self_check(tmp_path)
+
+
+def test_report_escapes_page_text_and_has_all_tabs(tmp_path):
+    import json
+
+    from gennai.report import render
+
+    evil = "<script>alert(1)</script>"
+    el = {**_el("e01", "text", label=evil), "tag": "input", "type": "text"}
+    step = {"element": "e01", "action": "fill", "value": evil}
+    case = {"id": "t01", "title": f"{evil}: valid", "technique": "ep", "target": "e01",
+            "steps": [step], "expect": "valid"}  # fmt: skip
+    (tmp_path / "elements.json").write_text(json.dumps([el]), encoding="utf-8")
+    (tmp_path / "test_cases.json").write_text(json.dumps([case]), encoding="utf-8")
+    row = {"id": "t01", "title": case["title"], "technique": "ep", "priority": 0.5,
+           "status": "failed", "duration": 0.1, "failure_class": "assertion",
+           "message": evil, "screenshot": None}  # fmt: skip
+    results = {"url": "http://x", "started": "now", "total_s": 1, "durations": {}, "elements": 1,
+               "llm": evil, "summary": {"passed": 0, "failed": 1,
+               "failures_per_class": {"assertion": 1}}, "tests": [row]}  # fmt: skip
+    page = render(tmp_path, results)
+    assert evil not in page and "&lt;script&gt;" in page
+    for tab in ("overview", "tests", "coverage", "elements", "metrics"):
+        assert f"data-tab='{tab}'" in page

@@ -33,7 +33,7 @@ class Settings:
     llm_providers: tuple[Provider, ...] = ()  # configured providers, in fallback order
     llm_max_calls: int = 3  # hard cap on HTTP attempts per run
     llm_max_output_tokens: int = 4096
-    llm_timeout_s: int = 120  # thinking models (e.g. Gemma) can take a minute
+    llm_timeout_s: int = 45  # a hung free-tier call moves on to the next provider
     llm_max_input_chars: int = 12000
 
 
@@ -58,7 +58,8 @@ def _providers() -> tuple[Provider, ...]:
             continue
         prefix = name.upper()
         key = os.environ.get(f"{prefix}_API_KEY", "").strip()
-        if not key:
+        # dotenv reads `KEY=   # comment` as the value "# comment"; that is an empty key
+        if not key or key.startswith("#"):
             continue
         model = os.environ.get(f"{prefix}_MODEL", "").strip()
         base_url = os.environ.get(f"{prefix}_BASE_URL", "").strip()
