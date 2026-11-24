@@ -1,13 +1,14 @@
 {
   "url": "https://the-internet.herokuapp.com",
-  "started": "2026-11-24T11:38:46",
-  "finished": "2026-11-24T11:39:42",
-  "total_s": 56.2,
+  "started": "2026-11-24T16:11:29",
+  "finished": "2026-11-24T16:12:17",
+  "total_s": 48.2,
   "durations": {
-    "explore": 10.08,
-    "generate": 1.49,
-    "codegen": 0.0,
-    "execute": 44.68
+    "explore": 5.84,
+    "llm": 1.55,
+    "generate": 0.0,
+    "codegen": 0.02,
+    "execute": 40.75
   },
   "elements": 40,
   "tests_per_technique": {
@@ -17,12 +18,25 @@
   },
   "llm": "used: gemini/gemini-3.5-flash-lite",
   "llm_stats": {
-    "proposed": 6,
-    "accepted": 6,
+    "proposed": 7,
+    "accepted": 7,
     "rejected_hallucinations": 0,
     "rejected_schema": 0,
     "status": "used: gemini/gemini-3.5-flash-lite",
-    "calls": 1
+    "calls": 1,
+    "avg_response_s": 1.55,
+    "prompt_tokens": 2309,
+    "completion_tokens": 375,
+    "attempts": [
+      {
+        "provider": "gemini",
+        "model": "gemini-3.5-flash-lite",
+        "outcome": "ok",
+        "prompt_tokens": 2309,
+        "completion_tokens": 375,
+        "seconds": 1.55
+      }
+    ]
   },
   "summary": {
     "passed": 25,
@@ -32,11 +46,11 @@
   "tests": [
     {
       "id": "t01",
-      "title": "Filter examples by search term",
+      "title": "Filter examples by typing text",
       "technique": "llm",
       "priority": 0.435,
       "status": "passed",
-      "duration": 1.92,
+      "duration": 2.67,
       "failure_class": null,
       "message": "",
       "screenshot": null
@@ -47,7 +61,7 @@
       "technique": "ep",
       "priority": 0.42,
       "status": "passed",
-      "duration": 1.46,
+      "duration": 1.44,
       "failure_class": null,
       "message": "",
       "screenshot": null
@@ -58,7 +72,7 @@
       "technique": "click",
       "priority": 0.36,
       "status": "passed",
-      "duration": 1.41,
+      "duration": 1.4,
       "failure_class": null,
       "message": "",
       "screenshot": null
@@ -69,7 +83,7 @@
       "technique": "click",
       "priority": 0.36,
       "status": "passed",
-      "duration": 1.42,
+      "duration": 1.43,
       "failure_class": null,
       "message": "",
       "screenshot": null
@@ -91,7 +105,7 @@
       "technique": "click",
       "priority": 0.36,
       "status": "passed",
-      "duration": 1.4,
+      "duration": 1.45,
       "failure_class": null,
       "message": "",
       "screenshot": null
@@ -102,7 +116,7 @@
       "technique": "click",
       "priority": 0.36,
       "status": "passed",
-      "duration": 1.4,
+      "duration": 1.42,
       "failure_class": null,
       "message": "",
       "screenshot": null
@@ -113,7 +127,7 @@
       "technique": "click",
       "priority": 0.36,
       "status": "passed",
-      "duration": 1.47,
+      "duration": 1.4,
       "failure_class": null,
       "message": "",
       "screenshot": null
@@ -124,7 +138,7 @@
       "technique": "click",
       "priority": 0.36,
       "status": "passed",
-      "duration": 1.47,
+      "duration": 1.48,
       "failure_class": null,
       "message": "",
       "screenshot": null
@@ -135,7 +149,7 @@
       "technique": "click",
       "priority": 0.36,
       "status": "passed",
-      "duration": 1.53,
+      "duration": 1.4,
       "failure_class": null,
       "message": "",
       "screenshot": null
@@ -146,7 +160,7 @@
       "technique": "click",
       "priority": 0.36,
       "status": "passed",
-      "duration": 1.38,
+      "duration": 1.45,
       "failure_class": null,
       "message": "",
       "screenshot": null
@@ -157,7 +171,7 @@
       "technique": "click",
       "priority": 0.36,
       "status": "passed",
-      "duration": 1.41,
+      "duration": 1.45,
       "failure_class": null,
       "message": "",
       "screenshot": null
@@ -168,7 +182,7 @@
       "technique": "click",
       "priority": 0.36,
       "status": "passed",
-      "duration": 1.45,
+      "duration": 1.4,
       "failure_class": null,
       "message": "",
       "screenshot": null
@@ -179,7 +193,7 @@
       "technique": "click",
       "priority": 0.36,
       "status": "passed",
-      "duration": 1.7,
+      "duration": 1.43,
       "failure_class": null,
       "message": "",
       "screenshot": null
@@ -190,7 +204,7 @@
       "technique": "click",
       "priority": 0.36,
       "status": "passed",
-      "duration": 2.13,
+      "duration": 1.4,
       "failure_class": null,
       "message": "",
       "screenshot": null
@@ -201,7 +215,7 @@
       "technique": "click",
       "priority": 0.36,
       "status": "passed",
-      "duration": 1.48,
+      "duration": 1.43,
       "failure_class": null,
       "message": "",
       "screenshot": null
@@ -212,7 +226,7 @@
       "technique": "click",
       "priority": 0.36,
       "status": "passed",
-      "duration": 6.08,
+      "duration": 1.42,
       "failure_class": null,
       "message": "",
       "screenshot": null
@@ -223,7 +237,7 @@
       "technique": "click",
       "priority": 0.36,
       "status": "passed",
-      "duration": 1.5,
+      "duration": 1.4,
       "failure_class": null,
       "message": "",
       "screenshot": null
@@ -234,7 +248,7 @@
       "technique": "click",
       "priority": 0.36,
       "status": "passed",
-      "duration": 1.47,
+      "duration": 1.4,
       "failure_class": null,
       "message": "",
       "screenshot": null
@@ -256,7 +270,7 @@
       "technique": "click",
       "priority": 0.36,
       "status": "passed",
-      "duration": 1.48,
+      "duration": 1.4,
       "failure_class": null,
       "message": "",
       "screenshot": null
@@ -267,7 +281,7 @@
       "technique": "click",
       "priority": 0.36,
       "status": "passed",
-      "duration": 1.51,
+      "duration": 1.43,
       "failure_class": null,
       "message": "",
       "screenshot": null
@@ -278,7 +292,7 @@
       "technique": "click",
       "priority": 0.36,
       "status": "passed",
-      "duration": 1.45,
+      "duration": 1.43,
       "failure_class": null,
       "message": "",
       "screenshot": null
@@ -289,7 +303,7 @@
       "technique": "click",
       "priority": 0.36,
       "status": "passed",
-      "duration": 1.38,
+      "duration": 1.4,
       "failure_class": null,
       "message": "",
       "screenshot": null
@@ -300,7 +314,7 @@
       "technique": "click",
       "priority": 0.36,
       "status": "passed",
-      "duration": 3.03,
+      "duration": 3.12,
       "failure_class": null,
       "message": "",
       "screenshot": null

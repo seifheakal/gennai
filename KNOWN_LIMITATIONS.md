@@ -9,7 +9,7 @@ Real flaws in the current version that were too expensive or risky to fix within
    - **Needed for production:** re-validation on each run, locator scoring across several loads, and human-approved repair.
 
 2. **Simple crawl, simple login.**
-   - **What:** by default the tool tests only the URL it is given. `--max-pages N` follows plain `<a href>` links on the same origin, breadth-first, up to 20 pages. Login (`GENNAI_LOGIN_*`) only handles a single form with one text or email field and one password field, submitted with Enter: no multi-step logins, SSO, MFA or CAPTCHA, and no login through a button that isn't a form submit. It was verified only on the bundled demo's script-based sign-in page. The crawler also does not follow links created by clicks or forms (single-page-app routing, buttons that navigate), or pages listed only in a sitemap. Links are skipped by a word list (logout, delete, remove, ...), so a harmless "Add/Remove" page is skipped too and a destructive link with an unusual name is not. Pages are deduplicated by URL, so `/` and `/index.html` count as two pages. The 25-test cap is shared by all pages, so with many pages some get only their highest-priority tests.
+   - **What:** by default the tool tests only the URL it is given. `--max-pages N` follows plain `<a href>` links on the same origin, breadth-first, up to 20 pages. Login (`GENNAI_LOGIN_*`) only handles a single form with one text or email field and one password field, submitted with Enter: no multi-step logins, SSO, MFA or CAPTCHA, and no login through a button that isn't a form submit. It was verified only on the bundled demo's script-based sign-in page. The crawler also does not follow links created by clicks or forms (single-page-app routing, buttons that navigate), or pages listed only in a sitemap. Links are skipped by a word list (logout, delete, remove, ...), so a harmless "Add/Remove" page is skipped too and a destructive link with an unusual name is not. Pages are deduplicated by URL, so `/` and `/index.html` count as two pages. The 25-test cap is shared by all pages: every element gets one test and every field one negative test first, so on large sites (more than about 25 elements) some elements get none.
    - **Impact:** pages behind a more complex login, or reachable only through script navigation, are not tested. On a large site the first N pages in link order are tested, not the most important ones.
    - **Why left:** each login style needs its own handling; smarter scoping needs a model of which pages matter.
    - **Needed for production:** configurable login steps and selectors, credentials from a secret store instead of `.env`, an explicit allow/deny list of paths, and per-page test budgets.
@@ -53,8 +53,8 @@ Real flaws in the current version that were too expensive or risky to fix within
    - **Needed for production:** check expectations against the field's own constraints deterministically. `--review` lets a person reject such tests before they run, but it is opt-in.
 
 10. **Cost controls are per run only.**
-    - **What:** there is a hard cap on LLM calls per run (`GENNAI_LLM_MAX_CALLS`), plus input and output token caps, timeouts, client-side spacing and fallback on 429.
-    - **Impact:** there are no per-user quotas, token accounting or cost reporting.
+    - **What:** there is a hard cap on LLM calls per run (`GENNAI_LLM_MAX_CALLS`), plus input and output token caps, timeouts, client-side spacing and fallback on 429. Each run records response time and token usage per call, as the provider reports them.
+    - **Impact:** there are no per-user quotas, no totals across runs and no cost in money (the default models are free).
     - **Why left:** the tool is a single-user CLI.
 
 11. **Local-target guard.**
@@ -64,7 +64,7 @@ Real flaws in the current version that were too expensive or risky to fix within
 
 12. **Free models are often overloaded, and the LLM evidence is thin.**
     - **What:** during live testing, `gemini-3.8-flash`, `gemini-3.6-flash` and `gemma-4-31b-it` often answered HTTP 503 ("high demand"). The default is therefore `gemini-3.5-flash-lite`. The Gemma fallback never returned a full answer live. Its `<thought>` reasoning prefix is stripped by the gate, but that is tested only with a mocked response. Google does not publish per-model free-tier limits (they appear per project in AI Studio), so the default spacing of 10 requests per minute is a conservative guess.
-    - **Impact:** on a busy day the LLM step may add nothing, and the run says so. The live measurement covers 3 pages and 19 proposed specs, with 0 rejected, which is too small to estimate a hallucination rate.
+    - **Impact:** on a busy day the LLM step may add nothing, and the run says so. The final live measurement covers 3 pages and 20 proposed specs, with 0 rejected, which is too small to estimate a hallucination rate.
 
 13. **Free-tier data use.**
     - **What:** with an LLM key configured, element labels and texts from the tested page are sent to the provider. Google's pricing page says free-tier content is used to improve its products.

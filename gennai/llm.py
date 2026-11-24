@@ -30,12 +30,13 @@ class _Client:
         self.last_call: dict[str, float] = {}
         self.cooldown_until: dict[str, float] = {}
         self.reasons: dict[str, str] = {}
+        self.attempts: list[dict] = []  # one row per HTTP attempt: provider, outcome, time, tokens
 
     def _unavailable(self, why: str = "") -> LLMUnavailable:
         parts = [f"{n}: {r}" for n, r in self.reasons.items()]
         return LLMUnavailable("; ".join(([why] if why else []) + parts) or "no provider left")
 
-    def _post(self, p: Provider, system: str, user: str) -> str:
+    def _post(self, p: Provider, system: str, user: str) -> tuple[str, dict]:
         body = {
             "model": p.model,
             "messages": [{"role": "system", "content": system}, {"role": "user", "content": user}],
@@ -57,7 +58,10 @@ class _Client:
         content = data["choices"][0]["message"]["content"]
         if not isinstance(content, str):
             raise TypeError("content is not a string")
-        return content
+        usage = data.get("usage") if isinstance(data.get("usage"), dict) else {}
+        tokens = {k: usage[k] for k in ("prompt_tokens", "completion_tokens")
+                  if isinstance(usage.get(k), int)}  # fmt: skip
+        return content, tokens
 
     def _space(self, p: Provider) -> None:
         """Wait so that calls to one provider are at least 60/RPM seconds apart."""
@@ -100,10 +104,15 @@ class _Client:
                     raise self._unavailable(f"call cap {self.s.llm_max_calls} reached")
                 self._space(p)
                 self.calls += 1
+                started = time.perf_counter()
+                row = {"provider": p.name, "model": p.model}
+                self.attempts.append(row)
                 try:
-                    return self._post(p, system, user), p
+                    text, tokens = self._post(p, system, user)
+                    row.update(outcome="ok", **tokens)
+                    return text, p
                 except urllib.error.HTTPError as e:
-                    self.reasons[p.name] = f"HTTP {e.code}"
+                    self.reasons[p.name] = row["outcome"] = f"HTTP {e.code}"
                     log.warning("LLM %s answered HTTP %s", p.name, e.code)
                     if e.code == 429:
                         self._cool_down(p, e)
@@ -115,13 +124,26 @@ class _Client:
                     TimeoutError,
                     OSError,
                 ) as e:
-                    self.reasons[p.name] = f"network error ({type(e).__name__})"
+                    self.reasons[p.name] = row["outcome"] = f"network error ({type(e).__name__})"
                     log.warning("LLM %s network error: %s", p.name, type(e).__name__)
                 except (ValueError, KeyError, IndexError, TypeError):
-                    self.reasons[p.name] = "malformed response"
+                    self.reasons[p.name] = row["outcome"] = "malformed response"
                     log.warning("LLM %s returned a malformed response", p.name)
                     dropped.add(p.name)
+                finally:
+                    row["seconds"] = round(time.perf_counter() - started, 2)
         raise self._unavailable()
+
+    def metrics(self) -> dict:
+        """Response time and token usage over this run's attempts (course brief: observability)."""
+        ok = [a for a in self.attempts if a.get("outcome") == "ok"]
+        return {
+            "calls": self.calls,
+            "avg_response_s": round(sum(a["seconds"] for a in ok) / len(ok), 2) if ok else None,
+            "prompt_tokens": sum(a.get("prompt_tokens", 0) for a in ok),
+            "completion_tokens": sum(a.get("completion_tokens", 0) for a in ok),
+            "attempts": self.attempts,
+        }
 
 
 def propose_cases(url: str, elements: list[dict], settings: Settings) -> tuple[list[Case], dict]:
@@ -136,8 +158,8 @@ def propose_cases(url: str, elements: list[dict], settings: Settings) -> tuple[l
     except LLMUnavailable as e:
         log.warning("LLM unavailable: %s", e)
         status = f"unavailable: {e}; used the algorithmic generators only"
-        return [], {"status": status, "calls": client.calls}
+        return [], {"status": status, **client.metrics()}
     cases, stats = gate_llm_cases(text, elements)
-    stats |= {"status": f"used: {provider.name}/{provider.model}", "calls": client.calls}
+    stats |= {"status": f"used: {provider.name}/{provider.model}", **client.metrics()}
     log.info("LLM proposed %d, accepted %d cases", stats["proposed"], stats["accepted"])
     return cases, stats

@@ -95,6 +95,8 @@ def run_pipeline(
     lap("explore")
     say(f"Phase 1: found {len(elements)} elements on {len(pages)} page(s)")
     extra_cases, llm = propose_cases(url, elements, settings)
+    if settings.llm_providers:
+        lap("llm")
     cases = generate(elements, settings.max_tests, extra_cases)
     if not cases:
         raise NoTestableElements(f"no testable elements found at {url}")

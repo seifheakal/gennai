@@ -9,6 +9,7 @@ from pathlib import Path
 from pprint import pformat
 from urllib.parse import urlparse
 
+from gennai import GennaiError
 from gennai.auth import login
 from gennai.config import Settings
 from gennai.phase1_explore import locate
@@ -218,4 +219,14 @@ def write_project(
         ),  # fmt: skip
         encoding="utf-8",
     )
+    _self_check(tests)
     return tests
+
+
+def _self_check(tests: Path) -> None:
+    """Compile every generated file before Phase 4 runs it; a template bug stops here."""
+    for f in sorted(tests.rglob("*.py")):
+        try:
+            compile(f.read_text(encoding="utf-8"), str(f), "exec")
+        except SyntaxError as e:
+            raise GennaiError(f"generated code failed its self-check: {f.name}:{e.lineno}") from e

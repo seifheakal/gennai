@@ -1,13 +1,14 @@
 {
   "url": "https://automationexercise.com",
-  "started": "2026-11-24T11:38:44",
-  "finished": "2026-11-24T11:39:30",
-  "total_s": 46.1,
+  "started": "2026-11-24T16:10:39",
+  "finished": "2026-11-24T16:11:28",
+  "total_s": 49.0,
   "durations": {
-    "explore": 14.41,
-    "generate": 1.04,
-    "codegen": 0.0,
-    "execute": 30.69
+    "explore": 9.43,
+    "llm": 1.23,
+    "generate": 0.0,
+    "codegen": 0.02,
+    "execute": 38.37
   },
   "elements": 18,
   "tests_per_technique": {
@@ -17,28 +18,41 @@
   },
   "llm": "used: gemini/gemini-3.5-flash-lite",
   "llm_stats": {
-    "proposed": 4,
-    "accepted": 4,
+    "proposed": 6,
+    "accepted": 6,
     "rejected_hallucinations": 0,
     "rejected_schema": 0,
     "status": "used: gemini/gemini-3.5-flash-lite",
-    "calls": 1
+    "calls": 1,
+    "avg_response_s": 1.23,
+    "prompt_tokens": 1133,
+    "completion_tokens": 222,
+    "attempts": [
+      {
+        "provider": "gemini",
+        "model": "gemini-3.5-flash-lite",
+        "outcome": "ok",
+        "prompt_tokens": 1133,
+        "completion_tokens": 222,
+        "seconds": 1.23
+      }
+    ]
   },
   "summary": {
     "passed": 20,
     "failed": 1,
     "failures_per_class": {
-      "page_unavailable": 1
+      "locator_not_found": 1
     }
   },
   "tests": [
     {
       "id": "t01",
-      "title": "Fill email address",
+      "title": "Fill valid email address",
       "technique": "llm",
       "priority": 0.925,
       "status": "passed",
-      "duration": 2.08,
+      "duration": 2.64,
       "failure_class": null,
       "message": "",
       "screenshot": null
@@ -49,7 +63,7 @@
       "technique": "ep",
       "priority": 0.91,
       "status": "passed",
-      "duration": 1.61,
+      "duration": 1.49,
       "failure_class": null,
       "message": "",
       "screenshot": null
@@ -59,10 +73,10 @@
       "title": "Your email address: invalid partition (not an email)",
       "technique": "ep",
       "priority": 0.91,
-      "status": "failed",
-      "duration": 0.65,
-      "failure_class": "page_unavailable",
-      "message": "failed on setup with \"conftest.PageUnavailable: https://automationexercise.com returned HTTP 520\"",
+      "status": "passed",
+      "duration": 3.02,
+      "failure_class": null,
+      "message": "",
       "screenshot": null
     },
     {
@@ -71,7 +85,7 @@
       "technique": "ep",
       "priority": 0.91,
       "status": "passed",
-      "duration": 1.14,
+      "duration": 0.82,
       "failure_class": null,
       "message": "",
       "screenshot": null
@@ -82,7 +96,7 @@
       "technique": "click",
       "priority": 0.74,
       "status": "passed",
-      "duration": 1.17,
+      "duration": 0.87,
       "failure_class": null,
       "message": "",
       "screenshot": null
@@ -93,7 +107,7 @@
       "technique": "click",
       "priority": 0.54,
       "status": "passed",
-      "duration": 1.58,
+      "duration": 1.0,
       "failure_class": null,
       "message": "",
       "screenshot": null
@@ -104,7 +118,7 @@
       "technique": "click",
       "priority": 0.54,
       "status": "passed",
-      "duration": 1.39,
+      "duration": 0.85,
       "failure_class": null,
       "message": "",
       "screenshot": null
@@ -115,7 +129,7 @@
       "technique": "click",
       "priority": 0.36,
       "status": "passed",
-      "duration": 0.98,
+      "duration": 0.87,
       "failure_class": null,
       "message": "",
       "screenshot": null
@@ -126,7 +140,7 @@
       "technique": "click",
       "priority": 0.36,
       "status": "passed",
-      "duration": 1.06,
+      "duration": 2.17,
       "failure_class": null,
       "message": "",
       "screenshot": null
@@ -137,7 +151,7 @@
       "technique": "click",
       "priority": 0.36,
       "status": "passed",
-      "duration": 1.32,
+      "duration": 0.83,
       "failure_class": null,
       "message": "",
       "screenshot": null
@@ -148,7 +162,7 @@
       "technique": "click",
       "priority": 0.36,
       "status": "passed",
-      "duration": 0.9,
+      "duration": 0.88,
       "failure_class": null,
       "message": "",
       "screenshot": null
@@ -159,7 +173,7 @@
       "technique": "click",
       "priority": 0.36,
       "status": "passed",
-      "duration": 1.36,
+      "duration": 0.89,
       "failure_class": null,
       "message": "",
       "screenshot": null
@@ -170,7 +184,7 @@
       "technique": "click",
       "priority": 0.36,
       "status": "passed",
-      "duration": 1.11,
+      "duration": 1.14,
       "failure_class": null,
       "message": "",
       "screenshot": null
@@ -181,7 +195,7 @@
       "technique": "click",
       "priority": 0.36,
       "status": "passed",
-      "duration": 1.56,
+      "duration": 1.36,
       "failure_class": null,
       "message": "",
       "screenshot": null
@@ -192,7 +206,7 @@
       "technique": "click",
       "priority": 0.36,
       "status": "passed",
-      "duration": 0.98,
+      "duration": 1.03,
       "failure_class": null,
       "message": "",
       "screenshot": null
@@ -203,7 +217,7 @@
       "technique": "click",
       "priority": 0.36,
       "status": "passed",
-      "duration": 1.51,
+      "duration": 0.85,
       "failure_class": null,
       "message": "",
       "screenshot": null
@@ -214,7 +228,7 @@
       "technique": "click",
       "priority": 0.36,
       "status": "passed",
-      "duration": 0.99,
+      "duration": 1.47,
       "failure_class": null,
       "message": "",
       "screenshot": null
@@ -225,7 +239,7 @@
       "technique": "click",
       "priority": 0.36,
       "status": "passed",
-      "duration": 0.86,
+      "duration": 0.9,
       "failure_class": null,
       "message": "",
       "screenshot": null
@@ -236,7 +250,7 @@
       "technique": "click",
       "priority": 0.36,
       "status": "passed",
-      "duration": 1.62,
+      "duration": 1.61,
       "failure_class": null,
       "message": "",
       "screenshot": null
@@ -246,11 +260,11 @@
       "title": "Dress: is clickable",
       "technique": "click",
       "priority": 0.36,
-      "status": "passed",
-      "duration": 1.85,
-      "failure_class": null,
-      "message": "",
-      "screenshot": null
+      "status": "failed",
+      "duration": 5.85,
+      "failure_class": "locator_not_found",
+      "message": "pages.site_automationexercise_c_page.LocatorNotFound: e17: no unique match among [('role:link', 'Dress')]",
+      "screenshot": "screenshots/test_t20.png"
     },
     {
       "id": "t21",
@@ -258,7 +272,7 @@
       "technique": "click",
       "priority": 0.36,
       "status": "passed",
-      "duration": 4.02,
+      "duration": 5.4,
       "failure_class": null,
       "message": "",
       "screenshot": null

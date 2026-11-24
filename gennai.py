@@ -86,6 +86,11 @@ def _summary(r: dict, out: Path) -> None:
     print(f"  llm:       {r['llm']}")
     if r.get("notifications"):
         print(f"  notified:  {', '.join(f'{k} {v}' for k, v in r['notifications'].items())}")
+    m = r.get("llm_stats") or {}
+    if m.get("avg_response_s") is not None:
+        print(f"  llm calls: {m['calls']}, avg response {m['avg_response_s']}s, "
+              f"tokens {m['prompt_tokens']} in / {m['completion_tokens']} out")  # fmt: skip
+    print(f"  phases:    {', '.join(f'{k} {v}s' for k, v in r['durations'].items())}")
     print(f"  time:      {r['total_s']}s")
     print(f"  report:    {out / 'report.html'}")
 
