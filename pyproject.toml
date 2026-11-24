@@ -1,0 +1,10 @@
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+norecursedirs = ["runs", ".venv"]
+
+[tool.ruff]
+line-length = 100
+extend-exclude = ["runs", "prompts", "examples"]  # generated output and verbatim prompts
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]

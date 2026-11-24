@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GenNAI Demo Sign-up</title>
+<style>
+  html, body { height: 100%; margin: 0; overflow: hidden; font: 16px system-ui, sans-serif; }
+  main { box-sizing: border-box; min-height: 100vh; max-width: 480px; margin: 0 auto;
+         padding: 16px 24px 24px; display: flex; flex-direction: column; }
+  h1 { font-size: 1.4rem; margin: 0 0 8px; }
+  #offers { min-height: 40px; }
+  form { flex: 1; display: flex; flex-direction: column; gap: 10px; }
+  label { display: block; font-weight: 600; }
+  input[type=text], input[type=number], select { width: 100%; box-sizing: border-box; padding: 6px; }
+  button[type=submit] { margin-top: auto; padding: 10px; }
+  /* Planted issue: a cookie banner that is always on top and covers the Submit button. */
+  #cookie { position: fixed; left: 0; right: 0; bottom: 0; height: 130px; background: #222;
+            color: #fff; padding: 16px; box-sizing: border-box; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Create your account</h1>
+  <div id="offers"><span id="offers-out"></span></div>
+  <form id="signup">
+    <div>
+      <label for="name">Name</label>
+      <input type="text" id="name" name="name" required minlength="2" maxlength="30">
+    </div>
+    <div>
+      <!-- Planted bug: type="text" with no validation, so invalid emails are accepted. -->
+      <label for="email">Email</label>
+      <input type="text" id="email" name="email">
+    </div>
+    <div>
+      <label for="age">Age</label>
+      <input type="number" id="age" name="age" min="18" max="120">
+    </div>
+    <div>
+      <label for="country">Country</label>
+      <select id="country" name="country">
+        <option value="">Select a country</option>
+        <option value="eg">Egypt</option>
+        <option value="de">Germany</option>
+        <option value="us">United States</option>
+      </select>
+    </div>
+    <div>
+      <label><input type="checkbox" id="terms" name="terms" required> I accept the terms</label>
+    </div>
+    <button type="submit">Submit</button>
+  </form>
+</main>
+<div id="cookie" role="region" aria-label="Cookie notice">We use cookies to improve this site.</div>
+<script>
+  document.getElementById('signup').addEventListener('submit', e => e.preventDefault());
+  setTimeout(() => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.textContent = 'Load offers';
+    b.addEventListener('click', () => {
+      document.getElementById('offers-out').textContent = '3 offers available';
+    });
+    document.getElementById('offers').prepend(b);
+  }, 1500);
+</script>
+</body>
+</html>
