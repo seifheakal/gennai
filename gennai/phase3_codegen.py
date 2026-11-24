@@ -26,6 +26,7 @@ from playwright.sync_api import sync_playwright
 
 URL = __URL__
 ACTION_TIMEOUT_MS = __TIMEOUT__
+NAV_TIMEOUT_MS = __NAV_TIMEOUT__  # page loads can be much slower than actions
 SHOTS = Path(__file__).resolve().parent.parent / "screenshots"
 
 
@@ -42,7 +43,7 @@ def page(browser):
     context = browser.new_context()
     context.set_default_timeout(ACTION_TIMEOUT_MS)
     page = context.new_page()
-    page.goto(URL, wait_until="domcontentloaded")
+    page.goto(URL, wait_until="domcontentloaded", timeout=NAV_TIMEOUT_MS)
     yield page
     context.close()
 
@@ -149,7 +150,9 @@ def write_project(
     (tests / "pages" / f"{module}.py").write_text(page_src, encoding="utf-8")
     (tests / "pytest.ini").write_text(PYTEST_INI, encoding="utf-8")
     (tests / "conftest.py").write_text(
-        CONFTEST.replace("__TIMEOUT__", repr(timeout)).replace("__URL__", repr(url)),
+        CONFTEST.replace("__TIMEOUT__", repr(timeout))
+        .replace("__NAV_TIMEOUT__", repr(settings.page_timeout_ms))
+        .replace("__URL__", repr(url)),
         encoding="utf-8",
     )
     body = "\n\n".join(_test_source(c, methods) for c in cases)
