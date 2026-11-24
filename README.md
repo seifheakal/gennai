@@ -153,9 +153,10 @@ This public version has no course restriction. An optional LLM step uses a curre
 | Role | Provider | Model | Free-tier limits | Source |
 |---|---|---|---|---|
 | Primary | Google Gemini API (OpenAI-compatible endpoint) | `gemini-3.8-flash` | "Free of charge" on the free tier. Google no longer publishes per-model free RPM/RPD; they are shown per project in AI Studio. The client spaces calls at 10/min by default (`GEMINI_RPM`). | [pricing](https://ai.google.dev/gemini-api/docs/pricing), [rate limits](https://ai.google.dev/gemini-api/docs/rate-limits), [OpenAI compatibility](https://ai.google.dev/gemini-api/docs/openai) |
-| Fallback | OpenRouter | `google/gemma-4-31b-it:free` | 20 requests/min. 50 requests/day, or 1,000/day after buying at least 10 credits. | [limits](https://openrouter.ai/docs/api-reference/limits), [models API](https://openrouter.ai/api/v1/models) |
+| Fallback | Google Gemini API, same key (`GEMMA_API_KEY=${GEMINI_API_KEY}`) | `gemma-4-31b-it` | "Free of charge"; the free tier is the only tier for Gemma. Spaced at 10/min by default. | [pricing](https://ai.google.dev/gemini-api/docs/pricing), [Gemma on the Gemini API](https://ai.google.dev/gemma/docs/core/gemma_on_gemini_api) |
+| Optional third | OpenRouter (own key) | `google/gemma-4-31b-it:free` | 20 requests/min. 50 requests/day, or 1,000/day after buying at least 10 credits. | [limits](https://openrouter.ai/docs/api-reference/limits), [models API](https://openrouter.ai/api/v1/models) |
 
-`gemini-3.8-flash` is the newest Flash model that Google's pricing page lists as free of charge. The pricing page also says free-tier content is used to improve Google's products, so do not use the LLM step on confidential pages.
+`gemini-3.8-flash` is the newest Flash model that Google's pricing page lists as free of charge. The Gemma fallback uses the same key, so one free Google key is enough; AI Studio shows the free limits per model, and a rate-limited Gemini call falls through to Gemma. The pricing page also says free-tier content is used to improve Google's products, so do not use the LLM step on confidential pages.
 
 ## How it was built
 
