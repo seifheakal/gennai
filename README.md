@@ -286,6 +286,8 @@ GenNAI was built with AI coding tools under my direction. For the course version
 
 This version (November 2026) was produced with Claude Code (Opus) from [`prompts/FINALIZATION_PROMPT.md`](prompts/FINALIZATION_PROMPT.md). I set the goals: finish rather than expand, use only measured claims, add the LLM safety basics and a free-tier model. The work rebuilt the four phases into one small package, deleted the parts that were simulated or broken, and added the gated LLM step. It was planned and reviewed by Opus, most of the code was written by Sonnet subagents, and every result was run before it was accepted.
 
+The full story, including how the work was split between models and sessions and how each claim was checked, is in [BUILT_WITH_AI.md](BUILT_WITH_AI.md). There is also a visual one-page version, [docs/how-it-was-built.html](docs/how-it-was-built.html). The algorithms behind each phase are explained in [TECHNICAL.md](TECHNICAL.md).
+
 ## Where this fits in my development
 
 GenNAI was my first serious AI project. Since then I have built AI tooling professionally: an AI assistant for a mailbox, and a larger knowledge-base pipeline for an engineering firm. Both are private. The table lists only items I verified in their code and tests. They show how this repo's known limitations are handled in that later work.

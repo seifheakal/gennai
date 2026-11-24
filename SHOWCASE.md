@@ -4,6 +4,7 @@ How to present GenNAI: what to run, what to point at in each phase, and how each
 
 - For a 2-3 minute version, use [DEMO_SCRIPT.md](DEMO_SCRIPT.md).
 - This guide is for a 10-minute demo or a code defence.
+- The algorithms behind each phase are in [TECHNICAL.md](TECHNICAL.md). How the project was built with AI agents, and how each claim was checked, is in [BUILT_WITH_AI.md](BUILT_WITH_AI.md), with a visual version in [docs/how-it-was-built.html](docs/how-it-was-built.html).
 - Numbers come from the saved runs in [`examples/`](examples/) unless a section says otherwise (2026-11-24, Windows 11, Python 3.13, `gemini-3.5-flash-lite` on the free tier). The demo page gained "Contact us" and "Log out" links after the saved demo run, so a fresh `demo` now finds 9 elements, not 7.
 
 ## Before you start
@@ -51,6 +52,19 @@ GenNAI summary
   phases:    explore 4.3s, llm 1.73s, generate 0.0s, codegen 0.02s, execute 15.62s
   time:      21.7s
 ```
+
+## Video script (3 minutes)
+
+For a recording with no voice-over, or with these lines read over it.
+
+| Time | On screen | Say |
+|---|---|---|
+| 0:00-0:15 | The web UI at http://127.0.0.1:8765/ (`python gennai.py ui`) | "GenNAI takes a URL and tests the page end to end: explore, design tests, write code, run, report." |
+| 0:15-1:00 | Type `demo` and start. The phases arrive one by one. | "Phase 1 finds every element and keeps only locators that match exactly one. Phase 2 designs tests with equivalence partitioning, boundary values and state combinations. A free Gemini model may propose more, through a deterministic gate. Phase 3 writes pytest code from fixed templates. Phase 4 runs it." |
+| 1:00-1:40 | Open the report: the findings, then click the cookie screenshot | "Two planted bugs, both found. A cookie banner covers Submit: the trial click names the covering element. And the Email field accepts 'not-an-email'." |
+| 1:40-2:10 | Coverage tab, then click the red Email cell | "Every element against every technique. Click a red cell and you get exactly the tests behind it." |
+| 2:10-2:35 | Metrics tab | "Time per phase, the LLM call with its response time and tokens, and the gate: what the model proposed and what it was allowed to add." |
+| 2:35-3:00 | `docs/how-it-was-built.html` | "It was built with AI agents under written rules: a spec first, delegated work, and nothing accepted without a proof run." |
 
 ## Report tour (3 minutes)
 
