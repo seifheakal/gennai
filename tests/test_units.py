@@ -193,3 +193,31 @@ def test_login_settings_all_or_nothing_and_never_in_repr(monkeypatch):
     settings = load_settings()
     assert settings.login_password == "secret-pass"
     assert "secret" not in repr(settings)
+
+
+def _signup(page, start):
+    """Elements shaped like demo/index.html, including the two planted-bug targets."""
+    ids = [f"e{start + i:02d}" for i in range(8)]
+    return [
+        _el(ids[0], "text", label="Name", required=True, minlength="2", maxlength="30", page=page),
+        _el(ids[1], "email", label="Email", page=page),
+        _el(ids[2], "number", label="Age", min="18", max="120", page=page),
+        _el(ids[3], "checkbox", label="Terms", required=True, page=page),
+        _el(ids[4], "button", tag="button", text="Submit", page=page),
+        _el(ids[5], "button", tag="button", text="Offers", form=-1, page=page),
+        _el(ids[6], "link", tag="a", text="Contact", form=-1, page=page),
+        _el(ids[7], "link", tag="a", text="Log out", form=-1, page=page),
+    ]
+
+
+def test_cap_keeps_every_element_and_a_negative_case_despite_many_model_cases():
+    els = _signup("http://x/", 1) + _signup("http://x/b", 11)
+    llm = [Case(title=f"m{i}", technique="llm", target=t, expect="valid",
+                steps=[Step(element=t, action="fill", value=f"value {i}")])
+           for i in range(15) for t in ("e01", "e02", "e11", "e12")][:15]  # fmt: skip
+    top = generate(els, 25, llm)
+    picked = {(c.target, c.expect) for c in top}
+    for submit, email in (("e05", "e02"), ("e15", "e12")):  # on both pages
+        assert (submit, "clickable") in picked
+        assert (email, "invalid") in picked
+    assert {c.target for c in top} == {e["id"] for e in els}  # every element has a test

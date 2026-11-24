@@ -14,6 +14,7 @@ IMPORTANCE = {
     "email": 1.0, "password": 1.0, "button": 0.9, "number": 0.8, "phone": 0.8, "text": 0.7,
     "select": 0.6, "checkbox": 0.6, "radio": 0.6, "link": 0.3,
 }  # fmt: skip
+NEGATIVE = ("invalid", "form_invalid", "max_length")  # cases that expect a rejection
 TECHNIQUE_WEIGHT = {"state": 1.0, "click": 0.9, "bva": 0.8, "ep": 0.7, "llm": 0.75}
 
 
@@ -178,8 +179,9 @@ def _score(case: Case, by_id: dict[str, dict]) -> float:
 def generate(elements: list[dict], max_tests: int, extra: Iterable[Case] = ()) -> list[Case]:
     """Build, de-duplicate, prioritise and cap test cases. `extra` = pre-validated extra cases.
 
-    With several pages the cap is shared fairly: each page's best case comes before any page's
-    second best, so one large page cannot crowd out the others.
+    The cap is filled in coverage order: every element's best case first, then every element's
+    best negative case, then the rest by priority. Within each step pages take turns, so one
+    large page (or many model proposals for one field) cannot crowd out the others.
     """
     cases: list[Case] = []
     forms: dict[tuple[str, int], list[dict]] = defaultdict(list)  # form indexes are per page
@@ -203,13 +205,20 @@ def generate(elements: list[dict], max_tests: int, extra: Iterable[Case] = ()) -
             c.page = by_id[c.target].get("page", "")
             unique.append(c)
     unique.sort(key=lambda c: -c.priority)
-    rank: Counter[str] = Counter()
-    fair = []
-    for c in unique:  # stable sort below keeps priority order within a rank
-        fair.append((rank[c.page], c))
-        rank[c.page] += 1
-    fair.sort(key=lambda rc: rc[0])
-    top = sorted((c for _, c in fair[:max_tests]), key=lambda c: -c.priority)
+    covered: set[tuple[str, str]] = set()  # (page, element) with a case
+    negative: set[tuple[str, str]] = set()  # ... with a negative case
+    rank: Counter[tuple[int, str]] = Counter()
+    order = []
+    for c in unique:  # highest priority first, so each step keeps the element's best case
+        el, neg = (c.page, c.target), c.expect in NEGATIVE
+        step = 0 if el not in covered else 1 if neg and el not in negative else 2
+        covered.add(el)
+        if neg:
+            negative.add(el)
+        order.append((step, rank[(step, c.page)], c))
+        rank[(step, c.page)] += 1
+    order.sort(key=lambda o: o[:2])  # stable: priority order is kept within a turn
+    top = sorted((c for *_, c in order[:max_tests]), key=lambda c: -c.priority)
     for i, c in enumerate(top, 1):
         c.id = f"t{i:02d}"
     return top
