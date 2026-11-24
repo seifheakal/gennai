@@ -1,0 +1,314 @@
+{
+  "url": "http://127.0.0.1:53598/",
+  "started": "2026-11-24T11:38:19",
+  "finished": "2026-11-24T11:38:35",
+  "total_s": 16.3,
+  "durations": {
+    "explore": 3.65,
+    "generate": 1.43,
+    "codegen": 0.0,
+    "execute": 11.2
+  },
+  "elements": 7,
+  "tests_per_technique": {
+    "state": 3,
+    "bva": 7,
+    "llm": 6,
+    "ep": 8,
+    "click": 1
+  },
+  "llm": "used: gemini/gemini-3.5-flash-lite",
+  "llm_stats": {
+    "proposed": 9,
+    "accepted": 9,
+    "rejected_hallucinations": 0,
+    "rejected_schema": 0,
+    "status": "used: gemini/gemini-3.5-flash-lite",
+    "calls": 1
+  },
+  "summary": {
+    "passed": 23,
+    "failed": 2,
+    "failures_per_class": {
+      "element_intercepted": 1,
+      "assertion": 1
+    }
+  },
+  "tests": [
+    {
+      "id": "t01",
+      "title": "Form 1: all fields valid",
+      "technique": "state",
+      "priority": 0.91,
+      "status": "passed",
+      "duration": 1.47,
+      "failure_class": null,
+      "message": "",
+      "screenshot": null
+    },
+    {
+      "id": "t02",
+      "title": "Form 1: required 'Name' left empty",
+      "technique": "state",
+      "priority": 0.91,
+      "status": "passed",
+      "duration": 0.16,
+      "failure_class": null,
+      "message": "",
+      "screenshot": null
+    },
+    {
+      "id": "t03",
+      "title": "Form 1: required 'I accept the terms' left empty",
+      "technique": "state",
+      "priority": 0.91,
+      "status": "passed",
+      "duration": 0.13,
+      "failure_class": null,
+      "message": "",
+      "screenshot": null
+    },
+    {
+      "id": "t04",
+      "title": "Name: length 1 (below minlength)",
+      "technique": "bva",
+      "priority": 0.85,
+      "status": "passed",
+      "duration": 0.11,
+      "failure_class": null,
+      "message": "",
+      "screenshot": null
+    },
+    {
+      "id": "t05",
+      "title": "Name: length 2 (minlength)",
+      "technique": "bva",
+      "priority": 0.85,
+      "status": "passed",
+      "duration": 0.11,
+      "failure_class": null,
+      "message": "",
+      "screenshot": null
+    },
+    {
+      "id": "t06",
+      "title": "Name: length 30 (maxlength)",
+      "technique": "bva",
+      "priority": 0.85,
+      "status": "passed",
+      "duration": 0.11,
+      "failure_class": null,
+      "message": "",
+      "screenshot": null
+    },
+    {
+      "id": "t07",
+      "title": "Name: length 31 is limited",
+      "technique": "bva",
+      "priority": 0.85,
+      "status": "passed",
+      "duration": 0.1,
+      "failure_class": null,
+      "message": "",
+      "screenshot": null
+    },
+    {
+      "id": "t08",
+      "title": "Test Name too short",
+      "technique": "llm",
+      "priority": 0.835,
+      "status": "passed",
+      "duration": 0.12,
+      "failure_class": null,
+      "message": "",
+      "screenshot": null
+    },
+    {
+      "id": "t09",
+      "title": "Test Name valid",
+      "technique": "llm",
+      "priority": 0.835,
+      "status": "passed",
+      "duration": 0.15,
+      "failure_class": null,
+      "message": "",
+      "screenshot": null
+    },
+    {
+      "id": "t10",
+      "title": "Name: valid partition",
+      "technique": "ep",
+      "priority": 0.82,
+      "status": "passed",
+      "duration": 0.11,
+      "failure_class": null,
+      "message": "",
+      "screenshot": null
+    },
+    {
+      "id": "t11",
+      "title": "Name: required left empty",
+      "technique": "ep",
+      "priority": 0.82,
+      "status": "passed",
+      "duration": 0.1,
+      "failure_class": null,
+      "message": "",
+      "screenshot": null
+    },
+    {
+      "id": "t12",
+      "title": "I accept the terms: valid partition",
+      "technique": "ep",
+      "priority": 0.79,
+      "status": "passed",
+      "duration": 0.12,
+      "failure_class": null,
+      "message": "",
+      "screenshot": null
+    },
+    {
+      "id": "t13",
+      "title": "I accept the terms: required left empty",
+      "technique": "ep",
+      "priority": 0.79,
+      "status": "passed",
+      "duration": 0.1,
+      "failure_class": null,
+      "message": "",
+      "screenshot": null
+    },
+    {
+      "id": "t14",
+      "title": "Submit: is clickable",
+      "technique": "click",
+      "priority": 0.74,
+      "status": "failed",
+      "duration": 5.09,
+      "failure_class": "element_intercepted",
+      "message": "<div id=\"cookie\" role=\"region\" aria-label=\"Cookie notice\">We use cookies to improve this site.</div> intercepts pointer events\nplaywright._impl._errors.TimeoutError: Locator.click: Timeout 5000ms exceeded.\nCall log:\n  - waiting for get_by_role(\"button\", name=\"Submit\", exact=True)\n    - locator resolved to <button type=\"submit\">Submit</button>\n  - attempting click action (trial run)\n    2 \u00d7 waiting for element to be visible, enabled and stable\n      - element is visible, enabled and stable\n      - scrolling into view if needed\n      - done scrolling\n[+17 more lines; full report in element text]",
+      "screenshot": "screenshots/test_t14.png"
+    },
+    {
+      "id": "t15",
+      "title": "Test Email valid",
+      "technique": "llm",
+      "priority": 0.725,
+      "status": "passed",
+      "duration": 0.1,
+      "failure_class": null,
+      "message": "",
+      "screenshot": null
+    },
+    {
+      "id": "t16",
+      "title": "Email: valid partition",
+      "technique": "ep",
+      "priority": 0.71,
+      "status": "passed",
+      "duration": 0.1,
+      "failure_class": null,
+      "message": "",
+      "screenshot": null
+    },
+    {
+      "id": "t17",
+      "title": "Email: invalid partition (not an email)",
+      "technique": "ep",
+      "priority": 0.71,
+      "status": "failed",
+      "duration": 0.1,
+      "failure_class": "assertion",
+      "message": "AssertionError: expected the field to be invalid\nassert True is False\n +  where True = evaluate('el => el.checkValidity()')\n +    where evaluate = <Locator frame=<Frame name= url='http://127.0.0.1:53598/'> selector='#email'>.evaluate\n +      where <Locator frame=<Frame name= url='http://127.0.0.1:53598/'> selector='#email'> = e02_email()\n +        where e02_email = <pages.site_127_0_0_1_page.Page object at 0x000001F839149D90>.e02_email",
+      "screenshot": "screenshots/test_t17.png"
+    },
+    {
+      "id": "t18",
+      "title": "Age: 17 (below min)",
+      "technique": "bva",
+      "priority": 0.68,
+      "status": "passed",
+      "duration": 0.1,
+      "failure_class": null,
+      "message": "",
+      "screenshot": null
+    },
+    {
+      "id": "t19",
+      "title": "Age: 120 (max)",
+      "technique": "bva",
+      "priority": 0.68,
+      "status": "passed",
+      "duration": 0.11,
+      "failure_class": null,
+      "message": "",
+      "screenshot": null
+    },
+    {
+      "id": "t20",
+      "title": "Age: 121 (above max)",
+      "technique": "bva",
+      "priority": 0.68,
+      "status": "passed",
+      "duration": 0.11,
+      "failure_class": null,
+      "message": "",
+      "screenshot": null
+    },
+    {
+      "id": "t21",
+      "title": "Test Age under minimum",
+      "technique": "llm",
+      "priority": 0.665,
+      "status": "passed",
+      "duration": 0.11,
+      "failure_class": null,
+      "message": "",
+      "screenshot": null
+    },
+    {
+      "id": "t22",
+      "title": "Test Age valid",
+      "technique": "llm",
+      "priority": 0.665,
+      "status": "passed",
+      "duration": 0.11,
+      "failure_class": null,
+      "message": "",
+      "screenshot": null
+    },
+    {
+      "id": "t23",
+      "title": "Age: valid partition",
+      "technique": "ep",
+      "priority": 0.65,
+      "status": "passed",
+      "duration": 0.11,
+      "failure_class": null,
+      "message": "",
+      "screenshot": null
+    },
+    {
+      "id": "t24",
+      "title": "Test Country selection",
+      "technique": "llm",
+      "priority": 0.605,
+      "status": "passed",
+      "duration": 0.1,
+      "failure_class": null,
+      "message": "",
+      "screenshot": null
+    },
+    {
+      "id": "t25",
+      "title": "Country: valid partition",
+      "technique": "ep",
+      "priority": 0.59,
+      "status": "passed",
+      "duration": 1.01,
+      "failure_class": null,
+      "message": "",
+      "screenshot": null
+    }
+  ]
+}
