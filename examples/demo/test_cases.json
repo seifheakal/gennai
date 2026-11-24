@@ -163,29 +163,13 @@
   },
   {
     "id": "t08",
-    "title": "Test Name too short",
+    "title": "Fill valid name",
     "technique": "llm",
     "steps": [
       {
         "element": "e01",
         "action": "fill",
-        "value": "A"
-      }
-    ],
-    "target": "e01",
-    "expect": "invalid",
-    "limit": null,
-    "priority": 0.835
-  },
-  {
-    "id": "t09",
-    "title": "Test Name valid",
-    "technique": "llm",
-    "steps": [
-      {
-        "element": "e01",
-        "action": "fill",
-        "value": "John Doe"
+        "value": "John"
       }
     ],
     "target": "e01",
@@ -194,7 +178,7 @@
     "priority": 0.835
   },
   {
-    "id": "t10",
+    "id": "t09",
     "title": "Name: valid partition",
     "technique": "ep",
     "steps": [
@@ -210,7 +194,7 @@
     "priority": 0.82
   },
   {
-    "id": "t11",
+    "id": "t10",
     "title": "Name: required left empty",
     "technique": "ep",
     "steps": [],
@@ -220,7 +204,7 @@
     "priority": 0.82
   },
   {
-    "id": "t12",
+    "id": "t11",
     "title": "I accept the terms: valid partition",
     "technique": "ep",
     "steps": [
@@ -236,7 +220,7 @@
     "priority": 0.79
   },
   {
-    "id": "t13",
+    "id": "t12",
     "title": "I accept the terms: required left empty",
     "technique": "ep",
     "steps": [],
@@ -246,7 +230,7 @@
     "priority": 0.79
   },
   {
-    "id": "t14",
+    "id": "t13",
     "title": "Submit: is clickable",
     "technique": "click",
     "steps": [],
@@ -256,8 +240,8 @@
     "priority": 0.74
   },
   {
-    "id": "t15",
-    "title": "Test Email valid",
+    "id": "t14",
+    "title": "Fill valid email",
     "technique": "llm",
     "steps": [
       {
@@ -272,7 +256,7 @@
     "priority": 0.725
   },
   {
-    "id": "t16",
+    "id": "t15",
     "title": "Email: valid partition",
     "technique": "ep",
     "steps": [
@@ -288,7 +272,7 @@
     "priority": 0.71
   },
   {
-    "id": "t17",
+    "id": "t16",
     "title": "Email: invalid partition (not an email)",
     "technique": "ep",
     "steps": [
@@ -304,7 +288,7 @@
     "priority": 0.71
   },
   {
-    "id": "t18",
+    "id": "t17",
     "title": "Age: 17 (below min)",
     "technique": "bva",
     "steps": [
@@ -320,7 +304,7 @@
     "priority": 0.68
   },
   {
-    "id": "t19",
+    "id": "t18",
     "title": "Age: 120 (max)",
     "technique": "bva",
     "steps": [
@@ -336,7 +320,7 @@
     "priority": 0.68
   },
   {
-    "id": "t20",
+    "id": "t19",
     "title": "Age: 121 (above max)",
     "technique": "bva",
     "steps": [
@@ -352,24 +336,8 @@
     "priority": 0.68
   },
   {
-    "id": "t21",
-    "title": "Test Age under minimum",
-    "technique": "llm",
-    "steps": [
-      {
-        "element": "e03",
-        "action": "fill",
-        "value": "15"
-      }
-    ],
-    "target": "e03",
-    "expect": "invalid",
-    "limit": null,
-    "priority": 0.665
-  },
-  {
-    "id": "t22",
-    "title": "Test Age valid",
+    "id": "t20",
+    "title": "Fill valid age",
     "technique": "llm",
     "steps": [
       {
@@ -384,7 +352,7 @@
     "priority": 0.665
   },
   {
-    "id": "t23",
+    "id": "t21",
     "title": "Age: valid partition",
     "technique": "ep",
     "steps": [
@@ -400,8 +368,8 @@
     "priority": 0.65
   },
   {
-    "id": "t24",
-    "title": "Test Country selection",
+    "id": "t22",
+    "title": "Select country",
     "technique": "llm",
     "steps": [
       {
@@ -416,7 +384,7 @@
     "priority": 0.605
   },
   {
-    "id": "t25",
+    "id": "t23",
     "title": "Country: valid partition",
     "technique": "ep",
     "steps": [
@@ -430,5 +398,15 @@
     "expect": "selected",
     "limit": null,
     "priority": 0.59
+  },
+  {
+    "id": "t24",
+    "title": "Load offers: is clickable",
+    "technique": "click",
+    "steps": [],
+    "target": "e06",
+    "expect": "clickable",
+    "limit": null,
+    "priority": 0.54
   }
 ]

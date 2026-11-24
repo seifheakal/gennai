@@ -4,7 +4,7 @@ from pages.site_the_internet_herokua_page import Page
 
 
 def test_t01(page):
-    'Filter examples by search term'
+    'Filter examples by typing text'
     p = Page(page)
     p.e01_filter_examples().fill('Dropdown')
     assert p.e01_filter_examples().evaluate("el => el.checkValidity()") is True, 'expected the field to be valid'

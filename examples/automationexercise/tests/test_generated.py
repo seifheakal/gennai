@@ -4,7 +4,7 @@ from pages.site_automationexercise_c_page import Page
 
 
 def test_t01(page):
-    'Fill email address'
+    'Fill valid email address'
     p = Page(page)
     p.e01_input().fill('test@example.com')
     assert p.e01_input().evaluate("el => el.checkValidity()") is True, 'expected the field to be valid'

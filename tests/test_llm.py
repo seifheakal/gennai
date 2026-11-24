@@ -85,6 +85,12 @@ def test_missing_model_names_variable(monkeypatch):
     assert KEY_G not in str(exc.value)
 
 
+def test_key_that_is_a_dotenv_comment_counts_as_empty(monkeypatch):
+    monkeypatch.setenv("GENNAI_LLM_PROVIDERS", "gemini")
+    monkeypatch.setenv("GEMINI_API_KEY", "# empty = provider not used")
+    assert load_settings().llm_providers == ()
+
+
 def test_429_falls_back_to_next_provider(monkeypatch):
     def handler(req):
         if "gemini" in req.full_url:
@@ -182,6 +188,22 @@ def test_503_moves_to_next_provider_without_retrying(monkeypatch):
     cases, stats = propose_cases("http://x", ELEMENTS, settings("gemini", "openrouter"))
     assert [u.split("/")[2] for u in seen] == ["gemini.test", "openrouter.test"]
     assert stats["accepted"] == 1 and stats["status"].startswith("used: openrouter")
+
+
+def test_metrics_record_time_tokens_and_failed_attempts(monkeypatch):
+    def handler(req):
+        if "gemini" in req.full_url:
+            raise http_error(503)
+        body = {"choices": [{"message": {"content": json.dumps(GOOD)}}],
+                "usage": {"prompt_tokens": 1200, "completion_tokens": 80}}  # fmt: skip
+        return Resp(body)
+
+    mock_urlopen(monkeypatch, handler)
+    _, stats = propose_cases("http://x", ELEMENTS, settings("gemini", "openrouter"))
+    assert [a["outcome"] for a in stats["attempts"]] == ["HTTP 503", "ok"]
+    assert all(isinstance(a["seconds"], float) for a in stats["attempts"])
+    assert stats["prompt_tokens"] == 1200 and stats["completion_tokens"] == 80
+    assert stats["avg_response_s"] is not None and stats["calls"] == 2
 
 
 def test_gate_strips_model_reasoning_block():

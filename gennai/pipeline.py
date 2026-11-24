@@ -63,6 +63,8 @@ def run_pipeline(
     (out / "elements.json").write_text(json.dumps(elements, indent=2), encoding="utf-8")
     lap("explore")
     extra_cases, llm = propose_cases(url, elements, settings)
+    if settings.llm_providers:
+        lap("llm")
     cases = generate(elements, settings.max_tests, extra_cases)
     if not cases:
         raise NoTestableElements(f"no testable elements found at {url}")

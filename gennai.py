@@ -48,6 +48,11 @@ def _summary(r: dict, out: Path) -> None:
     print(f"  results:   {s['passed']} passed, {s['failed']} failed")
     print(f"  failures:  {failures}")
     print(f"  llm:       {r['llm']}")
+    m = r.get("llm_stats") or {}
+    if m.get("avg_response_s") is not None:
+        print(f"  llm calls: {m['calls']}, avg response {m['avg_response_s']}s, "
+              f"tokens {m['prompt_tokens']} in / {m['completion_tokens']} out")  # fmt: skip
+    print(f"  phases:    {', '.join(f'{k} {v}s' for k, v in r['durations'].items())}")
     print(f"  time:      {r['total_s']}s")
     print(f"  report:    {out / 'report.html'}")
 

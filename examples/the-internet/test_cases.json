@@ -1,7 +1,7 @@
 [
   {
     "id": "t01",
-    "title": "Filter examples by search term",
+    "title": "Filter examples by typing text",
     "technique": "llm",
     "steps": [
       {
