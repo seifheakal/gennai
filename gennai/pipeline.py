@@ -44,8 +44,9 @@ def serve_dir(directory: Path = DEMO_DIR) -> Iterator[str]:
 
 
 def run_pipeline(
-    url: str, out: Path, settings: Settings, headed: bool = False, allow_local: bool = False
-) -> dict:
+    url: str, out: Path, settings: Settings, headed: bool = False, allow_local: bool = False,
+    max_pages: int = 1,
+) -> dict:  # fmt: skip
     """Explore, generate, write and run tests; return the results dict (also on disk)."""
     started = datetime.now().isoformat(timespec="seconds")
     t0 = last = time.perf_counter()
@@ -59,7 +60,7 @@ def run_pipeline(
 
     url = check_url(url, allow_local)
     out.mkdir(parents=True, exist_ok=True)
-    elements = explore(url, settings, headed, allow_local)
+    elements, pages = explore(url, settings, headed, allow_local, max_pages)
     (out / "elements.json").write_text(json.dumps(elements, indent=2), encoding="utf-8")
     lap("explore")
     extra_cases, llm = propose_cases(url, elements, settings)
@@ -80,6 +81,7 @@ def run_pipeline(
         "finished": datetime.now().isoformat(timespec="seconds"),
         "total_s": round(time.perf_counter() - t0, 1),
         "durations": durations,
+        "pages": pages,
         "elements": len(elements),
         "tests_per_technique": dict(Counter(c.technique for c in cases)),
         "llm": llm["status"],

@@ -27,9 +27,9 @@ flowchart LR
 
 | Phase | Module | What it does |
 |---|---|---|
-| 1 | `gennai/phase1_explore.py` | Loads the page once in Chromium and collects visible inputs, selects, checkboxes, buttons and links. It infers a semantic kind for each one: a text field named or labelled "email" is treated as an email field. It builds locator candidates (`data-testid`, `#id`, `[name]`, role plus accessible name, label, placeholder, text) and keeps only those that match exactly one element. |
-| 2 | `gennai/phase2_generate.py` | Builds the test cases (see the list below the table), removes duplicates, scores each test by element importance, required flag, form membership and technique, and keeps the top N. |
-| 3 | `gennai/phase3_codegen.py` | Writes `tests/` from fixed templates: `conftest.py` (browser fixtures, screenshot on failure), a Page Object whose fallback locator list is tried in order, and one test function per case. Every value is embedded with `repr()`. The generated folder runs with plain `pytest`. |
+| 1 | `gennai/phase1_explore.py` | Loads the page once in Chromium (with `--max-pages N`, also up to N-1 same-origin pages it links to, breadth-first) and collects visible inputs, selects, checkboxes, buttons and links. It infers a semantic kind for each one: a text field named or labelled "email" is treated as an email field. It builds locator candidates (`data-testid`, `#id`, `[name]`, role plus accessible name, label, placeholder, text) and keeps only those that match exactly one element on its own page. Each element records the URL of its page. |
+| 2 | `gennai/phase2_generate.py` | Builds the test cases (see the list below the table), removes duplicates, scores each test by element importance, required flag, form membership and technique, and keeps the top N. With several pages the cap is shared: every page's best test is kept before any page's second best. |
+| 3 | `gennai/phase3_codegen.py` | Writes `tests/` from fixed templates: `conftest.py` (browser fixtures, screenshot on failure), one Page Object per page whose fallback locator list is tried in order, and one test file per page (`test_generated.py`, `test_generated_p2.py`, ...) with one test function per case. Every value is embedded with `repr()`. The generated folder runs with plain `pytest`. |
 | 4 | `gennai/phase4_execute.py` | Runs the suite in a subprocess with a timeout and parses the JUnit XML. It classifies failures as `page_unavailable` (HTTP error on load), `element_intercepted`, `locator_not_found`, `timeout`, `assertion` or `other`, then writes `results.json` and `report.html` with the screenshots embedded. |
 | - | `gennai/llm.py`, `gennai/safety.py` | Optional LLM step, prompt building, the gate and the URL guard (see below). |
 
@@ -84,7 +84,20 @@ python gennai.py demo
 python gennai.py run https://the-internet.herokuapp.com
 ```
 
-Flags: `--out DIR` (default `runs/<host>_<timestamp>/`), `--headed` (show the browser), `--max-tests N` (default 25), `--allow-local` (`run` only).
+Flags: `--out DIR` (default `runs/<host>_<timestamp>/`), `--headed` (show the browser), `--max-tests N` (default 25), `--max-pages N` (default 1, at most 20), `--allow-local` (`run` only).
+
+**Multi-page crawling.** `--max-pages N` also tests up to N-1 pages that the start page links to:
+
+```powershell
+python gennai.py demo --max-pages 2
+python gennai.py run https://the-internet.herokuapp.com --max-pages 4
+```
+
+- Links are followed breadth-first from `<a href>` only, and only on the start page's origin (same scheme, host and port; this is always on). Pages are deduplicated by URL without the fragment and with the query sorted.
+- Links whose URL or text looks like logout, sign-out, delete, remove, destroy or unsubscribe are never followed. Neither are links to files such as `.pdf` or `.zip`, or responses that are not HTML.
+- Every crawled URL, and the URL it redirects to, passes the same local/private-address check as the start URL.
+- A linked page that fails to load (HTTP error, redirect to another origin, bot challenge) is logged and skipped; only the start page's failure stops the run.
+- `GENNAI_MAX_ELEMENTS` applies per page; `--max-tests` is shared by all pages. The report and `results.json` list the crawled pages and the page of each test.
 
 Each run writes `elements.json` (Phase 1), `test_cases.json` (Phase 2), `tests/` (Phase 3), `results.json`, `report.html` and `screenshots/` (Phase 4). The terminal shows a short summary and the report path.
 
@@ -102,7 +115,7 @@ python -m ruff check .
 
 ## Example output
 
-`python gennai.py demo` serves `demo/index.html`, a small sign-up page with two planted problems, and finds both:
+`python gennai.py demo` serves `demo/index.html`, a small sign-up page with two planted problems, and finds both. (`demo/contact.html`, a contact form linked from it, is only tested with `--max-pages 2` or more.)
 
 ![GenNAI report for the demo page](examples/demo/report.png)
 
@@ -123,6 +136,17 @@ Measured on 2026-11-24 on Windows 11, Python 3.13, headless Chromium, with the L
 | the-internet.herokuapp.com | 40 | 25 (1 / 0 / 0 / 23 / 1) | 25 | 0 | none | 56.2 s |
 
 Without a key, the same pages give 20 / 20 / 25 tests. On the demo that run had 18 passed with the same 2 failures.
+
+The demo row above was measured before the demo page gained its "Contact us" and "Log out" links for multi-page crawling. Re-run without a key after that change, the single-page demo has 9 elements and 22 tests (ep 8 / bva 7 / state 3 / click 4): 20 passed, with the same 2 failures.
+
+**Multi-page crawl** (measured 2026-11-24, same machine):
+
+| Run | Pages crawled | Elements | Tests | Passed | Failed | Run time |
+|---|---|---|---|---|---|---|
+| `demo --max-pages 3`, no key | 2: `/`, `/contact.html` (`Log out` skipped; `./` and `#form` links deduplicated) | 15 | 25 (14 on `/contact.html`) | 24 | 1 (element_intercepted) | 17.6 s |
+| `run https://the-internet.herokuapp.com --max-pages 4`, LLM on | 4: `/`, `/abtest`, `/accessibility_issues`, `/iframes_advanced` | 54 | 25 (10 / 3 / 9 / 3 per page) | 25 | 0 | 88.3 s |
+
+In the multi-page demo run the planted email bug is not in the suite: the shared 25-test cap kept higher-priority tests from both pages instead. `--max-tests 40` brings it back.
 
 **LLM step, live.**
 
@@ -149,12 +173,12 @@ The remaining `locator_not_found`, on a "Tshirt" category link, appeared in 2 of
 
 
 **The tool itself.**
-- 36 tests pass in about 17 s. They include:
-  - one end-to-end run against the local demo;
+- 48 tests pass in about 35 s. They include:
+  - two end-to-end runs against the local demo, one single-page and one multi-page crawl;
   - a test that feeds hostile strings through code generation and parses every generated file;
   - a test that a spec referencing a non-existent element is rejected.
 - `ruff check` and `ruff format --check` are clean.
-- The code is 1,281 lines of Python in `gennai.py` and `gennai/`. The course version had about 11,700 lines of Python across the phase folders and the web UI.
+- The code is 1,423 lines of Python in `gennai.py` and `gennai/`. The course version had about 11,700 lines of Python across the phase folders and the web UI.
 
 ## Course constraints and what changed for the demo
 
@@ -195,7 +219,7 @@ That later work has its own open list. The mailbox assistant still lacks CSRF pr
 
 ## Limitations and future work
 
-- [KNOWN_LIMITATIONS.md](KNOWN_LIMITATIONS.md) covers real flaws: heuristic locators, single page with no login, shallow assertions, an unsandboxed test run, basic injection defence, a reference-only hallucination gate, and an LLM path that has not been verified live.
+- [KNOWN_LIMITATIONS.md](KNOWN_LIMITATIONS.md) covers real flaws: heuristic locators, a same-origin link crawl with no login, shallow assertions, an unsandboxed test run, basic injection defence, a reference-only hallucination gate, and an LLM path that has not been verified live.
 - [FUTURE_WORK.md](FUTURE_WORK.md) covers features that were left out or removed, and what to build next.
 - [DEMO_SCRIPT.md](DEMO_SCRIPT.md) is a 2-3 minute walkthrough.
 
@@ -204,7 +228,7 @@ That later work has its own open list. The mailbox assistant still lacks CSRF pr
 Only test sites you own or have permission to test. The two public sites above are practice sites made for test automation. The tool keeps its footprint small:
 - It never submits forms. Click tests are trial clicks.
 - It enters only clearly fake data, for example `test.user@example.com`.
-- It loads the page once to explore and once per test (at most 25 tests by default).
+- It loads each page once to explore (one page by default, at most 20 with `--max-pages`) and once per test (at most 25 tests by default). It never follows links that look like logout or delete.
 - It refuses local and private network targets unless you pass `--allow-local`.
 
 ## License

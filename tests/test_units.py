@@ -4,7 +4,7 @@ import pytest
 
 from gennai import GennaiError
 from gennai.config import Settings
-from gennai.phase1_explore import candidate_locators, infer_kind
+from gennai.phase1_explore import candidate_locators, infer_kind, normalize_url, skip_reason
 from gennai.phase2_generate import Case, Step, generate
 from gennai.phase3_codegen import write_project
 from gennai.phase4_execute import classify_failure
@@ -119,3 +119,58 @@ def test_codegen_keeps_hostile_text_inside_literals(tmp_path):
         names = {n.func.id for n in ast.walk(tree) if isinstance(n, ast.Call)
                  and isinstance(n.func, ast.Name)}  # fmt: skip
         assert "__import__" not in names  # the payload stayed inside a string
+
+
+def test_normalize_url_dedupes_fragment_query_order_and_case():
+    assert normalize_url("HTTP://Example.com#top") == "http://example.com/"
+    assert normalize_url("http://example.com/a?b=2&a=1#x") == "http://example.com/a?a=1&b=2"
+
+
+ORIGIN = ("https", "example.com", 443)
+
+
+@pytest.mark.parametrize(
+    ("href", "text", "reason"),
+    [
+        ("https://example.com/about", "About", None),
+        ("https://EXAMPLE.com:443/about", "About", None),  # default port is the same origin
+        ("http://example.com/about", "About", "other origin"),  # scheme differs
+        ("https://other.com/", "Other", "other origin"),
+        ("mailto:a@example.com", "Mail", "not http(s)"),
+        ("https://example.com/logout", "Bye", "looks like logout/delete"),
+        ("https://example.com/item/7", "Delete item", "looks like logout/delete"),
+        ("https://example.com/files/guide.PDF", "Guide", "not an HTML page"),
+    ],
+)  # fmt: skip
+def test_skip_reason(href, text, reason):
+    assert skip_reason(href, text, ORIGIN) == reason
+
+
+def test_generation_keeps_forms_per_page_and_shares_the_cap():
+    a = [_el("e01", "text", label="A1", page="http://x/a"),
+         _el("e02", "text", label="A2", page="http://x/a")]  # fmt: skip
+    b = [_el("e03", "text", label="B1", page="http://x/b"),
+         _el("e04", "text", label="B2", page="http://x/b")]  # fmt: skip
+    cases = generate(a + b, 100)
+    state = [c for c in cases if c.technique == "state"]
+    assert len(state) == 2  # same form index on two pages = two forms, not one
+    for c in cases:
+        assert c.page == {"e01": "http://x/a", "e02": "http://x/a"}.get(c.target, "http://x/b")
+    assert {c.page for c in generate(a + b, 2)} == {"http://x/a", "http://x/b"}
+
+
+def test_codegen_writes_one_page_object_per_page(tmp_path):
+    els = [_el("e01", "text", label="Name", page="http://x/"),
+           _el("e02", "email", label="Mail", page="http://x/contact")]  # fmt: skip
+    cases = generate(els, 100)
+    tests = write_project("http://x/", els, cases, tmp_path, Settings())
+    assert sorted(f.name for f in (tests / "pages").glob("*.py")) == [
+        "site_x_p2_contact_page.py", "site_x_page.py"]  # fmt: skip
+    second = (tests / "test_generated_p2.py").read_text(encoding="utf-8")
+    assert "PAGE_URL = 'http://x/contact'" in second
+    assert "from pages.site_x_p2_contact_page import Page" in second
+    first = (tests / "test_generated.py").read_text(encoding="utf-8")
+    for c in cases:  # every test lands in its own page's file, once
+        name = f"def test_{c.id}("
+        assert (name in first) != (name in second)
+        assert (name in second) == (c.page == "http://x/contact")

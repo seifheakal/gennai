@@ -8,7 +8,7 @@ Features and ideas that were left out on purpose, one line each: what, where it 
 - **Web chat UI**: a browser interface over the same pipeline. The course's Flask UI ran the old phases by changing directories and copying files between them, and it broke once the phases were rebuilt.
 - **Run history and flaky-test detection**: an append-only record of runs, with status computed at render time, to tell real regressions from flake across runs (`gennai/phase4_execute.py`). The course version's SQLite history never stored a non-empty result.
 - **Notifications**: Slack or email when a run finishes. The course version's functions only logged "sent" and sent nothing.
-- **Multi-page crawling and authenticated flows**: a crawl scope and login fixtures in Phase 1. The course crawler did not produce usable output, and auth needs secret handling.
+- **Authenticated flows**: login fixtures in Phase 1 and in the generated `conftest.py`, with credentials read from `.env` and never logged. Left out because auth needs secret handling. (Multi-page crawling, removed from the course version with this item, has been rebuilt: see `--max-pages` in the README.)
 
 ## Ideas to build next
 

@@ -3,6 +3,8 @@
 import logging
 import re
 import time
+from collections import deque
+from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
 from playwright.sync_api import Error as PlaywrightError
 from playwright.sync_api import Page, sync_playwright
@@ -65,6 +67,14 @@ _ROLE = {
     "text": "textbox",
 }  # fmt: skip
 _BLOCKED_TITLES = ("just a moment", "attention required")
+_LINKS_JS = """() => Array.from(document.querySelectorAll('a[href]')).map(a => ({
+  href: a.href, text: (a.textContent || '').replace(/\\s+/g, ' ').trim().slice(0, 80)}))"""
+# crawling only reads pages, but following these could still change state on the site
+_RISKY = re.compile(r"log[-_ ]?out|sign[-_ ]?out|delete|remove|destroy|unsubscribe", re.I)
+_NON_HTML = (
+    ".pdf", ".zip", ".gz", ".tar", ".png", ".jpg", ".jpeg", ".gif", ".svg", ".webp", ".ico",
+    ".mp3", ".mp4", ".csv", ".json", ".xml", ".txt", ".doc", ".docx", ".xls", ".xlsx", ".exe",
+)  # fmt: skip
 
 
 def infer_kind(a: dict) -> str:
@@ -141,8 +151,43 @@ def _settle(page: Page, settle_ms: int) -> None:
     page.wait_for_timeout(max(0, settle_ms - int((time.monotonic() - start) * 1000)))
 
 
-def explore(url: str, settings: Settings, headed: bool = False, allow_local: bool = False) -> list:
-    """Return elements (dicts with id, kind, attributes, locators); each has a unique locator."""
+def normalize_url(url: str) -> str:
+    """Dedupe key for a page: lowercase scheme and host, no fragment, sorted query, '/' path."""
+    p = urlsplit(url)
+    query = urlencode(sorted(parse_qsl(p.query, keep_blank_values=True)))
+    return urlunsplit((p.scheme.lower(), p.netloc.lower(), p.path or "/", query, ""))
+
+
+def _origin(url: str) -> tuple:
+    p = urlsplit(url)
+    scheme = p.scheme.lower()
+    return scheme, p.hostname, p.port or {"http": 80, "https": 443}.get(scheme)
+
+
+def skip_reason(href: str, text: str, origin: tuple) -> str | None:
+    """Why a link is not crawled (None = crawl it): other origin, destructive-looking, not HTML."""
+    p = urlsplit(href)
+    if p.scheme.lower() not in ("http", "https"):
+        return "not http(s)"
+    if _origin(href) != origin:
+        return "other origin"
+    if _RISKY.search(p.path + "?" + p.query) or _RISKY.search(text or ""):
+        return "looks like logout/delete"
+    if p.path.lower().endswith(_NON_HTML):
+        return "not an HTML page"
+    return None
+
+
+def explore(
+    url: str, settings: Settings, headed: bool = False, allow_local: bool = False,
+    max_pages: int = 1,
+) -> tuple[list[dict], list[str]]:  # fmt: skip
+    """Explore `url` and, breadth-first, up to max_pages - 1 same-origin pages it links to.
+
+    Returns (elements, pages). Each element has a unique locator on its own page and a "page"
+    key with that page's URL. Only the first page's errors are fatal; a failing linked page is
+    logged and skipped.
+    """
     with sync_playwright() as p:
         try:
             browser = p.chromium.launch(headless=not headed)
@@ -154,22 +199,65 @@ def explore(url: str, settings: Settings, headed: bool = False, allow_local: boo
         try:
             page = browser.new_page()
             page.set_default_timeout(settings.page_timeout_ms)
-            try:
-                resp = page.goto(url, wait_until="load", timeout=settings.page_timeout_ms)
-            except PlaywrightError as e:
-                raise GennaiError(f"could not reach {url}: {_first_line(e)}") from e
-            check_url(page.url, allow_local)  # a redirect must not reach a local target
-            if resp is not None and resp.status >= 400:
-                hint = "server overloaded or down" if resp.status >= 500 else "it may block bots"
-                raise GennaiError(f"site returned HTTP {resp.status} ({hint})")
-            if any(t in page.title().lower() for t in _BLOCKED_TITLES):
-                raise GennaiError(f"bot challenge detected at {url}; cannot test this site")
-            _settle(page, settings.settle_ms)
-            return _pick_unique(page, page.evaluate(_JS), settings.max_elements)
-        except PlaywrightError as e:
-            raise GennaiError(f"browser error while exploring {url}: {_first_line(e)}") from e
+            elements: list[dict] = []
+            pages: list[str] = []
+            origin: tuple = ()
+            queue, seen = deque([url]), {normalize_url(url)}
+            while queue and len(pages) < max_pages:
+                target = queue.popleft()
+                try:
+                    _load(page, target, settings, allow_local, origin)
+                    found = _pick_unique(
+                        page, page.evaluate(_JS), settings.max_elements, len(elements)
+                    )
+                    links = page.evaluate(_LINKS_JS) if max_pages > 1 else []
+                except (GennaiError, PlaywrightError) as e:
+                    if not pages:
+                        if isinstance(e, GennaiError):
+                            raise
+                        raise GennaiError(
+                            f"browser error while exploring {url}: {_first_line(e)}"
+                        ) from e
+                    log.warning("skipping linked page %s: %s", target, _first_line(e))
+                    continue
+                if not pages:
+                    origin = _origin(page.url)  # after redirects, e.g. http -> https
+                for el in found:
+                    el["page"] = target
+                elements += found
+                pages.append(target)
+                for link in links:
+                    key = normalize_url(link["href"])
+                    reason = skip_reason(link["href"], link["text"], origin)
+                    if reason is None and key not in seen:
+                        seen.add(key)
+                        queue.append(key)
+                    elif reason is not None:
+                        log.debug("not crawling %s: %s", link["href"], reason)
+            log.info("explored %d page(s): %s", len(pages), ", ".join(pages))
+            return elements, pages
         finally:
             browser.close()
+
+
+def _load(page: Page, url: str, settings: Settings, allow_local: bool, origin: tuple) -> None:
+    """Open one page and check it; `origin` is empty for the first page, set for linked ones."""
+    check_url(url, allow_local)
+    try:
+        resp = page.goto(url, wait_until="load", timeout=settings.page_timeout_ms)
+    except PlaywrightError as e:
+        raise GennaiError(f"could not reach {url}: {_first_line(e)}") from e
+    check_url(page.url, allow_local)  # a redirect must not reach a local target
+    if origin and _origin(page.url) != origin:
+        raise GennaiError(f"redirected to another origin ({page.url})")
+    if resp is not None and resp.status >= 400:
+        hint = "server overloaded or down" if resp.status >= 500 else "it may block bots"
+        raise GennaiError(f"site returned HTTP {resp.status} ({hint})")
+    if origin and resp is not None and "html" not in resp.headers.get("content-type", "html"):
+        raise GennaiError(f"not an HTML page ({resp.headers['content-type']})")
+    if any(t in page.title().lower() for t in _BLOCKED_TITLES):
+        raise GennaiError(f"bot challenge detected at {url}; cannot test this site")
+    _settle(page, settings.settle_ms)
 
 
 def _count(page: Page, candidate: tuple[str, str]) -> int:
@@ -179,8 +267,10 @@ def _count(page: Page, candidate: tuple[str, str]) -> int:
         return 0
 
 
-def _pick_unique(page: Page, raw: list[dict], limit: int) -> list[dict]:
-    """Order fields, buttons, links; keep elements with a unique locator until limit."""
+def _pick_unique(page: Page, raw: list[dict], limit: int, offset: int = 0) -> list[dict]:
+    """Order fields, buttons, links; keep elements with a unique locator until limit.
+
+    Ids continue after `offset` so they stay unique across crawled pages."""
     for a in raw:
         a["kind"] = infer_kind(a)
     rank = {"button": 1, "link": 2}
@@ -191,7 +281,7 @@ def _pick_unique(page: Page, raw: list[dict], limit: int) -> list[dict]:
             break
         unique = [c for c in candidate_locators(a) if _count(page, c) == 1]
         if unique:
-            elements.append({"id": f"e{len(elements) + 1:02d}", **a, "locators": unique})
+            elements.append({"id": f"e{offset + len(elements) + 1:02d}", **a, "locators": unique})
         else:
             log.info("skipping %s %r: no unique locator", a["tag"], a["label"] or a["text"])
     return elements

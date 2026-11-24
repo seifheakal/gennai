@@ -1,6 +1,6 @@
 """Phase 2: derive test cases from elements (equivalence partitioning, BVA, state, click)."""
 
-from collections import defaultdict
+from collections import Counter, defaultdict
 from collections.abc import Iterable
 from typing import Literal
 
@@ -39,6 +39,7 @@ class Case(_Model):
     ]  # fmt: skip
     limit: int | None = None  # maxlength for expect="max_length"
     priority: float = 0.0
+    page: str = ""  # URL of the page the target element is on (set by generate)
 
 
 def _num(s: str | None) -> float | None:
@@ -147,6 +148,7 @@ def _bva(el: dict) -> list[Case]:
 
 
 def _state(form_idx: int, fields: list[dict]) -> list[Case]:
+    """Form-level cases; `fields` all belong to one form on one page."""
     fields = [e for e in fields if e["kind"] in FIELDS and _valid_value(e) is not None]
     if len(fields) < 2 or any(e["pattern"] for e in fields):
         return []
@@ -174,17 +176,21 @@ def _score(case: Case, by_id: dict[str, dict]) -> float:
 
 
 def generate(elements: list[dict], max_tests: int, extra: Iterable[Case] = ()) -> list[Case]:
-    """Build, de-duplicate, prioritise and cap test cases. `extra` = pre-validated extra cases."""
+    """Build, de-duplicate, prioritise and cap test cases. `extra` = pre-validated extra cases.
+
+    With several pages the cap is shared fairly: each page's best case comes before any page's
+    second best, so one large page cannot crowd out the others.
+    """
     cases: list[Case] = []
-    forms: dict[int, list[dict]] = defaultdict(list)
+    forms: dict[tuple[str, int], list[dict]] = defaultdict(list)  # form indexes are per page
     for el in elements:
         if el["kind"] in ("button", "link"):
             cases.append(_case(el, "click", "is clickable", None, "clickable"))
             continue
         if el["form"] >= 0:
-            forms[el["form"]].append(el)
+            forms[(el.get("page", ""), el["form"])].append(el)
         cases += _ep(el) + _bva(el)
-    for idx, fields in forms.items():
+    for (_, idx), fields in forms.items():
         cases += _state(idx, fields)
     cases += extra
     by_id = {e["id"]: e for e in elements}
@@ -194,8 +200,16 @@ def generate(elements: list[dict], max_tests: int, extra: Iterable[Case] = ()) -
         if key not in seen:
             seen.add(key)
             c.priority = _score(c, by_id)
+            c.page = by_id[c.target].get("page", "")
             unique.append(c)
-    top = sorted(unique, key=lambda c: -c.priority)[:max_tests]
+    unique.sort(key=lambda c: -c.priority)
+    rank: Counter[str] = Counter()
+    fair = []
+    for c in unique:  # stable sort below keeps priority order within a rank
+        fair.append((rank[c.page], c))
+        rank[c.page] += 1
+    fair.sort(key=lambda rc: rc[0])
+    top = sorted((c for _, c in fair[:max_tests]), key=lambda c: -c.priority)
     for i, c in enumerate(top, 1):
         c.id = f"t{i:02d}"
     return top

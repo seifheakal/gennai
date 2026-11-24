@@ -15,12 +15,20 @@ from gennai.pipeline import run_pipeline, serve_dir
 from gennai.safety import check_url
 
 log = logging.getLogger("gennai")
+MAX_PAGES = 20  # keeps a crawl polite and the run under the pytest timeout
 
 
 def _positive(text: str) -> int:
     value = int(text)
     if value <= 0:
         raise argparse.ArgumentTypeError("must be a positive integer")
+    return value
+
+
+def _max_pages(text: str) -> int:
+    value = _positive(text)
+    if value > MAX_PAGES:
+        raise argparse.ArgumentTypeError(f"must be at most {MAX_PAGES}")
     return value
 
 
@@ -32,6 +40,11 @@ def _parser() -> argparse.ArgumentParser:
         if name == "run":
             p.add_argument("url")
             p.add_argument("--allow-local", action="store_true", help="allow local/private hosts")
+        p.add_argument(
+            "--max-pages", type=_max_pages, default=1,
+            help=f"crawl up to N same-origin pages linked from the start page, breadth-first "
+            f"(default 1 = only the start page, max {MAX_PAGES})",
+        )  # fmt: skip
         p.add_argument("--out", type=Path, help="output dir (default runs/<host>_<timestamp>)")
         p.add_argument("--headed", action="store_true", help="show the browser")
         p.add_argument("--max-tests", type=_positive, help="cap on generated tests")
@@ -43,6 +56,7 @@ def _summary(r: dict, out: Path) -> None:
     failures = ", ".join(f"{k}={v}" for k, v in s["failures_per_class"].items()) or "none"
     print("\nGenNAI summary")
     print(f"  url:       {r['url']}")
+    print(f"  pages:     {len(r['pages'])} ({', '.join(r['pages'])})")
     print(f"  elements:  {r['elements']}")
     print(f"  tests:     {', '.join(f'{k}={v}' for k, v in r['tests_per_technique'].items())}")
     print(f"  results:   {s['passed']} passed, {s['failed']} failed")
@@ -64,12 +78,16 @@ def main(argv: list[str] | None = None) -> int:
         if args.command == "demo":
             with serve_dir() as url:
                 out = (args.out or Path("runs") / f"demo_{stamp}").resolve()
-                results = run_pipeline(url, out, settings, args.headed, allow_local=True)
+                results = run_pipeline(
+                    url, out, settings, args.headed, allow_local=True, max_pages=args.max_pages
+                )
         else:
             check_url(args.url, args.allow_local)  # fail with exit 2 before urlparse can raise
             host = re.sub(r"[^\w.-]", "_", urlparse(args.url).hostname or "site")
             out = (args.out or Path("runs") / f"{host}_{stamp}").resolve()
-            results = run_pipeline(args.url, out, settings, args.headed, args.allow_local)
+            results = run_pipeline(
+                args.url, out, settings, args.headed, args.allow_local, args.max_pages
+            )
     except GennaiError as e:
         log.debug("failure details", exc_info=True)
         log.error("%s", e)

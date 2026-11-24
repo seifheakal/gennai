@@ -64,7 +64,7 @@ def execute(out: Path, settings: Settings, cases: list[Case], headed: bool = Fal
 
 
 def _row(case: Case, tc: ET.Element | None, out: Path) -> dict:
-    row = {"id": case.id, "title": case.title, "technique": case.technique,
+    row = {"id": case.id, "title": case.title, "technique": case.technique, "page": case.page,
            "priority": case.priority, "status": "not_run", "duration": 0.0,
            "failure_class": None, "message": "", "screenshot": None}  # fmt: skip
     if tc is None:
@@ -117,19 +117,22 @@ def _html(out: Path, r: dict) -> str:
             )
         rows.append(
             f"<tr><td>{esc(t['id'])}</td><td>{esc(t['title'])}</td><td>{esc(t['technique'])}</td>"
+            f"<td>{esc(t.get('page', ''))}</td>"
             f"<td>{t['priority']}</td><td class='{esc(t['status'])}'>{esc(t['status'])}</td>"
             f"<td>{esc(t['failure_class'] or '')}</td><td>{t['duration']}s</td>"
             f"<td><code>{esc(t['message'])}</code>{shot}</td></tr>"
         )
     s = r["summary"]
+    pages = ", ".join(esc(p) for p in r.get("pages", [r["url"]]))
     return (
         f"<!doctype html><html lang='en'><meta charset='utf-8'><title>GenNAI report</title>"
         f"<style>{_CSS}</style><h1>GenNAI report</h1>"
         f"<p>URL: {esc(r['url'])}<br>Started: {esc(r['started'])}"
         f" &middot; total {esc(r['total_s'])}s"
+        f"<br>Pages: {esc(len(r.get('pages', [r['url']])))} &middot; {pages}"
         f"<br>Elements: {esc(r['elements'])} &middot; tests: {esc(r['tests_per_technique'])}"
         f"<br>Passed: {s['passed']} &middot; failed: {s['failed']} {esc(s['failures_per_class'])}"
         f"<br>LLM: {esc(r['llm'])}<br>Phase durations: {esc(r['durations'])}</p>"
-        "<table><tr><th>ID</th><th>Test</th><th>Technique</th><th>Priority</th><th>Status</th>"
+        "<table><tr><th>ID</th><th>Test</th><th>Technique</th><th>Page</th><th>Priority</th><th>Status</th>"
         f"<th>Failure class</th><th>Time</th><th>Details</th></tr>{''.join(rows)}</table></html>"
     )
