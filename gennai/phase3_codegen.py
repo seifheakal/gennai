@@ -9,6 +9,7 @@ from pathlib import Path
 from pprint import pformat
 from urllib.parse import urlparse
 
+from gennai.auth import login
 from gennai.config import Settings
 from gennai.phase1_explore import locate
 from gennai.phase2_generate import Case
@@ -27,11 +28,19 @@ from playwright.sync_api import sync_playwright
 URL = __URL__
 ACTION_TIMEOUT_MS = __TIMEOUT__
 NAV_TIMEOUT_MS = __NAV_TIMEOUT__  # page loads can be much slower than actions
+LOGIN_URL = __LOGIN_URL__  # user and password are read from the environment, never stored
 SHOTS = Path(__file__).resolve().parent.parent / "screenshots"
 
 
 class PageUnavailable(Exception):
     """The page answered with an HTTP error, so element checks would be meaningless."""
+
+
+class LoginFailed(Exception):
+    """The login form was submitted but the browser stayed on it."""
+
+
+__LOGIN__
 
 
 @pytest.fixture(scope="session")
@@ -42,10 +51,27 @@ def browser():
         b.close()
 
 
-@pytest.fixture
-def page(browser, request):
-    url = getattr(request.module, "PAGE_URL", URL)  # each test file names its page
+@pytest.fixture(scope="session")
+def auth_state(browser):
+    """Log in once per test session; every test then starts from that session."""
+    if not LOGIN_URL:
+        return None
+    user = os.environ.get("GENNAI_LOGIN_USER")
+    password = os.environ.get("GENNAI_LOGIN_PASSWORD")
+    if not (user and password):
+        pytest.fail("this suite logs in: set GENNAI_LOGIN_USER and GENNAI_LOGIN_PASSWORD")
     context = browser.new_context()
+    try:
+        login(context.new_page(), LOGIN_URL, user, password, NAV_TIMEOUT_MS)
+        return context.storage_state()
+    finally:
+        context.close()
+
+
+@pytest.fixture
+def page(browser, request, auth_state):
+    url = getattr(request.module, "PAGE_URL", URL)  # each test file names its page
+    context = browser.new_context(storage_state=auth_state)
     context.set_default_timeout(ACTION_TIMEOUT_MS)
     page = context.new_page()
     response = page.goto(url, wait_until="domcontentloaded", timeout=NAV_TIMEOUT_MS)
@@ -107,6 +133,11 @@ EXPECT = {
 ACTIONS = {"fill": ".fill({v})", "select": ".select_option({v})", "check": ".check()"}
 
 
+def _fill(template: str, values: dict[str, str]) -> str:
+    """Replace __MARKERS__ in one pass, so substituted text (page data) is never rescanned."""
+    return re.sub(r"__[A-Z_]+__", lambda m: values.get(m.group(0), m.group(0)), template)
+
+
 def _slug(s: str) -> str:
     return re.sub(r"\W+", "_", s.lower(), flags=re.ASCII).strip("_")[:20]
 
@@ -157,12 +188,11 @@ def write_project(
     for page_url, (module, test_file) in zip(pages, _modules(url, pages), strict=True):
         own = [e for e in elements if e.get("page", url) == page_url]
         candidates = {e["id"]: [tuple(c) for c in e["locators"]] for e in own}
-        # page-derived data is substituted last, so text like "__LOCATE__" can't hit a marker
-        page_src = (
-            PAGE_OBJECT.replace("__TIMEOUT__", repr(timeout / 1000))
-            .replace("__LOCATE__", inspect.getsource(locate).rstrip())
-            .replace("__CANDIDATES__", pformat(candidates, width=100))
-        )
+        page_src = _fill(PAGE_OBJECT, {
+            "__TIMEOUT__": repr(timeout / 1000),
+            "__LOCATE__": inspect.getsource(locate).rstrip(),
+            "__CANDIDATES__": pformat(candidates, width=100),
+        })  # fmt: skip
         for e in own:
             m, key = methods[e["id"]], e["id"]
             page_src += f"\n    def {m}(self):\n        return self._find({key!r})\n"
@@ -176,9 +206,16 @@ def write_project(
         )
     (tests / "pytest.ini").write_text(PYTEST_INI, encoding="utf-8")
     (tests / "conftest.py").write_text(
-        CONFTEST.replace("__TIMEOUT__", repr(timeout))
-        .replace("__NAV_TIMEOUT__", repr(settings.page_timeout_ms))
-        .replace("__URL__", repr(url)),
+        _fill(
+            CONFTEST,
+            {
+                "__TIMEOUT__": repr(timeout),
+                "__NAV_TIMEOUT__": repr(settings.page_timeout_ms),
+                "__URL__": repr(url),
+                "__LOGIN_URL__": repr(settings.login_url or None),
+                "__LOGIN__": inspect.getsource(login).rstrip(),
+            },
+        ),  # fmt: skip
         encoding="utf-8",
     )
     return tests

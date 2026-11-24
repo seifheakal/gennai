@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GenNAI Demo Sign-in</title>
+<style>
+  body { font: 16px system-ui, sans-serif; max-width: 360px; margin: 0 auto; padding: 16px 24px; }
+  form { display: flex; flex-direction: column; gap: 10px; }
+  label { display: block; font-weight: 600; }
+  input { width: 100%; box-sizing: border-box; padding: 6px; }
+  #error { color: #b3261e; min-height: 1.2em; }
+</style>
+</head>
+<body>
+<!-- Demo for authenticated runs (python gennai.py demo --login). The "session" is a cookie set
+     by this page's script: it exercises GenNAI's login fixture, it is not real security. -->
+<h1>Sign in</h1>
+<p>Demo account: <code>demo</code> / <code>demo-pass</code></p>
+<form id="signin">
+  <div><label for="user">Username</label><input type="text" id="user" name="user"></div>
+  <div><label for="pass">Password</label><input type="password" id="pass" name="pass"></div>
+  <button type="submit">Sign in</button>
+  <p id="error" role="alert"></p>
+</form>
+<script>
+  document.getElementById('signin').addEventListener('submit', e => {
+    e.preventDefault();
+    const ok = document.getElementById('user').value === 'demo' &&
+               document.getElementById('pass').value === 'demo-pass';
+    if (!ok) { document.getElementById('error').textContent = 'Wrong username or password'; return; }
+    document.cookie = 'session=demo; path=/';
+    location.href = 'account.html';
+  });
+</script>
+</body>
+</html>

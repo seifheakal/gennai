@@ -3,7 +3,7 @@ import ast
 import pytest
 
 from gennai import GennaiError
-from gennai.config import Settings
+from gennai.config import Settings, load_settings
 from gennai.phase1_explore import candidate_locators, infer_kind, normalize_url, skip_reason
 from gennai.phase2_generate import Case, Step, generate
 from gennai.phase3_codegen import write_project
@@ -82,6 +82,7 @@ def test_infer_kind_uses_name_and_label():
          "page_unavailable"),
         ("playwright._impl._errors.TimeoutError: Locator.fill: Timeout 5s exceeded.", "timeout"),
         ("AssertionError: expected the field to be invalid", "assertion"),
+        ("conftest.LoginFailed: still on the login form", "login_failed"),
         ("ValueError: boom", "other"),
     ],
 )  # fmt: skip
@@ -104,14 +105,18 @@ def test_check_url_allow_local():
 
 
 # quotes, triple quotes, newline, line separator, a code payload and the template markers
-HOSTILE = "x'\"'''\"\"\"\n__import__('os').system('echo pwned') #__LOCATE__ __CANDIDATES__  "
+HOSTILE = (
+    "x'\"'''\"\"\"\n__import__('os').system('echo pwned') "
+    "#__LOCATE__ __CANDIDATES__ __LOGIN__ __LOGIN_URL__ __URL__  "
+)
 
 
 def test_codegen_keeps_hostile_text_inside_literals(tmp_path):
     el = _el("e01", "text", label=HOSTILE, name=HOSTILE, locators=[("label", HOSTILE)])
     case = Case(title=HOSTILE, technique="ep", target="e01", expect="valid",
                 steps=[Step(element="e01", action="fill", value=HOSTILE)])  # fmt: skip
-    write_project("http://example.com/" + HOSTILE, [el], [case], tmp_path, Settings())
+    settings = Settings(login_url="http://example.com/login" + HOSTILE)
+    write_project("http://example.com/" + HOSTILE, [el], [case], tmp_path, settings)
     files = list((tmp_path / "tests").rglob("*.py"))
     assert len(files) == 3
     for f in files:
@@ -174,3 +179,17 @@ def test_codegen_writes_one_page_object_per_page(tmp_path):
         name = f"def test_{c.id}("
         assert (name in first) != (name in second)
         assert (name in second) == (c.page == "http://x/contact")
+
+
+def test_login_settings_all_or_nothing_and_never_in_repr(monkeypatch):
+    monkeypatch.setattr("gennai.config.load_dotenv", lambda: None)
+    monkeypatch.setenv("GENNAI_LOGIN_URL", "https://example.com/login")
+    monkeypatch.delenv("GENNAI_LOGIN_USER", raising=False)
+    monkeypatch.delenv("GENNAI_LOGIN_PASSWORD", raising=False)
+    with pytest.raises(GennaiError, match="GENNAI_LOGIN_USER"):
+        load_settings()
+    monkeypatch.setenv("GENNAI_LOGIN_USER", "secret-user")
+    monkeypatch.setenv("GENNAI_LOGIN_PASSWORD", "secret-pass")
+    settings = load_settings()
+    assert settings.login_password == "secret-pass"
+    assert "secret" not in repr(settings)

@@ -8,11 +8,11 @@ Real flaws in the current version that were too expensive or risky to fix within
    - **Why left:** stable locators on pages you don't control need DOM-diffing or repair logic.
    - **Needed for production:** re-validation on each run, locator scoring across several loads, and human-approved repair.
 
-2. **Simple crawl, no login.**
-   - **What:** by default the tool tests only the URL it is given. `--max-pages N` follows plain `<a href>` links on the same origin, breadth-first, up to 20 pages. It does not handle authentication, links created by clicks or forms (single-page-app routing, buttons that navigate), or pages listed only in a sitemap. Links are skipped by a word list (logout, delete, remove, ...), so a harmless "Add/Remove" page is skipped too and a destructive link with an unusual name is not. Pages are deduplicated by URL, so `/` and `/index.html` count as two pages. The 25-test cap is shared by all pages, so with many pages some get only their highest-priority tests.
-   - **Impact:** forms behind a login, or reachable only through script navigation, are not tested. On a large site the first N pages in link order are tested, not the most important ones.
-   - **Why left:** authenticated flows need secret handling; smarter scoping needs a model of which pages matter.
-   - **Needed for production:** auth fixtures with credentials stored outside the repo, an explicit allow/deny list of paths, and per-page test budgets.
+2. **Simple crawl, simple login.**
+   - **What:** by default the tool tests only the URL it is given. `--max-pages N` follows plain `<a href>` links on the same origin, breadth-first, up to 20 pages. Login (`GENNAI_LOGIN_*`) only handles a single form with one text or email field and one password field, submitted with Enter: no multi-step logins, SSO, MFA or CAPTCHA, and no login through a button that isn't a form submit. It was verified only on the bundled demo's script-based sign-in page. The crawler also does not follow links created by clicks or forms (single-page-app routing, buttons that navigate), or pages listed only in a sitemap. Links are skipped by a word list (logout, delete, remove, ...), so a harmless "Add/Remove" page is skipped too and a destructive link with an unusual name is not. Pages are deduplicated by URL, so `/` and `/index.html` count as two pages. The 25-test cap is shared by all pages, so with many pages some get only their highest-priority tests.
+   - **Impact:** pages behind a more complex login, or reachable only through script navigation, are not tested. On a large site the first N pages in link order are tested, not the most important ones.
+   - **Why left:** each login style needs its own handling; smarter scoping needs a model of which pages matter.
+   - **Needed for production:** configurable login steps and selectors, credentials from a secret store instead of `.env`, an explicit allow/deny list of paths, and per-page test budgets.
 
 3. **Shallow assertions.**
    - **What:** the generated tests check what the browser itself knows: HTML5 constraint validation (`checkValidity()`), `maxlength` truncation, selected and checked state, and whether an element can receive a click (`click(trial=True)`, which clicks nothing). Forms are never submitted.

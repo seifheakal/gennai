@@ -10,6 +10,7 @@ from playwright.sync_api import Error as PlaywrightError
 from playwright.sync_api import Page, sync_playwright
 
 from gennai import GennaiError
+from gennai.auth import LoginFailed, login
 from gennai.config import Settings
 from gennai.safety import check_url
 
@@ -42,7 +43,9 @@ _JS = """() => {
       tag, type: (attr('type') || (tag === 'input' ? 'text' : '')).toLowerCase(),
       dom_id: e.id || null, name: attr('name'), placeholder: attr('placeholder'),
       aria_label: attr('aria-label'), label: field ? labelOf(e) : '',
-      text: trim(tag === 'input' ? e.value : field ? '' : (e.innerText || e.textContent)),
+      // a password field's value is never read: it could be a real credential
+      text: trim(tag === 'input' ? (e.type === 'password' ? '' : e.value)
+        : field ? '' : (e.innerText || e.textContent)),
       required: e.required === true, minlength: attr('minlength'), maxlength: attr('maxlength'),
       min: attr('min'), max: attr('max'), pattern: attr('pattern'),
       testid: attr('data-testid'), role: attr('role'),
@@ -199,6 +202,8 @@ def explore(
         try:
             page = browser.new_page()
             page.set_default_timeout(settings.page_timeout_ms)
+            if settings.login_url:
+                _login(page, settings, allow_local)
             elements: list[dict] = []
             pages: list[str] = []
             origin: tuple = ()
@@ -238,6 +243,15 @@ def explore(
             return elements, pages
         finally:
             browser.close()
+
+
+def _login(page: Page, settings: Settings, allow_local: bool) -> None:
+    url = check_url(settings.login_url, allow_local)
+    try:
+        login(page, url, settings.login_user, settings.login_password, settings.page_timeout_ms)
+    except (LoginFailed, PlaywrightError) as e:
+        raise GennaiError(f"login at {url} failed: {_first_line(e)}") from e
+    log.info("logged in at %s", url)  # never the user name or password
 
 
 def _load(page: Page, url: str, settings: Settings, allow_local: bool, origin: tuple) -> None:

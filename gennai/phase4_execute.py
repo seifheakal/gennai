@@ -25,6 +25,8 @@ def classify_failure(message: str) -> str:
     """Failure class from a pytest/Playwright message. Order matters: intercepted is a timeout."""
     if "PageUnavailable" in message:
         return "page_unavailable"
+    if "LoginFailed" in message:
+        return "login_failed"
     if "intercepts pointer events" in message or "ElementClickIntercepted" in message:
         return "element_intercepted"
     if "LocatorNotFound" in message:
@@ -42,6 +44,9 @@ def execute(out: Path, settings: Settings, cases: list[Case], headed: bool = Fal
     cmd = [sys.executable, "-m", "pytest", str(tests), "-c", str(tests / "pytest.ini"),
            "-p", "no:cacheprovider", f"--junitxml={junit}", "-q"]  # fmt: skip
     env = {**os.environ, "GENNAI_HEADED": "1" if headed else "0"}
+    if settings.login_url:  # only in the child's environment, never in a file
+        env.update(GENNAI_LOGIN_USER=settings.login_user,
+                   GENNAI_LOGIN_PASSWORD=settings.login_password)  # fmt: skip
     junit.unlink(missing_ok=True)
     try:
         proc = subprocess.run(

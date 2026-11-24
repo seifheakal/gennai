@@ -64,6 +64,11 @@ def _parser() -> argparse.ArgumentParser:
             "--review", action="store_true",
             help="pause after generating test cases so you can approve or edit them",
         )  # fmt: skip
+        if name == "demo":
+            p.add_argument(
+                "--login", action="store_true",
+                help="sign in to the demo's test account and test the page behind it",
+            )  # fmt: skip
     return parser
 
 
@@ -108,6 +113,10 @@ def main(argv: list[str] | None = None) -> int:
         history = history.resolve() if history else None
         if args.command == "demo":
             with serve_dir() as url:
+                if args.login:  # the demo's own test account, shown on demo/login.html
+                    settings = replace(settings, login_url=url + "login.html",
+                                       login_user="demo", login_password="demo-pass")  # fmt: skip
+                    url += "account.html"
                 results = run_pipeline(
                     url, out, settings, args.headed, True, args.max_pages, review, history
                 )

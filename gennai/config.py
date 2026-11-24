@@ -37,6 +37,9 @@ class Settings:
     llm_max_input_chars: int = 12000
     history_dir: str = "runs/history"  # one append-only <site>.jsonl per site
     flaky_window: int = 5  # a test is flaky if it passed and failed within this many runs
+    login_url: str = ""  # with user and password: log in before exploring and in each test run
+    login_user: str = field(default="", repr=False)
+    login_password: str = field(default="", repr=False)
 
 
 def _positive_int(name: str, default: int) -> int:
@@ -74,6 +77,16 @@ def _providers() -> tuple[Provider, ...]:
     return tuple(out)
 
 
+def _login() -> tuple[str, str, str]:
+    names = ("GENNAI_LOGIN_URL", "GENNAI_LOGIN_USER", "GENNAI_LOGIN_PASSWORD")
+    values = tuple(os.environ.get(n, "").strip() for n in names)
+    if any(values) and not all(values):
+        raise GennaiError(f"set all of {', '.join(names)} to log in, or none of them")
+    if values[0] and not values[0].startswith(("http://", "https://")):
+        raise GennaiError("GENNAI_LOGIN_URL must start with http:// or https://")
+    return values  # type: ignore[return-value]
+
+
 def load_settings() -> Settings:
     """Read GENNAI_* variables, validating each; fails fast naming the bad variable."""
     load_dotenv()
@@ -81,6 +94,7 @@ def load_settings() -> Settings:
     if level not in LOG_LEVELS:
         raise GennaiError(f"GENNAI_LOG_LEVEL must be one of {', '.join(LOG_LEVELS)}")
     d = Settings()
+    login_url, login_user, login_password = _login()
     return Settings(
         page_timeout_ms=_positive_int("GENNAI_PAGE_TIMEOUT_MS", d.page_timeout_ms),
         action_timeout_ms=_positive_int("GENNAI_ACTION_TIMEOUT_MS", d.action_timeout_ms),
@@ -98,4 +112,7 @@ def load_settings() -> Settings:
         llm_max_input_chars=_positive_int("GENNAI_LLM_MAX_INPUT_CHARS", d.llm_max_input_chars),
         history_dir=os.environ.get("GENNAI_HISTORY_DIR", "").strip() or d.history_dir,
         flaky_window=_positive_int("GENNAI_FLAKY_WINDOW", d.flaky_window),
+        login_url=login_url,
+        login_user=login_user,
+        login_password=login_password,
     )

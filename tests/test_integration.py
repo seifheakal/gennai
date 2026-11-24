@@ -1,5 +1,9 @@
 import json
+from dataclasses import replace
 
+import pytest
+
+from gennai import GennaiError
 from gennai.config import Settings
 from gennai.pipeline import run_pipeline, serve_dir
 
@@ -71,3 +75,19 @@ def test_demo_history_marks_flaky(tmp_path):
     assert "flaky</span>" in (tmp_path / "r2" / "report.html").read_text(encoding="utf-8")
     steady = [t for t in second["tests"] if not t["flaky"]]
     assert all(t["history"][0] == t["history"][2] for t in steady)  # the demo is deterministic
+
+
+def test_demo_behind_login(tmp_path, caplog):
+    with serve_dir() as url:
+        settings = replace(Settings(), login_url=url + "login.html", login_user="demo",
+                           login_password="demo-pass")  # fmt: skip
+        results = run_pipeline(url + "account.html", tmp_path, settings, allow_local=True)
+        bad = replace(settings, login_password="wrong-pass")
+        with pytest.raises(GennaiError, match="login .* failed"):
+            run_pipeline(url + "account.html", tmp_path / "bad", bad, allow_local=True)
+    elements = json.loads((tmp_path / "elements.json").read_text(encoding="utf-8"))
+    assert "Display name" in [e["label"] for e in elements]  # the page behind the login
+    assert results["summary"]["failed"] == 0 and results["summary"]["passed"] >= 1
+    for f in tmp_path.rglob("*"):  # the password is in no output file and no log line
+        assert not f.is_file() or b"demo-pass" not in f.read_bytes()
+    assert not any("demo-pass" in m for m in caplog.messages)
