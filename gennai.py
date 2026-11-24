@@ -1,19 +1,17 @@
-"""GenNAI command line: `python gennai.py run <url>` or `python gennai.py demo`."""
+"""GenNAI command line: `python gennai.py run <url>`, `demo` or `ui`."""
 
 import argparse
 import logging
-import re
 import sys
 from dataclasses import replace
-from datetime import datetime
 from pathlib import Path
-from urllib.parse import urlparse
 
 from gennai import GennaiError, NoTestableElements
 from gennai.config import load_settings
-from gennai.pipeline import run_pipeline, serve_dir
+from gennai.pipeline import run_paths, run_pipeline, serve_dir, site_name
 from gennai.review import ask_in_terminal
 from gennai.safety import check_url
+from gennai.web import serve as serve_ui
 
 log = logging.getLogger("gennai")
 MAX_PAGES = 20  # keeps a crawl polite and the run under the pytest timeout
@@ -24,13 +22,6 @@ def _positive(text: str) -> int:
     if value <= 0:
         raise argparse.ArgumentTypeError("must be a positive integer")
     return value
-
-
-def _site(url: str) -> str:
-    """Folder-safe site name: the host, plus the port if one is given."""
-    parts = urlparse(url)
-    name = parts.hostname + (f"_{parts.port}" if parts.port else "")
-    return re.sub(r"[^\w.-]", "_", name)
 
 
 def _max_pages(text: str) -> int:
@@ -69,6 +60,8 @@ def _parser() -> argparse.ArgumentParser:
                 "--login", action="store_true",
                 help="sign in to the demo's test account and test the page behind it",
             )  # fmt: skip
+    ui = sub.add_parser("ui", help="open a local web page that starts runs")
+    ui.add_argument("--port", type=int, default=8765, help="port on 127.0.0.1 (default 8765)")
     return parser
 
 
@@ -103,16 +96,16 @@ def main(argv: list[str] | None = None) -> int:
     try:
         settings = load_settings()
         logging.getLogger().setLevel(settings.log_level)
+        if args.command == "ui":
+            serve_ui(args.port)  # each run reloads the settings
+            return 0
         if args.max_tests:
             settings = replace(settings, max_tests=args.max_tests)
-        stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         review = ask_in_terminal if args.review else None
         if args.command == "run":
             check_url(args.url, args.allow_local)  # fail with exit 2 before urlparse can raise
-        site = "demo" if args.command == "demo" else _site(args.url)
-        out = (args.out or Path("runs") / f"{site}_{stamp}").resolve()
-        history = None if args.no_history else Path(settings.history_dir, f"{site}.jsonl")
-        history = history.resolve() if history else None
+        site = "demo" if args.command == "demo" else site_name(args.url)
+        out, history = run_paths(site, settings, args.out, not args.no_history)
         if args.command == "demo":
             with serve_dir() as url:
                 if args.login:  # the demo's own test account, shown on demo/login.html

@@ -131,6 +131,13 @@ GENNAI_LOGIN_PASSWORD=...
 - **Email**: `GENNAI_SMTP_HOST`, `GENNAI_SMTP_PORT` (default 587; 465 uses implicit TLS), `GENNAI_SMTP_USER`, `GENNAI_SMTP_PASSWORD`, `GENNAI_EMAIL_FROM` (default: the SMTP user) and `GENNAI_EMAIL_TO`. STARTTLS is used when the server offers it; without TLS the password is never sent and the email is not sent.
 - A failed notification is a warning, not an error: the run still exits 0. The result per channel (`sent` or `failed: ...`) is in the summary and in `results.json` (`notifications`). The webhook URL and the SMTP password are never logged.
 
+**Web UI.** `python gennai.py ui` serves a chat-style page on http://127.0.0.1:8765/ (`--port` to change it):
+
+- Type a URL (or `demo`) and the number of pages. Each phase posts a line as it finishes, then a summary line with a link to that run's `report.html`.
+- It calls the same `run_pipeline` as the CLI and uses the same `.env` settings (LLM, login, notifications), output folders and run history.
+- It listens on 127.0.0.1 only and runs one test at a time. Only public URLs and `demo` are accepted (no `--allow-local`), and there is no review step (that needs a terminal).
+- A run can only be started by a JSON POST from the page's own origin with the right `Host` header, so another website open in the same browser can't start one. The report is served with a Content-Security-Policy that blocks network requests.
+
 **Run history and flaky tests.** Every run is appended as one JSON line to `runs/history/<site>.jsonl` (`demo.jsonl` for the demo). The file is only ever appended to, never rewritten:
 
 - A test is matched across runs by what it does: the page path, the attributes of the elements it touches, its actions and values, and its expectation. Its `t01`-style id is only a priority rank and is not used, and neither is the host, so the demo's random port doesn't matter.
@@ -232,14 +239,19 @@ The remaining `locator_not_found`, on a "Tshirt" category link, appeared in 2 of
 - With nothing listening on the webhook port, and an SMTP user configured against the sink (which offers no TLS), the run still exited 0 with `slack failed: URLError, email failed: SMTPException: server offers no TLS; not sending the password`. Neither the webhook path nor the password was in the output.
 - Sending to a real Slack workspace or mail provider needs your own webhook or account and was not tested here.
 
+**Web UI** (measured 2026-11-24 in a browser, LLM on):
+- `demo` with 2 pages: the page showed "Phase 1: found 15 elements on 2 page(s)", then Phase 2 (25 cases, 4 from the LLM), Phase 3, Phase 4, and "25 passed, 0 failed, 0 flaky" with a working report link. With the LLM's cases in the 25-test cap, neither planted demo bug was in this suite.
+- the-internet.herokuapp.com with 2 pages: 43 elements, 25 tests (23 click, 1 ep, 1 LLM), 25 passed.
+- A test starts a real server, runs the demo through it, and checks the request guards (wrong `Host`, a non-JSON POST, a foreign `Origin`, a path-traversal report path, and a local target).
+
 **The tool itself.**
-- 76 tests pass in about 2 minutes. They include:
+- 83 tests pass in about 2.5 minutes. They include:
   - five end-to-end runs against the local demo: single-page, multi-page crawl, a review that rejects and edits cases, run history marking a flaky test, and a run behind the demo's login (which also checks that the password appears in no output file or log line);
   - tests that the review step refuses structural edits, including an id that would inject code into a test function name;
   - a test that feeds hostile strings through code generation and parses every generated file;
   - a test that a spec referencing a non-existent element is rejected.
 - `ruff check` and `ruff format --check` are clean.
-- The code is 1,851 lines of Python in `gennai.py` and `gennai/`. The course version had about 11,700 lines of Python across the phase folders and the web UI.
+- The code is 2,076 lines of Python in `gennai.py` and `gennai/`. The course version had about 11,700 lines of Python across the phase folders and the web UI.
 
 ## Course constraints and what changed for the demo
 

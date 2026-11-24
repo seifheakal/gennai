@@ -91,3 +91,9 @@ Real flaws in the current version that were too expensive or risky to fix within
     - **Impact:** a notification lost to a network error is reported in the run summary but not resent.
     - **Why left:** the tool is a single-user CLI; a retry queue needs a long-running process.
     - **Needed for production:** retries with backoff, a hosted report to link to, and per-channel message formatting.
+
+18. **The web UI is a local single-user page.**
+    - **What:** one run at a time, progress by polling once a second, run messages kept in memory (gone when the server stops; the output folders stay). No review step, no `--allow-local`, no login form of its own (it uses `.env`), and no authentication: anyone who can reach 127.0.0.1 on that machine can start a run.
+    - **Impact:** fine for one person on their own machine; not something to expose on a network.
+    - **Why left:** a shared service needs user accounts, a job queue and persistent run records.
+    - **Needed for production:** authentication, a queue with per-user limits, and runs stored with the history.

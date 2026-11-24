@@ -3,6 +3,7 @@
 import functools
 import json
 import logging
+import re
 import threading
 import time
 from collections import Counter
@@ -11,6 +12,7 @@ from contextlib import contextmanager
 from datetime import datetime
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
+from urllib.parse import urlparse
 
 from gennai import GennaiError, NoTestableElements
 from gennai.config import Settings
@@ -32,6 +34,23 @@ class _QuietHandler(SimpleHTTPRequestHandler):
         pass
 
 
+def site_name(url: str) -> str:
+    """Folder-safe site name: the host, plus the port if one is given."""
+    parts = urlparse(url)
+    name = (parts.hostname or "site") + (f"_{parts.port}" if parts.port else "")
+    return re.sub(r"[^\w.-]", "_", name)
+
+
+def run_paths(
+    site: str, settings: Settings, out: Path | None = None, history: bool = True,
+    runs: Path = Path("runs"),
+) -> tuple[Path, Path | None]:  # fmt: skip
+    """(output folder, history file) for a run: runs/<site>_<timestamp>, history/<site>.jsonl."""
+    stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    out = (out or runs / f"{site}_{stamp}").resolve()
+    return out, Path(settings.history_dir, f"{site}.jsonl").resolve() if history else None
+
+
 @contextmanager
 def serve_dir(directory: Path = DEMO_DIR) -> Iterator[str]:
     """Serve a directory on 127.0.0.1 (free port) in a background thread; yield its URL."""
@@ -48,14 +67,16 @@ def serve_dir(directory: Path = DEMO_DIR) -> Iterator[str]:
 def run_pipeline(
     url: str, out: Path, settings: Settings, headed: bool = False, allow_local: bool = False,
     max_pages: int = 1, review: Callable[[Path], None] | None = None,
-    history: Path | None = None,
+    history: Path | None = None, progress: Callable[[str], None] | None = None,
 ) -> dict:  # fmt: skip
     """Explore, generate, write and run tests; return the results dict (also on disk).
 
     With `review`, the cases are written for a person to approve and `review(path)` is called;
     it must block until they are done. Only approved cases are generated and run.
     With `history`, the run is appended to that JSONL file and flaky tests are marked.
+    `progress` (used by the web UI) receives one short line as each phase finishes.
     """
+    say = progress or (lambda text: None)
     started = datetime.now().isoformat(timespec="seconds")
     t0 = last = time.perf_counter()
     durations: dict[str, float] = {}
@@ -68,9 +89,11 @@ def run_pipeline(
 
     url = check_url(url, allow_local)
     out.mkdir(parents=True, exist_ok=True)
+    say(f"Exploring {url}" + (f" and up to {max_pages - 1} linked pages" if max_pages > 1 else ""))
     elements, pages = explore(url, settings, headed, allow_local, max_pages)
     (out / "elements.json").write_text(json.dumps(elements, indent=2), encoding="utf-8")
     lap("explore")
+    say(f"Phase 1: found {len(elements)} elements on {len(pages)} page(s)")
     extra_cases, llm = propose_cases(url, elements, settings)
     cases = generate(elements, settings.max_tests, extra_cases)
     if not cases:
@@ -82,6 +105,8 @@ def run_pipeline(
             json.dumps([c.model_dump() for c in cases], indent=2), encoding="utf-8"
         )
     lap("generate")
+    techniques = ", ".join(f"{k} {v}" for k, v in Counter(c.technique for c in cases).items())
+    say(f"Phase 2: generated {len(cases)} test cases ({techniques}); LLM: {llm['status']}")
     if review is not None:
         write_for_review(cases_file, cases)
         review(cases_file)
@@ -91,11 +116,13 @@ def run_pipeline(
             raise GennaiError("the review rejected every test case; nothing to run")
     write_project(url, elements, cases, out, settings)
     lap("codegen")
+    say("Phase 3: wrote the pytest suite; running it now")
     rows = execute(out, settings, cases, headed)
     by_id = {e["id"]: e for e in elements}
     for row, case in zip(rows, cases, strict=True):
         row["key"] = case_key(case, by_id)
     lap("execute")
+    say(f"Phase 4: ran {sum(r['status'] in ('passed', 'failed') for r in rows)} tests")
     meta = {
         "url": url,
         "started": started,

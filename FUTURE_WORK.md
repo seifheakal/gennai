@@ -2,10 +2,9 @@
 
 Features and ideas that were left out on purpose, one line each: what, where it would go, and why it was left out. Real flaws in what exists are in [KNOWN_LIMITATIONS.md](KNOWN_LIMITATIONS.md).
 
-## Removed from the course version (did not work or was simulated)
+## Removed from the course version, since rebuilt
 
-- **Web chat UI**: a browser interface over the same pipeline. The course's Flask UI ran the old phases by changing directories and copying files between them, and it broke once the phases were rebuilt.
-Rebuilt since, and described in the README: multi-page crawling (`--max-pages`), login with credentials from `.env` (`GENNAI_LOGIN_*`), Slack and email notifications (`GENNAI_SLACK_WEBHOOK_URL`, `GENNAI_SMTP_*`), human review of generated tests (`--review`), and run history with flaky-test marking (`runs/history/<site>.jsonl`). The course's reviewer was simulated with `random.random()`; the rebuilt one waits for a person. The course's SQLite history never stored a non-empty result; the rebuilt one is an append-only JSONL file. The course's notifications only logged "sent"; the rebuilt ones send and report each channel's result.
+Rebuilt since, and described in the README: multi-page crawling (`--max-pages`), login with credentials from `.env` (`GENNAI_LOGIN_*`), Slack and email notifications (`GENNAI_SLACK_WEBHOOK_URL`, `GENNAI_SMTP_*`), a local web chat UI (`python gennai.py ui`), human review of generated tests (`--review`), and run history with flaky-test marking (`runs/history/<site>.jsonl`). The course's reviewer was simulated with `random.random()`; the rebuilt one waits for a person. The course's SQLite history never stored a non-empty result; the rebuilt one is an append-only JSONL file. The course's notifications only logged "sent"; the rebuilt ones send and report each channel's result. The course's Flask UI ran the old phases by changing directories and copying files; the rebuilt one is a small standard-library server that calls `run_pipeline`.
 
 ## Ideas to build next
 
