@@ -9,6 +9,10 @@ GenNAI takes the URL of a web page and tests it end to end with one command:
 
 It is for developers who want a fast first pass of UI checks on a page, including invalid input and elements that something else covers, without writing the tests by hand. An optional free-tier LLM can propose extra test cases. It only returns JSON, and a deterministic gate filters that JSON before anything becomes code.
 
+**Demo video (1:44):** the web UI tests the bundled demo across 2 pages, and the report shows both planted bugs, then the coverage, elements and metrics tabs. Click the image to play it.
+
+[![GenNAI demo: the report with both planted bugs found](docs/media/gennai-demo-poster.png)](docs/media/gennai-demo.webm)
+
 ## How it works
 
 ```mermaid
