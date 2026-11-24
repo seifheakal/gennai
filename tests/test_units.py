@@ -78,6 +78,8 @@ def test_infer_kind_uses_name_and_label():
         ("TimeoutError: Locator.click: Timeout 5000ms exceeded.\n <div> intercepts pointer events",
          "element_intercepted"),
         ("pages.x.LocatorNotFound: e01: no unique match", "locator_not_found"),
+        ('failed on setup with "conftest.PageUnavailable: https://x/ returned HTTP 503"',
+         "page_unavailable"),
         ("playwright._impl._errors.TimeoutError: Locator.fill: Timeout 5s exceeded.", "timeout"),
         ("AssertionError: expected the field to be invalid", "assertion"),
         ("ValueError: boom", "other"),

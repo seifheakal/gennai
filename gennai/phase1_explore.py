@@ -160,9 +160,8 @@ def explore(url: str, settings: Settings, headed: bool = False, allow_local: boo
                 raise GennaiError(f"could not reach {url}: {_first_line(e)}") from e
             check_url(page.url, allow_local)  # a redirect must not reach a local target
             if resp is not None and resp.status >= 400:
-                raise GennaiError(
-                    f"site returned HTTP {resp.status} (it may block automated browsers)"
-                )
+                hint = "server overloaded or down" if resp.status >= 500 else "it may block bots"
+                raise GennaiError(f"site returned HTTP {resp.status} ({hint})")
             if any(t in page.title().lower() for t in _BLOCKED_TITLES):
                 raise GennaiError(f"bot challenge detected at {url}; cannot test this site")
             _settle(page, settings.settle_ms)

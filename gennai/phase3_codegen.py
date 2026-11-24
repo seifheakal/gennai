@@ -30,6 +30,10 @@ NAV_TIMEOUT_MS = __NAV_TIMEOUT__  # page loads can be much slower than actions
 SHOTS = Path(__file__).resolve().parent.parent / "screenshots"
 
 
+class PageUnavailable(Exception):
+    """The page answered with an HTTP error, so element checks would be meaningless."""
+
+
 @pytest.fixture(scope="session")
 def browser():
     with sync_playwright() as p:
@@ -43,7 +47,9 @@ def page(browser):
     context = browser.new_context()
     context.set_default_timeout(ACTION_TIMEOUT_MS)
     page = context.new_page()
-    page.goto(URL, wait_until="domcontentloaded", timeout=NAV_TIMEOUT_MS)
+    response = page.goto(URL, wait_until="domcontentloaded", timeout=NAV_TIMEOUT_MS)
+    if response is not None and response.status >= 400:
+        raise PageUnavailable(f"{URL} returned HTTP {response.status}")
     yield page
     context.close()
 

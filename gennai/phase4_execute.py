@@ -21,6 +21,8 @@ MESSAGE_LIMIT = 500
 
 def classify_failure(message: str) -> str:
     """Failure class from a pytest/Playwright message. Order matters: intercepted is a timeout."""
+    if "PageUnavailable" in message:
+        return "page_unavailable"
     if "intercepts pointer events" in message or "ElementClickIntercepted" in message:
         return "element_intercepted"
     if "LocatorNotFound" in message:
