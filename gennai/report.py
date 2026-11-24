@@ -27,6 +27,8 @@ FAILURE_CLASSES = {
     "timeout": "An action did not finish within the time limit.",
     "page_unavailable": "The page answered with an HTTP error when the test loaded it. "
     "The site was down or overloaded; this says nothing about the element.",
+    "login_failed": "Signing in with GENNAI_LOGIN_* failed when the test run started, so the "
+    "test could not reach the page as a signed-in user.",
     "other": "Any other error. See the message.",
 }
 EXPECT_TEXT = {
@@ -39,6 +41,7 @@ EXPECT_TEXT = {
     "form_valid": "the whole form reports valid",
     "form_invalid": "the whole form reports invalid",
 }
+MARK = {"passed": "\u2713", "failed": "\u2717", None: "\u00b7"}  # check, cross, dot
 VERBS = {"fill": "type {v} into", "select": "select {v} in", "check": "check"}
 
 
@@ -115,6 +118,8 @@ class _Report:
             ("Elements covered", pct, "coverage", ""),
             ("Run time", f"{self.r['total_s']} s", "metrics", ""),
         ]
+        if self.r.get("history"):
+            cards.insert(4, ("Flaky", s.get("flaky", 0), "tests", ""))
         if self.llm.get("avg_response_s") is not None:
             tokens = f"{self.llm['prompt_tokens']} / {self.llm['completion_tokens']}"
             cards += [
@@ -133,9 +138,21 @@ class _Report:
         return (
             f"<header><h1>GenNAI report {verdict}</h1><div class='muted'>{esc(self.r['url'])}"
             f" &middot; started {esc(self.r['started'])} &middot; LLM: {esc(self.r['llm'])}"
-            f"</div><div class='cards'>{buttons}</div><nav class='tabs' role='tablist'>{nav}</nav>"
+            f"{self.extra()}</div><div class='cards'>{buttons}</div>"
+            f"<nav class='tabs' role='tablist'>{nav}</nav>"
             "</header>"
         )
+
+    def extra(self) -> str:
+        """Review and run-history facts for the header line, when those features were used."""
+        out, v, h = "", self.r.get("review"), self.r.get("history")
+        if v:
+            out += (f" &middot; review: {v['approved']} approved ({v['edited']} edited), "
+                    f"{v['rejected']} rejected")  # fmt: skip
+        if h:
+            out += (f" &middot; run {h['runs']} of this site; flaky = passed and failed within "
+                    f"the last {h['window']} runs")  # fmt: skip
+        return out
 
     # overview: findings, failure classes, techniques
 
@@ -232,7 +249,13 @@ class _Report:
             els = self.touched(t)
             c = self.cases.get(t["id"]) or {}
             search = " ".join(
-                [t["title"], t["technique"], t["status"], t["failure_class"] or ""]
+                [
+                    t["title"],
+                    t["technique"],
+                    t["status"],
+                    t["failure_class"] or "",
+                    "flaky" if t.get("flaky") else "",
+                ]
                 + [self.label(e) for e in els]
                 + [s.get("value", "") for s in c.get("steps", [])]
             ).lower()
@@ -262,6 +285,10 @@ class _Report:
                 if t["failure_class"]
                 else ""
             )
+            if "history" in t:  # recent runs, oldest first
+                marks = " ".join(MARK.get(x, "?") for x in t["history"])
+                status += f" <span class='muted' title='recent runs, oldest first'>{marks}</span>"
+                status += " <span class='badge'>flaky</span>" if t["flaky"] else ""
             page_cell = f"<td>{esc(_short(t.get('page', '')))}</td>" if self.multi else ""
             bodies.append(
                 f"<tbody class='t' data-id='{esc(t['id'])}' data-title='{esc(t['title'].lower())}' "

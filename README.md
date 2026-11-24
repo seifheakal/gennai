@@ -27,10 +27,10 @@ flowchart LR
 
 | Phase | Module | What it does |
 |---|---|---|
-| 1 | `gennai/phase1_explore.py` | Loads the page once in Chromium and collects visible inputs, selects, checkboxes, buttons and links. It infers a semantic kind for each one: a text field named or labelled "email" is treated as an email field. It builds locator candidates (`data-testid`, `#id`, `[name]`, role plus accessible name, label, placeholder, text) and keeps only those that match exactly one element. |
-| 2 | `gennai/phase2_generate.py` | Builds the test cases (see the list below the table), removes duplicates, scores each test by element importance, required flag, form membership and technique, and keeps the top N. |
-| 3 | `gennai/phase3_codegen.py` | Writes `tests/` from fixed templates: `conftest.py` (browser fixtures, screenshot on failure), a Page Object whose fallback locator list is tried in order, and one test function per case. Every value is embedded with `repr()`. Every generated file is compiled as a self-check before Phase 4 runs it. The generated folder runs with plain `pytest`. |
-| 4 | `gennai/phase4_execute.py` | Runs the suite in a subprocess with a timeout and parses the JUnit XML. It classifies failures as `page_unavailable` (HTTP error on load), `element_intercepted`, `locator_not_found`, `timeout`, `assertion` or `other`, then writes `results.json` and `report.html` (rendered by `gennai/report.py`). The report is one self-contained file with clickable summary cards and five tabs: **Overview** (findings with steps, error and screenshot, and what each failure class means), **Tests** (search, filter by status, technique and failure class, sort, expand a row for its steps, locators and re-run command), **Coverage** (element × technique, coloured by result; click a cell to see those tests), **Elements** (what Phase 1 found, with constraints and every locator) and **Metrics** (time per phase; LLM response time, tokens and gate counts; slowest tests). |
+| 1 | `gennai/phase1_explore.py` | Loads the page once in Chromium (with `--max-pages N`, also up to N-1 same-origin pages it links to, breadth-first) and collects visible inputs, selects, checkboxes, buttons and links. It infers a semantic kind for each one: a text field named or labelled "email" is treated as an email field. It builds locator candidates (`data-testid`, `#id`, `[name]`, role plus accessible name, label, placeholder, text) and keeps only those that match exactly one element on its own page. Each element records the URL of its page. |
+| 2 | `gennai/phase2_generate.py` | Builds the test cases (see the list below the table), removes duplicates, scores each test by element importance, required flag, form membership and technique, and keeps the top N. The cap is filled in coverage order: every element's best test, then every element's best negative test, then the rest by priority, with pages taking turns. |
+| 3 | `gennai/phase3_codegen.py` | Writes `tests/` from fixed templates: `conftest.py` (browser fixtures, screenshot on failure), one Page Object per page whose fallback locator list is tried in order, and one test file per page (`test_generated.py`, `test_generated_p2.py`, ...) with one test function per case. Every value is embedded with `repr()`. Every generated file is compiled as a self-check before Phase 4 runs it. The generated folder runs with plain `pytest`. |
+| 4 | `gennai/phase4_execute.py` | Runs the suite in a subprocess with a timeout and parses the JUnit XML. It classifies failures as `page_unavailable` (HTTP error on load), `login_failed`, `element_intercepted`, `locator_not_found`, `timeout`, `assertion` or `other`, then writes `results.json` and `report.html` (rendered by `gennai/report.py`). The report is one self-contained file with clickable summary cards and five tabs: **Overview** (findings with steps, error and screenshot, and what each failure class means), **Tests** (search, filter by status, technique and failure class, sort, expand a row for its steps, locators and re-run command), **Coverage** (element × technique, coloured by result; click a cell to see those tests), **Elements** (what Phase 1 found, with constraints and every locator) and **Metrics** (time per phase; LLM response time, tokens and gate counts; slowest tests). |
 | - | `gennai/llm.py`, `gennai/safety.py` | Optional LLM step, prompt building, the gate and the URL guard (see below). |
 
 Phase 2 generates these test cases:
@@ -84,13 +84,72 @@ python gennai.py demo
 python gennai.py run https://the-internet.herokuapp.com
 ```
 
-Flags: `--out DIR` (default `runs/<host>_<timestamp>/`), `--headed` (show the browser), `--max-tests N` (default 25), `--allow-local` (`run` only).
+Flags: `--out DIR` (default `runs/<host>_<timestamp>/`, or `runs/<host>_<port>_<timestamp>/` when the URL has a port), `--headed` (show the browser), `--max-tests N` (default 25), `--max-pages N` (default 1, at most 20), `--review` (approve tests before they run), `--no-history` (don't record this run), `--allow-local` (`run` only), `--login` (`demo` only: test the demo's page behind a sign-in).
+
+**Multi-page crawling.** `--max-pages N` also tests up to N-1 pages that the start page links to:
+
+```powershell
+python gennai.py demo --max-pages 2
+python gennai.py run https://the-internet.herokuapp.com --max-pages 4
+```
+
+- Links are followed breadth-first from `<a href>` only, and only on the start page's origin (same scheme, host and port; this is always on). Pages are deduplicated by URL without the fragment and with the query sorted.
+- Links whose URL or text looks like logout, sign-out, delete, remove, destroy or unsubscribe are never followed. Neither are links to files such as `.pdf` or `.zip`, or responses that are not HTML.
+- Every crawled URL, and the URL it redirects to, passes the same local/private-address check as the start URL.
+- A linked page that fails to load (HTTP error, redirect to another origin, bot challenge) is logged and skipped; only the start page's failure stops the run.
+- `GENNAI_MAX_ELEMENTS` applies per page; `--max-tests` is shared by all pages. The report and `results.json` list the crawled pages and the page of each test.
+
+**Human review.** `--review` pauses between Phase 2 and Phase 3:
+
+```powershell
+python gennai.py run https://the-internet.herokuapp.com --review
+```
+
+- GenNAI writes `test_cases.json` with `"approved": true` on every case, prints its path and waits.
+- Open the file and set `"approved": false` on a case (or delete it) to drop it. You may also change a case's `title` and its step `value`s, for example to try your own input.
+- Press Enter to continue. Only approved cases are turned into code and run. The summary, `results.json` (`"review"`) and the report show how many were approved, edited and rejected.
+- Any other change is refused with an error naming the case: ids, targets, expectations and which elements a case touches decide the generated code, so they must stay as generated. Ctrl+C or closed input cancels the run (exit 2) before any test is generated.
+- Nobody is simulated: without `--review` every generated case runs, as before.
+
+**Pages behind a login.** Put the login page and an account in `.env`. All three are needed, or none:
+
+```
+GENNAI_LOGIN_URL=https://example.com/login
+GENNAI_LOGIN_USER=...
+GENNAI_LOGIN_PASSWORD=...
+```
+
+- GenNAI opens the login URL, fills the first visible password field and the first text or email field of its form, and presses Enter. Login succeeded when no password field is left; otherwise the run stops with exit 2 (`login ... failed`).
+- Phase 1 explores (and crawls) with that session. Logout-looking links are never followed, so the session survives the crawl.
+- The generated `conftest.py` logs in once per test session and starts every test from that session. It contains only the login URL: the user name and password are read from the environment (`GENNAI_LOGIN_USER`, `GENNAI_LOGIN_PASSWORD`), which GenNAI passes to the test run. A login that fails during the test run is reported as `login_failed`.
+- The user name and password are never logged, written to an output file or sent to the LLM. Phase 1 also never reads the value of any password field.
+- `python gennai.py demo --login` signs in to the demo's own test account (`demo` / `demo-pass`, shown on `demo/login.html`) and tests `demo/account.html`, which redirects to the sign-in page without a session. The demo's "session" is a cookie set by page script: it exercises the login fixture, not real security.
+
+**Notifications.** Off unless configured in `.env`. When a run finishes, GenNAI sends a one-line summary (URL, passed, failed, failure classes, flaky count, report folder) to each configured channel:
+
+- **Slack** (or any Slack-compatible incoming webhook): `GENNAI_SLACK_WEBHOOK_URL=https://hooks.slack.com/services/...`. It must be `https://`; `http://127.0.0.1:` and `http://localhost:` are also accepted, for local receivers.
+- **Email**: `GENNAI_SMTP_HOST`, `GENNAI_SMTP_PORT` (default 587; 465 uses implicit TLS), `GENNAI_SMTP_USER`, `GENNAI_SMTP_PASSWORD`, `GENNAI_EMAIL_FROM` (default: the SMTP user) and `GENNAI_EMAIL_TO`. STARTTLS is used when the server offers it; without TLS the password is never sent and the email is not sent.
+- A failed notification is a warning, not an error: the run still exits 0. The result per channel (`sent` or `failed: ...`) is in the summary and in `results.json` (`notifications`). The webhook URL and the SMTP password are never logged.
+
+**Web UI.** `python gennai.py ui` serves a chat-style page on http://127.0.0.1:8765/ (`--port` to change it):
+
+- Type a URL (or `demo`) and the number of pages. Each phase posts a line as it finishes, then a summary line with a link to that run's `report.html`.
+- It calls the same `run_pipeline` as the CLI and uses the same `.env` settings (LLM, login, notifications), output folders and run history.
+- It listens on 127.0.0.1 only and runs one test at a time. Only public URLs and `demo` are accepted (no `--allow-local`), and there is no review step (that needs a terminal).
+- A run can only be started by a JSON POST from the page's own origin with the right `Host` header, so another website open in the same browser can't start one. The report is served with a Content-Security-Policy that blocks network requests.
+
+**Run history and flaky tests.** Every run is appended as one JSON line to `runs/history/<site>.jsonl` (`demo.jsonl` for the demo). The file is only ever appended to, never rewritten:
+
+- A test is matched across runs by what it does: the page path, the attributes of the elements it touches, its actions and values, and its expectation. Its `t01`-style id is only a priority rank and is not used, and neither is the host, so the demo's random port doesn't matter.
+- A test is marked **flaky** when it both passed and failed within the last `GENNAI_FLAKY_WINDOW` runs of that site (default 5, this run included).
+- The report has a "Recent runs" column (for example `✓ ✓ ✗ ✓ flaky`, with `·` where the test did not run) and a history line in its header. `results.json` has `history` and `flaky` on each test and `summary.flaky`; the terminal summary has a `history:` line.
+- `GENNAI_HISTORY_DIR` moves the history folder; `--no-history` skips recording a run.
 
 Each run writes `elements.json` (Phase 1), `test_cases.json` (Phase 2), `tests/` (Phase 3), `results.json`, `report.html` and `screenshots/` (Phase 4). The terminal shows a short summary: results, time per phase, LLM calls with average response time and tokens, and the report path.
 
 Exit codes:
 - `0`: the pipeline finished. Failed generated tests are findings, not errors.
-- `2`: bad input, a refused URL, or a site that is unreachable or blocks automation.
+- `2`: bad input, a refused URL, a site that is unreachable or blocks automation, or a cancelled or invalid review.
 - `3`: no testable elements.
 
 Run the tool's own tests:
@@ -102,7 +161,7 @@ python -m ruff check .
 
 ## Example output
 
-`python gennai.py demo` serves `demo/index.html`, a small sign-up page with two planted problems, and finds both:
+`python gennai.py demo` serves `demo/index.html`, a small sign-up page with two planted problems, and finds both. (`demo/contact.html`, a contact form linked from it, is only tested with `--max-pages 2` or more.)
 
 ![GenNAI report for the demo page](examples/demo/report.png)
 
@@ -132,6 +191,17 @@ Measured on 2026-11-24 on Windows 11, Python 3.13, headless Chromium, with the L
 
 Without a key, the same pages give 20 / 20 / 25 tests. On the demo that run had 18 passed with the same 2 failures.
 
+The demo row above was measured before the demo page gained its "Contact us" and "Log out" links for multi-page crawling. Re-run without a key after that change, the single-page demo has 9 elements and 22 tests (ep 8 / bva 7 / state 3 / click 4): 20 passed, with the same 2 failures.
+
+**Multi-page crawl** (measured 2026-11-24, same machine):
+
+| Run | Pages crawled | Elements | Tests | Passed | Failed | Run time |
+|---|---|---|---|---|---|---|
+| `demo --max-pages 3`, no key | 2: `/`, `/contact.html` (`Log out` skipped; `./` and `#form` links deduplicated) | 15 | 25 (14 on `/contact.html`) | 24 | 1 (element_intercepted) | 17.6 s |
+| `run https://the-internet.herokuapp.com --max-pages 4`, LLM on | 4: `/`, `/abtest`, `/accessibility_issues`, `/iframes_advanced` | 54 | 25 (10 / 3 / 9 / 3 per page) | 25 | 0 | 88.3 s |
+
+That run used the earlier selection rule; it left the planted email bug out of the 25-test cap. The coverage-order rule (see Phase 2) keeps both planted bugs: see "Demo cap" below.
+
 **LLM step, live.** Response time and tokens are the provider's own `usage` numbers, recorded per call in `results.json` and shown in the report.
 
 | Site | Calls | Response time | Tokens in / out | Proposed | Accepted by the gate | Rejected (hallucination / schema) | In final suite | Passed |
@@ -155,15 +225,44 @@ The remaining `locator_not_found`, on a "Tshirt" category link, appeared in 2 of
 **the-internet.herokuapp.com.** The first run flagged the "Skip to content" link as a `timeout`. That was a false positive: the link sits off-screen until it is focused. Phase 1 now skips elements that lie entirely off-screen, and the later runs passed 25 of 25.
 
 
+**Human review** (measured 2026-11-24 by driving the CLI's prompt from a script: wait for it, edit the file, send Enter):
+- Demo, no key: 25 cases offered, 3 rejected, 1 step value edited, 19 approved. The rejected cases were absent from the generated code, and the edited value was in it.
+- the-internet.herokuapp.com, `--max-pages 2`: 25 offered, 3 rejected, 22 run and passed. The LLM step was unavailable on that run (Gemini timed out, Gemma answered HTTP 503), so only algorithmic tests were offered.
+- On the demo, the edited value turned a "length 1 (below minlength)" case into a failing `assertion`. An edited value is run as-is against the original expectation (see [KNOWN_LIMITATIONS.md](KNOWN_LIMITATIONS.md)).
+
+**Run history** (measured 2026-11-24, through the CLI):
+- Demo, `--max-pages 2`, twice: every test was matched across the two runs (24 passed both times, 1 failed both times), 0 flaky. That is expected: the demo is deterministic.
+- the-internet.herokuapp.com, `--max-pages 2`, three times: 24 tests matched in all three runs and passed each time, 0 flaky. The third run's LLM answered and added 1 new test, shown as not run in the first two. In the first two runs the LLM step was unavailable (HTTP 503 from both providers).
+- No real flake showed up on these sites, so the flaky marker was checked by appending to the demo's history a run in which one passing test had failed. The next run marked exactly that test (`✓ ✓ ✗ ✓ flaky`). An integration test does the same.
+
+**Login** (measured 2026-11-24 on the demo's sign-in page, no LLM key):
+- `demo --login`: 5 elements, all from the account page behind the sign-in; 15 tests, 15 passed.
+- The same through `.env`-style variables: `GENNAI_LOGIN_*` set in the environment and `run http://127.0.0.1:8931/account.html --allow-local` against a separately served `demo/`: 15 passed. The log said `logged in at http://127.0.0.1:8931/login.html` and nothing else about the account.
+- The password string was in no file of either run's output folder. A wrong password stopped the run with `login ... failed: still on the login form after submitting it`.
+- I did not run the login against the-internet.herokuapp.com: its `/login` takes the practice account shown on that page, and signing in to a third-party site is something to do yourself (`GENNAI_LOGIN_URL=https://the-internet.herokuapp.com/login`, then `run https://the-internet.herokuapp.com/secure`).
+
+**Notifications** (measured 2026-11-24 with local receivers, not real Slack or a real mail server):
+- A demo run with a webhook URL pointing at a local HTTP server and SMTP pointing at a local SMTP sink printed `notified: slack sent, email sent`. The receiver got the POST `{"text": "GenNAI finished http://127.0.0.1:58518/: 20 passed, 2 failed (element_intercepted 1, assertion 1), 0 flaky. Report: gennai_notify/report.html"}`, and the sink got an email with the subject `GenNAI: 20 passed, 2 failed` and the same text.
+- With nothing listening on the webhook port, and an SMTP user configured against the sink (which offers no TLS), the run still exited 0 with `slack failed: URLError, email failed: SMTPException: server offers no TLS; not sending the password`. Neither the webhook path nor the password was in the output.
+- Sending to a real Slack workspace or mail provider needs your own webhook or account and was not tested here.
+
+**Demo cap** (measured 2026-11-24, after the coverage-order rule in Phase 2): `demo` three times with the LLM on (4-5 model tests in each suite): 23 passed, 2 failed (`element_intercepted`, `assertion`) every time. `demo --max-pages 2` three times: 23 passed, 2 failed each time, but the free models answered 503 on all three, so no model tests were in those suites; one earlier 2-page run on the same rule with 3 model tests also caught both. The UI's `demo` at 1 and 2 pages caught both. A unit test feeds 15 model proposals at the highest-scoring fields on two demo-like pages and checks both bugs stay in the 25; under the previous rule all four of those tests were cut.
+
+**Web UI** (measured 2026-11-24 in a browser, LLM on):
+- `demo` with 2 pages: the page showed "Phase 1: found 15 elements on 2 page(s)", then Phase 2 (25 cases, 4 from the LLM), Phase 3, Phase 4, and "25 passed, 0 failed, 0 flaky" with a working report link. That run used the previous selection rule; see "Demo cap" above for the rule that keeps both bugs.
+- the-internet.herokuapp.com with 2 pages: 43 elements, 25 tests (23 click, 1 ep, 1 LLM), 25 passed.
+- A test starts a real server, runs the demo through it, and checks the request guards (wrong `Host`, a non-JSON POST, a foreign `Origin`, a path-traversal report path, and a local target).
+
 **The tool itself.**
-- 40 tests pass in about 21 s. They include:
-  - one end-to-end run against the local demo;
+- 88 tests pass in about 2.5 minutes. They include:
+  - five end-to-end runs against the local demo: single-page, multi-page crawl, a review that rejects and edits cases, run history marking a flaky test, and a run behind the demo's login (which also checks that the password appears in no output file or log line);
+  - tests that the review step refuses structural edits, including an id that would inject code into a test function name;
   - a test that feeds hostile strings through code generation and parses every generated file;
   - a test that a spec referencing a non-existent element is rejected;
   - a test that response time, tokens and failed calls are recorded;
   - a test that page text containing `<script>` is escaped in the report.
 - `ruff check` and `ruff format --check` are clean.
-- The code is 1,733 lines of Python in `gennai.py` and `gennai/`, plus 140 lines of CSS and JavaScript that are inlined into the report. The course version had about 11,700 lines of Python across the phase folders and the web UI.
+- The code is 2,540 lines of Python in `gennai.py` and `gennai/`, plus 140 lines of CSS and JavaScript that are inlined into the report. The course version had about 11,700 lines of Python across the phase folders and the web UI.
 
 ## Course constraints and what changed for the demo
 
@@ -197,14 +296,14 @@ GenNAI was my first serious AI project. Since then I have built AI tooling profe
 | Basic prompt-injection defence | The mailbox assistant sanitises the model's Markdown output with `bleach` and a tag allow-list before rendering it. A test covers this. |
 | The gate checks references, not meaning | In the knowledge-base pipeline the model only appends proposals to a staging file. A script allocates ids and checks required fields, then runs the full integrity checker against a shadow copy, and applies the proposals only if it comes back clean. Dedicated tests cover the gate. |
 | Small test suite | The mailbox assistant has 181 mocked test functions. They include tests that fail if any delete or move call appears in the source. |
-| No run history, no resumable stages | The knowledge-base pipeline has 15 stages with `--dry-run`, `--only` and `--from`. Records are append-only and carry their source on every row, status is computed rather than stored, and corrections are new superseding records. |
+| No resumable stages, and run history is one plain file | The knowledge-base pipeline has 15 stages with `--dry-run`, `--only` and `--from`. Records are append-only and carry their source on every row, status is computed rather than stored, and corrections are new superseding records. |
 | No integrity checks over output | The knowledge-base pipeline has 34 integrity checks that run as a pipeline stage. Running them before every commit is a written rule there, not an enforced hook. |
 
 That later work has its own open list. The mailbox assistant still lacks CSRF protection, cost and quota guardrails before large scans, structured logging and schema migrations. For the knowledge-base pipeline, config-only onboarding of a second workspace and an MCP server are still plans.
 
 ## Limitations and future work
 
-- [KNOWN_LIMITATIONS.md](KNOWN_LIMITATIONS.md) covers real flaws: heuristic locators, single page with no login, shallow assertions, an unsandboxed test run, basic injection defence, a reference-only hallucination gate, and thin live evidence for the LLM step.
+- [KNOWN_LIMITATIONS.md](KNOWN_LIMITATIONS.md) covers real flaws: heuristic locators, a same-origin link crawl and a form-only login, shallow assertions, an unsandboxed test run, review edits that are not re-checked, basic injection defence, a reference-only hallucination gate, and thin live evidence for the LLM step.
 - [FUTURE_WORK.md](FUTURE_WORK.md) covers features that were left out or removed, and what to build next.
 - [DEMO_SCRIPT.md](DEMO_SCRIPT.md) is a 2-3 minute walkthrough.
 - [SHOWCASE.md](SHOWCASE.md) is the longer presentation guide: what to highlight in each phase, where each course requirement shows, and answers for the likely questions.
@@ -214,7 +313,7 @@ That later work has its own open list. The mailbox assistant still lacks CSRF pr
 Only test sites you own or have permission to test. The two public sites above are practice sites made for test automation. The tool keeps its footprint small:
 - It never submits forms. Click tests are trial clicks.
 - It enters only clearly fake data, for example `test.user@example.com`.
-- It loads the page once to explore and once per test (at most 25 tests by default).
+- It loads each page once to explore (one page by default, at most 20 with `--max-pages`) and once per test (at most 25 tests by default). It never follows links that look like logout or delete.
 - It refuses local and private network targets unless you pass `--allow-local`.
 
 ## License

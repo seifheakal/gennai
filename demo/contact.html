@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GenNAI Demo Contact</title>
+<style>
+  body { font: 16px system-ui, sans-serif; max-width: 480px; margin: 0 auto; padding: 16px 24px; }
+  h1 { font-size: 1.4rem; margin: 0 0 8px; }
+  form { display: flex; flex-direction: column; gap: 10px; }
+  label { display: block; font-weight: 600; }
+  input, select, textarea { width: 100%; box-sizing: border-box; padding: 6px; }
+</style>
+</head>
+<body>
+<!-- Second demo page, reached by multi-page crawling (python gennai.py demo --max-pages 2).
+     It has no planted bugs, so its generated tests are expected to pass. -->
+<h1>Contact us</h1>
+<nav><a href="./">Back to sign-up</a> &middot; <a href="contact.html#form">Jump to form</a></nav>
+<form id="contact">
+  <div>
+    <label for="cemail">Your email</label>
+    <input type="email" id="cemail" name="email" required>
+  </div>
+  <div>
+    <label for="topic">Topic</label>
+    <select id="topic" name="topic" required>
+      <option value="">Choose a topic</option>
+      <option value="billing">Billing</option>
+      <option value="other">Other</option>
+    </select>
+  </div>
+  <div>
+    <label for="message">Message</label>
+    <textarea id="message" name="message" required minlength="10" maxlength="200"></textarea>
+  </div>
+  <button type="submit">Send</button>
+</form>
+<script>
+  document.getElementById('contact').addEventListener('submit', e => e.preventDefault());
+</script>
+</body>
+</html>

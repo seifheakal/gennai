@@ -2,13 +2,9 @@
 
 Features and ideas that were left out on purpose, one line each: what, where it would go, and why it was left out. Real flaws in what exists are in [KNOWN_LIMITATIONS.md](KNOWN_LIMITATIONS.md).
 
-## Removed from the course version (did not work or was simulated)
+## Removed from the course version, since rebuilt
 
-- **Human review of generated tests**: a step between Phase 2 and Phase 3 where a person approves or rejects test cases before they run (`gennai/pipeline.py`). The course version simulated reviewer feedback with `random.random()`, so it was removed rather than kept fake.
-- **Web chat UI**: a browser interface over the same pipeline. The course's Flask UI ran the old phases by changing directories and copying files between them, and it broke once the phases were rebuilt.
-- **Run history and flaky-test detection**: an append-only record of runs, with status computed at render time, to tell real regressions from flake across runs (`gennai/phase4_execute.py`). The course version's SQLite history never stored a non-empty result.
-- **Notifications**: Slack or email when a run finishes. The course version's functions only logged "sent" and sent nothing.
-- **Multi-page crawling and authenticated flows**: a crawl scope and login fixtures in Phase 1. The course crawler did not produce usable output, and auth needs secret handling.
+Rebuilt since, and described in the README: multi-page crawling (`--max-pages`), login with credentials from `.env` (`GENNAI_LOGIN_*`), Slack and email notifications (`GENNAI_SLACK_WEBHOOK_URL`, `GENNAI_SMTP_*`), a local web chat UI (`python gennai.py ui`), human review of generated tests (`--review`), and run history with flaky-test marking (`runs/history/<site>.jsonl`). The course's reviewer was simulated with `random.random()`; the rebuilt one waits for a person. The course's SQLite history never stored a non-empty result; the rebuilt one is an append-only JSONL file. The course's notifications only logged "sent"; the rebuilt ones send and report each channel's result. The course's Flask UI ran the old phases by changing directories and copying files; the rebuilt one is a small standard-library server that calls `run_pipeline`.
 
 ## Ideas to build next
 
@@ -24,4 +20,4 @@ Features and ideas that were left out on purpose, one line each: what, where it 
 - **Sandboxed test execution**: run the generated suite in a container with no host filesystem access (`gennai/phase4_execute.py`).
 - **MCP server or Claude Code slash command**: expose `run` as a tool (for example `/run-gennai <url>`) so an agent can test a page it just changed.
 - **Generated architecture map**: a small script that draws the module and data-flow diagram from the code so it can't drift from the README.
-- **Structured logging and error tracking**: JSON logs with a run id. Only worth it if run history is added.
+- **Structured logging and error tracking**: JSON logs with a run id that matches the run's line in the history file.

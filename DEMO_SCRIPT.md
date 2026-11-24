@@ -41,4 +41,4 @@ Say: "It was a university Generative AI course project. The course allowed only 
 
 Show `KNOWN_LIMITATIONS.md` and `FUTURE_WORK.md`.
 
-Say: "The honest gaps are written down. Locators are heuristic, the run isn't sandboxed, and the gate checks references but not meaning. Next I'd extend the gate to check whether the model's expected result follows from the field's constraints, add run history to separate flaky tests from real regressions, and add a human review step before tests run."
+Say: "The honest gaps are written down. Locators are heuristic, the run isn't sandboxed, and the gate checks references but not meaning. Next I'd extend the gate to check whether the model's expected result follows from the field's constraints, and add login fixtures for authenticated pages. Multi-page crawling, a human review step and run history with flaky marking are already in."

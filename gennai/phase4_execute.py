@@ -1,5 +1,6 @@
 """Phase 4: run the generated suite, classify failures, write results.json and report.html."""
 
+import hashlib
 import json
 import logging
 import os
@@ -8,6 +9,7 @@ import sys
 import xml.etree.ElementTree as ET
 from collections import Counter
 from pathlib import Path
+from urllib.parse import urlsplit
 
 from gennai import GennaiError
 from gennai.config import Settings
@@ -22,6 +24,8 @@ def classify_failure(message: str) -> str:
     """Failure class from a pytest/Playwright message. Order matters: intercepted is a timeout."""
     if "PageUnavailable" in message:
         return "page_unavailable"
+    if "LoginFailed" in message:
+        return "login_failed"
     if "intercepts pointer events" in message or "ElementClickIntercepted" in message:
         return "element_intercepted"
     if "LocatorNotFound" in message:
@@ -39,6 +43,9 @@ def execute(out: Path, settings: Settings, cases: list[Case], headed: bool = Fal
     cmd = [sys.executable, "-m", "pytest", str(tests), "-c", str(tests / "pytest.ini"),
            "-p", "no:cacheprovider", f"--junitxml={junit}", "-q"]  # fmt: skip
     env = {**os.environ, "GENNAI_HEADED": "1" if headed else "0"}
+    if settings.login_url:  # only in the child's environment, never in a file
+        env.update(GENNAI_LOGIN_USER=settings.login_user,
+                   GENNAI_LOGIN_PASSWORD=settings.login_password)  # fmt: skip
     junit.unlink(missing_ok=True)
     try:
         proc = subprocess.run(
@@ -63,7 +70,7 @@ def execute(out: Path, settings: Settings, cases: list[Case], headed: bool = Fal
 
 
 def _row(case: Case, tc: ET.Element | None, out: Path) -> dict:
-    row = {"id": case.id, "title": case.title, "technique": case.technique,
+    row = {"id": case.id, "title": case.title, "technique": case.technique, "page": case.page,
            "priority": case.priority, "status": "not_run", "duration": 0.0,
            "failure_class": None, "message": "", "screenshot": None}  # fmt: skip
     if tc is None:
@@ -84,12 +91,65 @@ def _row(case: Case, tc: ET.Element | None, out: Path) -> dict:
     return row
 
 
-def write_results(out: Path, meta: dict, rows: list[dict]) -> dict:
-    """Write results.json and report.html; return the results dict."""
+def case_key(case: Case, by_id: dict[str, dict]) -> str:
+    """Stable id of a test across runs, from what it does (t01... are only priority ranks).
+
+    Uses the page path (not the host, so the demo's random port doesn't matter), the touched
+    elements' attributes, the actions and values, and the expectation. Titles are left out.
+    """
+
+    def sig(eid: str) -> list:
+        el = by_id[eid]
+        keys = ("tag", "kind", "dom_id", "name", "label", "aria_label", "placeholder", "text")
+        return [el.get(k) for k in keys]
+
+    page = urlsplit(case.page)
+    steps = [(sig(s.element), s.action, s.value) for s in case.steps]
+    data = [page.path or "/", page.query, case.technique, case.expect, case.limit,
+            sig(case.target), steps]  # fmt: skip
+    return hashlib.sha1(json.dumps(data).encode()).hexdigest()[:12]
+
+
+def record_history(path: Path, out: Path, meta: dict, rows: list[dict], window: int) -> dict:
+    """Append this run to the site's JSONL history and mark rows flaky over the last runs.
+
+    The file is only ever appended to, one line per run. Each row gets "history" (its status
+    in each of the last `window` runs, oldest first, None where it did not run) and "flaky"
+    (it both passed and failed in that window).
+    """
+    runs = []
+    if path.exists():
+        for n, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+            try:
+                tests = json.loads(line)["tests"]
+                runs.append({k: v for k, v in tests.items() if v in ("passed", "failed")})
+            except (ValueError, KeyError, TypeError, AttributeError):
+                if line.strip():
+                    log.warning("%s line %d is not a run record; ignored", path, n)
+    record = {"finished": meta["finished"], "url": meta["url"], "out": str(out),
+              "tests": {r["key"]: r["status"] for r in rows
+                        if r["status"] in ("passed", "failed")}}  # fmt: skip
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("a", encoding="utf-8") as f:
+        f.write(json.dumps(record) + "\n")
+    recent = (runs + [record["tests"]])[-window:]
+    for r in rows:
+        r["history"] = [tests.get(r["key"]) for tests in recent]
+        r["flaky"] = {"passed", "failed"} <= set(r["history"])
+    return {"file": str(path), "runs": len(runs) + 1, "window": len(recent)}
+
+
+def write_results(
+    out: Path, meta: dict, rows: list[dict], history: Path | None = None, window: int = 5
+) -> dict:
+    """Write results.json and report.html (and append to `history`); return the results."""
     failures = Counter(r["failure_class"] for r in rows if r["status"] == "failed")
+    meta = {**meta, "history": record_history(history, out, meta, rows, window) if history
+            else None}  # fmt: skip
     results = {**meta, "summary": {
         "passed": sum(r["status"] == "passed" for r in rows),
         "failed": sum(r["status"] == "failed" for r in rows),
+        "flaky": sum(bool(r.get("flaky")) for r in rows),
         "failures_per_class": dict(failures)}, "tests": rows}  # fmt: skip
     (out / "results.json").write_text(json.dumps(results, indent=2), encoding="utf-8")
     (out / "report.html").write_text(render(out, results), encoding="utf-8")

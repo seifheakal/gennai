@@ -1,6 +1,6 @@
 """Phase 2: derive test cases from elements (equivalence partitioning, BVA, state, click)."""
 
-from collections import defaultdict
+from collections import Counter, defaultdict
 from collections.abc import Iterable
 from typing import Literal
 
@@ -14,6 +14,7 @@ IMPORTANCE = {
     "email": 1.0, "password": 1.0, "button": 0.9, "number": 0.8, "phone": 0.8, "text": 0.7,
     "select": 0.6, "checkbox": 0.6, "radio": 0.6, "link": 0.3,
 }  # fmt: skip
+NEGATIVE = ("invalid", "form_invalid", "max_length")  # cases that expect a rejection
 TECHNIQUE_WEIGHT = {"state": 1.0, "click": 0.9, "bva": 0.8, "ep": 0.7, "llm": 0.75}
 
 
@@ -39,6 +40,7 @@ class Case(_Model):
     ]  # fmt: skip
     limit: int | None = None  # maxlength for expect="max_length"
     priority: float = 0.0
+    page: str = ""  # URL of the page the target element is on (set by generate)
 
 
 def _num(s: str | None) -> float | None:
@@ -147,6 +149,7 @@ def _bva(el: dict) -> list[Case]:
 
 
 def _state(form_idx: int, fields: list[dict]) -> list[Case]:
+    """Form-level cases; `fields` all belong to one form on one page."""
     fields = [e for e in fields if e["kind"] in FIELDS and _valid_value(e) is not None]
     if len(fields) < 2 or any(e["pattern"] for e in fields):
         return []
@@ -174,17 +177,22 @@ def _score(case: Case, by_id: dict[str, dict]) -> float:
 
 
 def generate(elements: list[dict], max_tests: int, extra: Iterable[Case] = ()) -> list[Case]:
-    """Build, de-duplicate, prioritise and cap test cases. `extra` = pre-validated extra cases."""
+    """Build, de-duplicate, prioritise and cap test cases. `extra` = pre-validated extra cases.
+
+    The cap is filled in coverage order: every element's best case first, then every element's
+    best negative case, then the rest by priority. Within each step pages take turns, so one
+    large page (or many model proposals for one field) cannot crowd out the others.
+    """
     cases: list[Case] = []
-    forms: dict[int, list[dict]] = defaultdict(list)
+    forms: dict[tuple[str, int], list[dict]] = defaultdict(list)  # form indexes are per page
     for el in elements:
         if el["kind"] in ("button", "link"):
             cases.append(_case(el, "click", "is clickable", None, "clickable"))
             continue
         if el["form"] >= 0:
-            forms[el["form"]].append(el)
+            forms[(el.get("page", ""), el["form"])].append(el)
         cases += _ep(el) + _bva(el)
-    for idx, fields in forms.items():
+    for (_, idx), fields in forms.items():
         cases += _state(idx, fields)
     cases += extra
     by_id = {e["id"]: e for e in elements}
@@ -194,8 +202,23 @@ def generate(elements: list[dict], max_tests: int, extra: Iterable[Case] = ()) -
         if key not in seen:
             seen.add(key)
             c.priority = _score(c, by_id)
+            c.page = by_id[c.target].get("page", "")
             unique.append(c)
-    top = sorted(unique, key=lambda c: -c.priority)[:max_tests]
+    unique.sort(key=lambda c: -c.priority)
+    covered: set[tuple[str, str]] = set()  # (page, element) with a case
+    negative: set[tuple[str, str]] = set()  # ... with a negative case
+    rank: Counter[tuple[int, str]] = Counter()
+    order = []
+    for c in unique:  # highest priority first, so each step keeps the element's best case
+        el, neg = (c.page, c.target), c.expect in NEGATIVE
+        step = 0 if el not in covered else 1 if neg and el not in negative else 2
+        covered.add(el)
+        if neg:
+            negative.add(el)
+        order.append((step, rank[(step, c.page)], c))
+        rank[(step, c.page)] += 1
+    order.sort(key=lambda o: o[:2])  # stable: priority order is kept within a turn
+    top = sorted((c for *_, c in order[:max_tests]), key=lambda c: -c.priority)
     for i, c in enumerate(top, 1):
         c.id = f"t{i:02d}"
     return top

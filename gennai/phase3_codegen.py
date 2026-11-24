@@ -10,6 +10,7 @@ from pprint import pformat
 from urllib.parse import urlparse
 
 from gennai import GennaiError
+from gennai.auth import login
 from gennai.config import Settings
 from gennai.phase1_explore import locate
 from gennai.phase2_generate import Case
@@ -28,11 +29,19 @@ from playwright.sync_api import sync_playwright
 URL = __URL__
 ACTION_TIMEOUT_MS = __TIMEOUT__
 NAV_TIMEOUT_MS = __NAV_TIMEOUT__  # page loads can be much slower than actions
+LOGIN_URL = __LOGIN_URL__  # user and password are read from the environment, never stored
 SHOTS = Path(__file__).resolve().parent.parent / "screenshots"
 
 
 class PageUnavailable(Exception):
     """The page answered with an HTTP error, so element checks would be meaningless."""
+
+
+class LoginFailed(Exception):
+    """The login form was submitted but the browser stayed on it."""
+
+
+__LOGIN__
 
 
 @pytest.fixture(scope="session")
@@ -43,14 +52,32 @@ def browser():
         b.close()
 
 
-@pytest.fixture
-def page(browser):
+@pytest.fixture(scope="session")
+def auth_state(browser):
+    """Log in once per test session; every test then starts from that session."""
+    if not LOGIN_URL:
+        return None
+    user = os.environ.get("GENNAI_LOGIN_USER")
+    password = os.environ.get("GENNAI_LOGIN_PASSWORD")
+    if not (user and password):
+        pytest.fail("this suite logs in: set GENNAI_LOGIN_USER and GENNAI_LOGIN_PASSWORD")
     context = browser.new_context()
+    try:
+        login(context.new_page(), LOGIN_URL, user, password, NAV_TIMEOUT_MS)
+        return context.storage_state()
+    finally:
+        context.close()
+
+
+@pytest.fixture
+def page(browser, request, auth_state):
+    url = getattr(request.module, "PAGE_URL", URL)  # each test file names its page
+    context = browser.new_context(storage_state=auth_state)
     context.set_default_timeout(ACTION_TIMEOUT_MS)
     page = context.new_page()
-    response = page.goto(URL, wait_until="domcontentloaded", timeout=NAV_TIMEOUT_MS)
+    response = page.goto(url, wait_until="domcontentloaded", timeout=NAV_TIMEOUT_MS)
     if response is not None and response.status >= 400:
-        raise PageUnavailable(f"{URL} returned HTTP {response.status}")
+        raise PageUnavailable(f"{url} returned HTTP {response.status}")
     yield page
     context.close()
 
@@ -107,6 +134,11 @@ EXPECT = {
 ACTIONS = {"fill": ".fill({v})", "select": ".select_option({v})", "check": ".check()"}
 
 
+def _fill(template: str, values: dict[str, str]) -> str:
+    """Replace __MARKERS__ in one pass, so substituted text (page data) is never rescanned."""
+    return re.sub(r"__[A-Z_]+__", lambda m: values.get(m.group(0), m.group(0)), template)
+
+
 def _slug(s: str) -> str:
     return re.sub(r"\W+", "_", s.lower(), flags=re.ASCII).strip("_")[:20]
 
@@ -134,37 +166,57 @@ def _test_source(case: Case, methods: dict[str, str]) -> str:
     return "\n".join(lines) + "\n"
 
 
+def _modules(url: str, pages: list[str]) -> list[tuple[str, str]]:
+    """(page object module, test file stem) per page; the first page keeps the old names."""
+    host = _slug(urlparse(url).hostname or "x")
+    out = [(f"site_{host}_page", "test_generated")]
+    for n, page_url in enumerate(pages[1:], 2):
+        path = _slug(urlparse(page_url).path) or "root"
+        out.append((f"site_{host}_p{n}_{path}_page", f"test_generated_p{n}"))
+    return out
+
+
 def write_project(
     url: str, elements: list[dict], cases: list[Case], out: Path, settings: Settings
 ) -> Path:
-    """Write <out>/tests/ and return its path."""
+    """Write <out>/tests/ (one Page Object and one test file per page) and return its path."""
     tests = out / "tests"
     (tests / "pages").mkdir(parents=True, exist_ok=True)
     timeout = settings.action_timeout_ms
-    module = "site_" + _slug(urlparse(url).hostname or "x") + "_page"
     methods = {e["id"]: f"{e['id']}_{_slug(e['label'] or e['text'] or e['name'] or e['tag'])}"
                for e in elements}  # fmt: skip
-    candidates = {e["id"]: [tuple(c) for c in e["locators"]] for e in elements}
-
-    # page-derived data is substituted last, so text like "__LOCATE__" can't hit a marker
-    page_src = (
-        PAGE_OBJECT.replace("__TIMEOUT__", repr(timeout / 1000))
-        .replace("__LOCATE__", inspect.getsource(locate).rstrip())
-        .replace("__CANDIDATES__", pformat(candidates, width=100))
-    )
-    for e in elements:
-        page_src += f"\n    def {methods[e['id']]}(self):\n        return self._find({e['id']!r})\n"
-    (tests / "pages" / f"{module}.py").write_text(page_src, encoding="utf-8")
+    pages = list(dict.fromkeys(e.get("page", url) for e in elements)) or [url]
+    for page_url, (module, test_file) in zip(pages, _modules(url, pages), strict=True):
+        own = [e for e in elements if e.get("page", url) == page_url]
+        candidates = {e["id"]: [tuple(c) for c in e["locators"]] for e in own}
+        page_src = _fill(PAGE_OBJECT, {
+            "__TIMEOUT__": repr(timeout / 1000),
+            "__LOCATE__": inspect.getsource(locate).rstrip(),
+            "__CANDIDATES__": pformat(candidates, width=100),
+        })  # fmt: skip
+        for e in own:
+            m, key = methods[e["id"]], e["id"]
+            page_src += f"\n    def {m}(self):\n        return self._find({key!r})\n"
+        (tests / "pages" / f"{module}.py").write_text(page_src, encoding="utf-8")
+        ids = {e["id"] for e in own}
+        body = "\n\n".join(_test_source(c, methods) for c in cases if c.target in ids)
+        (tests / f"{test_file}.py").write_text(
+            f'"""Generated by GenNAI."""\n\nfrom pages.{module} import Page\n\n'
+            f"PAGE_URL = {page_url!r}\n\n\n{body}",
+            encoding="utf-8",
+        )
     (tests / "pytest.ini").write_text(PYTEST_INI, encoding="utf-8")
     (tests / "conftest.py").write_text(
-        CONFTEST.replace("__TIMEOUT__", repr(timeout))
-        .replace("__NAV_TIMEOUT__", repr(settings.page_timeout_ms))
-        .replace("__URL__", repr(url)),
-        encoding="utf-8",
-    )
-    body = "\n\n".join(_test_source(c, methods) for c in cases)
-    (tests / "test_generated.py").write_text(
-        f'"""Generated by GenNAI."""\n\nfrom pages.{module} import Page\n\n\n{body}',
+        _fill(
+            CONFTEST,
+            {
+                "__TIMEOUT__": repr(timeout),
+                "__NAV_TIMEOUT__": repr(settings.page_timeout_ms),
+                "__URL__": repr(url),
+                "__LOGIN_URL__": repr(settings.login_url or None),
+                "__LOGIN__": inspect.getsource(login).rstrip(),
+            },
+        ),  # fmt: skip
         encoding="utf-8",
     )
     _self_check(tests)
