@@ -33,7 +33,7 @@ class Settings:
     llm_providers: tuple[Provider, ...] = ()  # configured providers, in fallback order
     llm_max_calls: int = 3  # hard cap on HTTP attempts per run
     llm_max_output_tokens: int = 4096
-    llm_timeout_s: int = 60
+    llm_timeout_s: int = 120  # thinking models (e.g. Gemma) can take a minute
     llm_max_input_chars: int = 12000
 
 
@@ -51,7 +51,7 @@ def _positive_int(name: str, default: int) -> int:
 
 
 def _providers() -> tuple[Provider, ...]:
-    raw = os.environ.get("GENNAI_LLM_PROVIDERS", "").strip() or "gemini,openrouter"
+    raw = os.environ.get("GENNAI_LLM_PROVIDERS", "").strip() or "gemini,gemma,openrouter"
     out = []
     for name in (n.strip().lower() for n in raw.split(",")):
         if not name:  # a name without a key (e.g. "none") is skipped below

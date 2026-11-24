@@ -170,3 +170,21 @@ def test_key_never_logged(monkeypatch, caplog):
         propose_cases("http://x", ELEMENTS, settings("gemini", "openrouter"))
     assert caplog.records
     assert KEY_G not in caplog.text and KEY_O not in caplog.text
+
+
+def test_503_moves_to_next_provider_without_retrying(monkeypatch):
+    def handler(req):
+        if "gemini" in req.full_url:
+            raise http_error(503)
+        return answer(GOOD)
+
+    seen = mock_urlopen(monkeypatch, handler)
+    cases, stats = propose_cases("http://x", ELEMENTS, settings("gemini", "openrouter"))
+    assert [u.split("/")[2] for u in seen] == ["gemini.test", "openrouter.test"]
+    assert stats["accepted"] == 1 and stats["status"].startswith("used: openrouter")
+
+
+def test_gate_strips_model_reasoning_block():
+    text = "<thought>The user wants {json}. I will use e01.</thought>\n" + json.dumps(GOOD)
+    cases, stats = gate_llm_cases(text, ELEMENTS)
+    assert stats["accepted"] == 1 and stats["rejected_schema"] == 0

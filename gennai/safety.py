@@ -39,6 +39,7 @@ SYSTEM_PROMPT = (
     "listed option values."
 )
 _COMMENT = re.compile(r"<!--.*?-->", re.DOTALL)
+_THOUGHT = re.compile(r"<thought>.*?</thought>", re.DOTALL)
 
 
 def check_url(url: str, allow_local: bool = False) -> str:
@@ -115,7 +116,7 @@ class _Spec(BaseModel):
 def gate_llm_cases(text: str, elements: list[dict]) -> tuple[list[Case], dict]:
     """Deterministic gate: the model proposes, this disposes. Returns accepted cases and counts."""
     stats = {"proposed": 0, "accepted": 0, "rejected_hallucinations": 0, "rejected_schema": 0}
-    body = text.strip()
+    body = _THOUGHT.sub("", text).strip()  # some models (e.g. Gemma) prepend their reasoning
     if body.startswith("```"):
         body = body.split("\n", 1)[1] if "\n" in body else ""
         body = body.rsplit("```", 1)[0]

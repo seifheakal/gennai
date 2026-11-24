@@ -15,7 +15,7 @@ from gennai.safety import build_prompt, gate_llm_cases
 
 log = logging.getLogger(__name__)
 NOT_USED = "not used: no LLM key configured (set GEMINI_API_KEY or OPENROUTER_API_KEY in .env)"
-RETRIES = 2
+RETRIES = 1  # extra passes over the provider chain
 DEFAULT_COOLDOWN_S = 60.0
 
 
@@ -81,12 +81,21 @@ class _Client:
         self.cooldown_until[p.name] = time.monotonic() + wait
 
     def complete(self, system: str, user: str) -> tuple[str, Provider]:
-        """Try providers in order; return (answer, provider) or raise LLMUnavailable."""
-        for p in self.s.llm_providers:
-            if self.cooldown_until.get(p.name, -math.inf) > time.monotonic():
-                self.reasons[p.name] = "cooling down after rate limit"
-                continue
-            for attempt in range(RETRIES + 1):
+        """Try providers in order; return (answer, provider) or raise LLMUnavailable.
+
+        A 5xx, timeout or network error moves on to the next provider (an overloaded free
+        model rarely recovers within seconds); the chain is retried after a pause.
+        """
+        dropped: set[str] = set()  # providers that answered 4xx or malformed output
+        for attempt in range(RETRIES + 1):
+            if attempt:
+                time.sleep(2**attempt)
+            for p in self.s.llm_providers:
+                if p.name in dropped:
+                    continue
+                if self.cooldown_until.get(p.name, -math.inf) > time.monotonic():
+                    self.reasons[p.name] = "cooling down after rate limit"
+                    continue
                 if self.calls >= self.s.llm_max_calls:
                     raise self._unavailable(f"call cap {self.s.llm_max_calls} reached")
                 self._space(p)
@@ -98,9 +107,8 @@ class _Client:
                     log.warning("LLM %s answered HTTP %s", p.name, e.code)
                     if e.code == 429:
                         self._cool_down(p, e)
-                        break
-                    if e.code < 500:
-                        break
+                    elif e.code < 500:
+                        dropped.add(p.name)
                 except (
                     urllib.error.URLError,
                     http.client.HTTPException,
@@ -112,9 +120,7 @@ class _Client:
                 except (ValueError, KeyError, IndexError, TypeError):
                     self.reasons[p.name] = "malformed response"
                     log.warning("LLM %s returned a malformed response", p.name)
-                    break
-                if attempt < RETRIES:
-                    time.sleep(2**attempt)
+                    dropped.add(p.name)
         raise self._unavailable()
 
 
