@@ -4,11 +4,12 @@ Features and ideas that were left out on purpose, one line each: what, where it 
 
 ## Removed from the course version (did not work or was simulated)
 
-- **Human review of generated tests**: a step between Phase 2 and Phase 3 where a person approves or rejects test cases before they run (`gennai/pipeline.py`). The course version simulated reviewer feedback with `random.random()`, so it was removed rather than kept fake.
 - **Web chat UI**: a browser interface over the same pipeline. The course's Flask UI ran the old phases by changing directories and copying files between them, and it broke once the phases were rebuilt.
 - **Run history and flaky-test detection**: an append-only record of runs, with status computed at render time, to tell real regressions from flake across runs (`gennai/phase4_execute.py`). The course version's SQLite history never stored a non-empty result.
 - **Notifications**: Slack or email when a run finishes. The course version's functions only logged "sent" and sent nothing.
-- **Authenticated flows**: login fixtures in Phase 1 and in the generated `conftest.py`, with credentials read from `.env` and never logged. Left out because auth needs secret handling. (Multi-page crawling, removed from the course version with this item, has been rebuilt: see `--max-pages` in the README.)
+- **Authenticated flows**: login fixtures in Phase 1 and in the generated `conftest.py`, with credentials read from `.env` and never logged. Left out because auth needs secret handling.
+
+Rebuilt since: multi-page crawling (`--max-pages`) and human review of generated tests (`--review`), both described in the README. The course's reviewer was simulated with `random.random()`; the rebuilt one waits for a person.
 
 ## Ideas to build next
 

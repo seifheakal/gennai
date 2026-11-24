@@ -50,7 +50,7 @@ Real flaws in the current version that were too expensive or risky to fix within
 9. **The hallucination gate checks references, not meaning.**
    - **What:** a model-proposed test is accepted only if its element id exists, its action is allowed for that element kind, and a select value is one of the detected options. Whether the model's expectation ("this value should be invalid") is correct is not checked.
    - **Impact:** a wrong expectation shows up as a false `assertion` failure.
-   - **Needed for production:** check expectations against the field's own constraints deterministically, or require human review of model-proposed tests.
+   - **Needed for production:** check expectations against the field's own constraints deterministically. `--review` lets a person reject such tests before they run, but it is opt-in.
 
 10. **Cost controls are per run only.**
     - **What:** there is a hard cap on LLM calls per run (`GENNAI_LLM_MAX_CALLS`), plus input and output token caps, timeouts, client-side spacing and fallback on 429.
@@ -73,3 +73,9 @@ Real flaws in the current version that were too expensive or risky to fix within
 14. **The course's model constraint shaped the design.**
     - **What:** the course allowed only free-tier, open-source or local models. The course version committed no LLM API call at all. Test design was done entirely by the deterministic generators: equivalence partitioning, boundary values and state combinations.
     - **Impact:** the deterministic core is still the main source of tests. The model is an optional add-on that proposes extra cases and passes through the same gate.
+
+15. **Review edits are not re-checked.**
+    - **What:** with `--review` a person may change a case's title and step values. The edited value runs against the case's original expectation. Nothing checks that the two still agree, so a value edited on a "below minlength" case makes it fail with `assertion` (seen on the demo). The review is a pause in one terminal session: there is no way to stop after Phase 2 and resume later, and the file is not locked while you edit it.
+    - **Impact:** a careless edit produces a false failure. A review cannot be handed to someone else to do later.
+    - **Why left:** recomputing expectations needs the same semantic check the LLM gate lacks (item 9). Resuming needs the staged pipeline in FUTURE_WORK.
+    - **Needed for production:** recompute or confirm the expectation for edited values, and a `--from codegen` resume that reads an approved `test_cases.json`.

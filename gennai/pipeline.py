@@ -6,19 +6,20 @@ import logging
 import threading
 import time
 from collections import Counter
-from collections.abc import Iterator
+from collections.abc import Callable, Iterator
 from contextlib import contextmanager
 from datetime import datetime
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
-from gennai import NoTestableElements
+from gennai import GennaiError, NoTestableElements
 from gennai.config import Settings
 from gennai.llm import propose_cases
 from gennai.phase1_explore import explore
 from gennai.phase2_generate import generate
 from gennai.phase3_codegen import write_project
 from gennai.phase4_execute import execute, write_results
+from gennai.review import load_reviewed, write_for_review
 from gennai.safety import check_url
 
 log = logging.getLogger(__name__)
@@ -45,9 +46,13 @@ def serve_dir(directory: Path = DEMO_DIR) -> Iterator[str]:
 
 def run_pipeline(
     url: str, out: Path, settings: Settings, headed: bool = False, allow_local: bool = False,
-    max_pages: int = 1,
+    max_pages: int = 1, review: Callable[[Path], None] | None = None,
 ) -> dict:  # fmt: skip
-    """Explore, generate, write and run tests; return the results dict (also on disk)."""
+    """Explore, generate, write and run tests; return the results dict (also on disk).
+
+    With `review`, the cases are written for a person to approve and `review(path)` is called;
+    it must block until they are done. Only approved cases are generated and run.
+    """
     started = datetime.now().isoformat(timespec="seconds")
     t0 = last = time.perf_counter()
     durations: dict[str, float] = {}
@@ -67,10 +72,20 @@ def run_pipeline(
     cases = generate(elements, settings.max_tests, extra_cases)
     if not cases:
         raise NoTestableElements(f"no testable elements found at {url}")
-    (out / "test_cases.json").write_text(
-        json.dumps([c.model_dump() for c in cases], indent=2), encoding="utf-8"
-    )
+    cases_file = out / "test_cases.json"
+    review_stats = None
+    if review is None:
+        cases_file.write_text(
+            json.dumps([c.model_dump() for c in cases], indent=2), encoding="utf-8"
+        )
     lap("generate")
+    if review is not None:
+        write_for_review(cases_file, cases)
+        review(cases_file)
+        cases, review_stats = load_reviewed(cases_file, cases)
+        lap("review")  # time spent waiting for the person
+        if not cases:
+            raise GennaiError("the review rejected every test case; nothing to run")
     write_project(url, elements, cases, out, settings)
     lap("codegen")
     rows = execute(out, settings, cases, headed)
@@ -86,5 +101,6 @@ def run_pipeline(
         "tests_per_technique": dict(Counter(c.technique for c in cases)),
         "llm": llm["status"],
         "llm_stats": llm,
+        "review": review_stats,
     }
     return write_results(out, meta, rows)

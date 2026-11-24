@@ -124,6 +124,11 @@ def _html(out: Path, r: dict) -> str:
         )
     s = r["summary"]
     pages = ", ".join(esc(p) for p in r.get("pages", [r["url"]]))
+    v = r.get("review")
+    review = (
+        f"<br>Human review: {v['approved']} approved ({v['edited']} edited), "
+        f"{v['rejected']} rejected" if v else ""
+    )  # fmt: skip
     return (
         f"<!doctype html><html lang='en'><meta charset='utf-8'><title>GenNAI report</title>"
         f"<style>{_CSS}</style><h1>GenNAI report</h1>"
@@ -132,7 +137,7 @@ def _html(out: Path, r: dict) -> str:
         f"<br>Pages: {esc(len(r.get('pages', [r['url']])))} &middot; {pages}"
         f"<br>Elements: {esc(r['elements'])} &middot; tests: {esc(r['tests_per_technique'])}"
         f"<br>Passed: {s['passed']} &middot; failed: {s['failed']} {esc(s['failures_per_class'])}"
-        f"<br>LLM: {esc(r['llm'])}<br>Phase durations: {esc(r['durations'])}</p>"
+        f"<br>LLM: {esc(r['llm'])}{review}<br>Phase durations: {esc(r['durations'])}</p>"
         "<table><tr><th>ID</th><th>Test</th><th>Technique</th><th>Page</th><th>Priority</th><th>Status</th>"
         f"<th>Failure class</th><th>Time</th><th>Details</th></tr>{''.join(rows)}</table></html>"
     )

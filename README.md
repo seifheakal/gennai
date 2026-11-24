@@ -84,7 +84,7 @@ python gennai.py demo
 python gennai.py run https://the-internet.herokuapp.com
 ```
 
-Flags: `--out DIR` (default `runs/<host>_<timestamp>/`), `--headed` (show the browser), `--max-tests N` (default 25), `--max-pages N` (default 1, at most 20), `--allow-local` (`run` only).
+Flags: `--out DIR` (default `runs/<host>_<timestamp>/`), `--headed` (show the browser), `--max-tests N` (default 25), `--max-pages N` (default 1, at most 20), `--review` (approve tests before they run), `--allow-local` (`run` only).
 
 **Multi-page crawling.** `--max-pages N` also tests up to N-1 pages that the start page links to:
 
@@ -99,11 +99,23 @@ python gennai.py run https://the-internet.herokuapp.com --max-pages 4
 - A linked page that fails to load (HTTP error, redirect to another origin, bot challenge) is logged and skipped; only the start page's failure stops the run.
 - `GENNAI_MAX_ELEMENTS` applies per page; `--max-tests` is shared by all pages. The report and `results.json` list the crawled pages and the page of each test.
 
+**Human review.** `--review` pauses between Phase 2 and Phase 3:
+
+```powershell
+python gennai.py run https://the-internet.herokuapp.com --review
+```
+
+- GenNAI writes `test_cases.json` with `"approved": true` on every case, prints its path and waits.
+- Open the file and set `"approved": false` on a case (or delete it) to drop it. You may also change a case's `title` and its step `value`s, for example to try your own input.
+- Press Enter to continue. Only approved cases are turned into code and run. The summary, `results.json` (`"review"`) and the report show how many were approved, edited and rejected.
+- Any other change is refused with an error naming the case: ids, targets, expectations and which elements a case touches decide the generated code, so they must stay as generated. Ctrl+C or closed input cancels the run (exit 2) before any test is generated.
+- Nobody is simulated: without `--review` every generated case runs, as before.
+
 Each run writes `elements.json` (Phase 1), `test_cases.json` (Phase 2), `tests/` (Phase 3), `results.json`, `report.html` and `screenshots/` (Phase 4). The terminal shows a short summary and the report path.
 
 Exit codes:
 - `0`: the pipeline finished. Failed generated tests are findings, not errors.
-- `2`: bad input, a refused URL, or a site that is unreachable or blocks automation.
+- `2`: bad input, a refused URL, a site that is unreachable or blocks automation, or a cancelled or invalid review.
 - `3`: no testable elements.
 
 Run the tool's own tests:
@@ -172,13 +184,19 @@ The remaining `locator_not_found`, on a "Tshirt" category link, appeared in 2 of
 **the-internet.herokuapp.com.** The first run flagged the "Skip to content" link as a `timeout`. That was a false positive: the link sits off-screen until it is focused. Phase 1 now skips elements that lie entirely off-screen, and the later runs passed 25 of 25.
 
 
+**Human review** (measured 2026-11-24 by driving the CLI's prompt from a script: wait for it, edit the file, send Enter):
+- Demo, no key: 25 cases offered, 3 rejected, 1 step value edited, 19 approved. The rejected cases were absent from the generated code, and the edited value was in it.
+- the-internet.herokuapp.com, `--max-pages 2`: 25 offered, 3 rejected, 22 run and passed. The LLM step was unavailable on that run (Gemini timed out, Gemma answered HTTP 503), so only algorithmic tests were offered.
+- On the demo, the edited value turned a "length 1 (below minlength)" case into a failing `assertion`. An edited value is run as-is against the original expectation (see [KNOWN_LIMITATIONS.md](KNOWN_LIMITATIONS.md)).
+
 **The tool itself.**
-- 48 tests pass in about 35 s. They include:
-  - two end-to-end runs against the local demo, one single-page and one multi-page crawl;
+- 61 tests pass in about 51 s. They include:
+  - three end-to-end runs against the local demo: single-page, multi-page crawl, and with a review that rejects and edits cases;
+  - tests that the review step refuses structural edits, including an id that would inject code into a test function name;
   - a test that feeds hostile strings through code generation and parses every generated file;
   - a test that a spec referencing a non-existent element is rejected.
 - `ruff check` and `ruff format --check` are clean.
-- The code is 1,423 lines of Python in `gennai.py` and `gennai/`. The course version had about 11,700 lines of Python across the phase folders and the web UI.
+- The code is 1,526 lines of Python in `gennai.py` and `gennai/`. The course version had about 11,700 lines of Python across the phase folders and the web UI.
 
 ## Course constraints and what changed for the demo
 
@@ -219,7 +237,7 @@ That later work has its own open list. The mailbox assistant still lacks CSRF pr
 
 ## Limitations and future work
 
-- [KNOWN_LIMITATIONS.md](KNOWN_LIMITATIONS.md) covers real flaws: heuristic locators, a same-origin link crawl with no login, shallow assertions, an unsandboxed test run, basic injection defence, a reference-only hallucination gate, and an LLM path that has not been verified live.
+- [KNOWN_LIMITATIONS.md](KNOWN_LIMITATIONS.md) covers real flaws: heuristic locators, a same-origin link crawl with no login, shallow assertions, an unsandboxed test run, review edits that are not re-checked, basic injection defence, a reference-only hallucination gate, and an LLM path that has not been verified live.
 - [FUTURE_WORK.md](FUTURE_WORK.md) covers features that were left out or removed, and what to build next.
 - [DEMO_SCRIPT.md](DEMO_SCRIPT.md) is a 2-3 minute walkthrough.
 
