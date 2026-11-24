@@ -1,22 +1,28 @@
 {
   "url": "https://the-internet.herokuapp.com",
-  "started": "2026-11-24T11:20:04",
-  "finished": "2026-11-24T11:20:47",
-  "total_s": 42.7,
+  "started": "2026-11-24T11:38:46",
+  "finished": "2026-11-24T11:39:42",
+  "total_s": 56.2,
   "durations": {
-    "explore": 4.32,
-    "generate": 0.0,
+    "explore": 10.08,
+    "generate": 1.49,
     "codegen": 0.0,
-    "execute": 38.33
+    "execute": 44.68
   },
   "elements": 40,
   "tests_per_technique": {
+    "llm": 1,
     "ep": 1,
-    "click": 24
+    "click": 23
   },
-  "llm": "not used: no LLM key configured (set GEMINI_API_KEY or OPENROUTER_API_KEY in .env)",
+  "llm": "used: gemini/gemini-3.5-flash-lite",
   "llm_stats": {
-    "status": "not used: no LLM key configured (set GEMINI_API_KEY or OPENROUTER_API_KEY in .env)"
+    "proposed": 6,
+    "accepted": 6,
+    "rejected_hallucinations": 0,
+    "rejected_schema": 0,
+    "status": "used: gemini/gemini-3.5-flash-lite",
+    "calls": 1
   },
   "summary": {
     "passed": 25,
@@ -26,9 +32,9 @@
   "tests": [
     {
       "id": "t01",
-      "title": "Filter examples: valid partition",
-      "technique": "ep",
-      "priority": 0.42,
+      "title": "Filter examples by search term",
+      "technique": "llm",
+      "priority": 0.435,
       "status": "passed",
       "duration": 1.92,
       "failure_class": null,
@@ -37,39 +43,50 @@
     },
     {
       "id": "t02",
-      "title": "The Internet: home: is clickable",
-      "technique": "click",
-      "priority": 0.36,
+      "title": "Filter examples: valid partition",
+      "technique": "ep",
+      "priority": 0.42,
       "status": "passed",
-      "duration": 1.4,
+      "duration": 1.46,
       "failure_class": null,
       "message": "",
       "screenshot": null
     },
     {
       "id": "t03",
-      "title": "A/B Testing: is clickable",
+      "title": "The Internet: home: is clickable",
       "technique": "click",
       "priority": 0.36,
       "status": "passed",
-      "duration": 1.47,
+      "duration": 1.41,
       "failure_class": null,
       "message": "",
       "screenshot": null
     },
     {
       "id": "t04",
-      "title": "Accessibility Issues: is clickable",
+      "title": "A/B Testing: is clickable",
       "technique": "click",
       "priority": 0.36,
       "status": "passed",
-      "duration": 1.4,
+      "duration": 1.42,
       "failure_class": null,
       "message": "",
       "screenshot": null
     },
     {
       "id": "t05",
+      "title": "Accessibility Issues: is clickable",
+      "technique": "click",
+      "priority": 0.36,
+      "status": "passed",
+      "duration": 1.43,
+      "failure_class": null,
+      "message": "",
+      "screenshot": null
+    },
+    {
+      "id": "t06",
       "title": "Add/Remove Elements: is clickable",
       "technique": "click",
       "priority": 0.36,
@@ -80,7 +97,7 @@
       "screenshot": null
     },
     {
-      "id": "t06",
+      "id": "t07",
       "title": "Advanced Iframes: is clickable",
       "technique": "click",
       "priority": 0.36,
@@ -91,96 +108,41 @@
       "screenshot": null
     },
     {
-      "id": "t07",
+      "id": "t08",
       "title": "Advanced Shadow DOM: is clickable",
       "technique": "click",
       "priority": 0.36,
       "status": "passed",
-      "duration": 1.45,
-      "failure_class": null,
-      "message": "",
-      "screenshot": null
-    },
-    {
-      "id": "t08",
-      "title": "Autocomplete: is clickable",
-      "technique": "click",
-      "priority": 0.36,
-      "status": "passed",
-      "duration": 1.4,
+      "duration": 1.47,
       "failure_class": null,
       "message": "",
       "screenshot": null
     },
     {
       "id": "t09",
-      "title": "Basic Auth: is clickable",
+      "title": "Autocomplete: is clickable",
       "technique": "click",
       "priority": 0.36,
       "status": "passed",
-      "duration": 1.5,
+      "duration": 1.47,
       "failure_class": null,
       "message": "",
       "screenshot": null
     },
     {
       "id": "t10",
-      "title": "Broken Images: is clickable",
+      "title": "Basic Auth: is clickable",
       "technique": "click",
       "priority": 0.36,
       "status": "passed",
-      "duration": 1.4,
+      "duration": 1.53,
       "failure_class": null,
       "message": "",
       "screenshot": null
     },
     {
       "id": "t11",
-      "title": "Browser Permissions: is clickable",
-      "technique": "click",
-      "priority": 0.36,
-      "status": "passed",
-      "duration": 1.43,
-      "failure_class": null,
-      "message": "",
-      "screenshot": null
-    },
-    {
-      "id": "t12",
-      "title": "Canvas: is clickable",
-      "technique": "click",
-      "priority": 0.36,
-      "status": "passed",
-      "duration": 1.4,
-      "failure_class": null,
-      "message": "",
-      "screenshot": null
-    },
-    {
-      "id": "t13",
-      "title": "Challenging DOM: is clickable",
-      "technique": "click",
-      "priority": 0.36,
-      "status": "passed",
-      "duration": 1.42,
-      "failure_class": null,
-      "message": "",
-      "screenshot": null
-    },
-    {
-      "id": "t14",
-      "title": "Chat: is clickable",
-      "technique": "click",
-      "priority": 0.36,
-      "status": "passed",
-      "duration": 1.4,
-      "failure_class": null,
-      "message": "",
-      "screenshot": null
-    },
-    {
-      "id": "t15",
-      "title": "Checkboxes: is clickable",
+      "title": "Broken Images: is clickable",
       "technique": "click",
       "priority": 0.36,
       "status": "passed",
@@ -190,52 +152,8 @@
       "screenshot": null
     },
     {
-      "id": "t16",
-      "title": "Context Menu: is clickable",
-      "technique": "click",
-      "priority": 0.36,
-      "status": "passed",
-      "duration": 1.4,
-      "failure_class": null,
-      "message": "",
-      "screenshot": null
-    },
-    {
-      "id": "t17",
-      "title": "Cookie Consent: is clickable",
-      "technique": "click",
-      "priority": 0.36,
-      "status": "passed",
-      "duration": 1.42,
-      "failure_class": null,
-      "message": "",
-      "screenshot": null
-    },
-    {
-      "id": "t18",
-      "title": "Custom Dropdown: is clickable",
-      "technique": "click",
-      "priority": 0.36,
-      "status": "passed",
-      "duration": 1.4,
-      "failure_class": null,
-      "message": "",
-      "screenshot": null
-    },
-    {
-      "id": "t19",
-      "title": "Date & Time Pickers: is clickable",
-      "technique": "click",
-      "priority": 0.36,
-      "status": "passed",
-      "duration": 1.42,
-      "failure_class": null,
-      "message": "",
-      "screenshot": null
-    },
-    {
-      "id": "t20",
-      "title": "Digest Authentication: is clickable",
+      "id": "t12",
+      "title": "Browser Permissions: is clickable",
       "technique": "click",
       "priority": 0.36,
       "status": "passed",
@@ -245,56 +163,144 @@
       "screenshot": null
     },
     {
-      "id": "t21",
-      "title": "Disappearing Elements: is clickable",
+      "id": "t13",
+      "title": "Canvas: is clickable",
       "technique": "click",
       "priority": 0.36,
       "status": "passed",
-      "duration": 1.42,
+      "duration": 1.45,
+      "failure_class": null,
+      "message": "",
+      "screenshot": null
+    },
+    {
+      "id": "t14",
+      "title": "Challenging DOM: is clickable",
+      "technique": "click",
+      "priority": 0.36,
+      "status": "passed",
+      "duration": 1.7,
+      "failure_class": null,
+      "message": "",
+      "screenshot": null
+    },
+    {
+      "id": "t15",
+      "title": "Chat: is clickable",
+      "technique": "click",
+      "priority": 0.36,
+      "status": "passed",
+      "duration": 2.13,
+      "failure_class": null,
+      "message": "",
+      "screenshot": null
+    },
+    {
+      "id": "t16",
+      "title": "Checkboxes: is clickable",
+      "technique": "click",
+      "priority": 0.36,
+      "status": "passed",
+      "duration": 1.48,
+      "failure_class": null,
+      "message": "",
+      "screenshot": null
+    },
+    {
+      "id": "t17",
+      "title": "Context Menu: is clickable",
+      "technique": "click",
+      "priority": 0.36,
+      "status": "passed",
+      "duration": 6.08,
+      "failure_class": null,
+      "message": "",
+      "screenshot": null
+    },
+    {
+      "id": "t18",
+      "title": "Cookie Consent: is clickable",
+      "technique": "click",
+      "priority": 0.36,
+      "status": "passed",
+      "duration": 1.5,
+      "failure_class": null,
+      "message": "",
+      "screenshot": null
+    },
+    {
+      "id": "t19",
+      "title": "Custom Dropdown: is clickable",
+      "technique": "click",
+      "priority": 0.36,
+      "status": "passed",
+      "duration": 1.47,
+      "failure_class": null,
+      "message": "",
+      "screenshot": null
+    },
+    {
+      "id": "t20",
+      "title": "Date & Time Pickers: is clickable",
+      "technique": "click",
+      "priority": 0.36,
+      "status": "passed",
+      "duration": 1.47,
+      "failure_class": null,
+      "message": "",
+      "screenshot": null
+    },
+    {
+      "id": "t21",
+      "title": "Digest Authentication: is clickable",
+      "technique": "click",
+      "priority": 0.36,
+      "status": "passed",
+      "duration": 1.48,
       "failure_class": null,
       "message": "",
       "screenshot": null
     },
     {
       "id": "t22",
-      "title": "Drag and Drop: is clickable",
+      "title": "Disappearing Elements: is clickable",
       "technique": "click",
       "priority": 0.36,
       "status": "passed",
-      "duration": 1.4,
+      "duration": 1.51,
       "failure_class": null,
       "message": "",
       "screenshot": null
     },
     {
       "id": "t23",
-      "title": "Dropdown: is clickable",
+      "title": "Drag and Drop: is clickable",
       "technique": "click",
       "priority": 0.36,
       "status": "passed",
-      "duration": 1.4,
+      "duration": 1.45,
       "failure_class": null,
       "message": "",
       "screenshot": null
     },
     {
       "id": "t24",
-      "title": "Dynamic Content: is clickable",
+      "title": "Dropdown: is clickable",
       "technique": "click",
       "priority": 0.36,
       "status": "passed",
-      "duration": 1.4,
+      "duration": 1.38,
       "failure_class": null,
       "message": "",
       "screenshot": null
     },
     {
       "id": "t25",
-      "title": "Dynamic Controls: is clickable",
+      "title": "Dynamic Content: is clickable",
       "technique": "click",
       "priority": 0.36,
       "status": "passed",
-      "duration": 3.09,
+      "duration": 3.03,
       "failure_class": null,
       "message": "",
       "screenshot": null

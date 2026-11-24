@@ -62,9 +62,9 @@ Real flaws in the current version that were too expensive or risky to fix within
     - **Impact:** a redirect to a local address has already been requested by the time it is refused. The guard does not protect against DNS rebinding. Subresource requests made by the page are not filtered, and the generated tests navigate again without a fresh check.
     - **Needed for production:** pin the resolved IP for the run and route the browser through a filtering proxy.
 
-12. **The LLM path has not been verified live.**
-    - **What:** no API key was available while finalising this version. The provider client, fallback, call cap and gate are covered by mocked tests only. Google does not publish per-model free-tier limits (they appear per project in AI Studio), so the default spacing of 10 requests per minute is a conservative guess.
-    - **Impact:** the first real run with a key may need small fixes, for example to how the provider counts `max_tokens` for thinking models.
+12. **Free models are often overloaded, and the LLM evidence is thin.**
+    - **What:** during live testing, `gemini-3.8-flash`, `gemini-3.6-flash` and `gemma-4-31b-it` often answered HTTP 503 ("high demand"). The default is therefore `gemini-3.5-flash-lite`. The Gemma fallback never returned a full answer live. Its `<thought>` reasoning prefix is stripped by the gate, but that is tested only with a mocked response. Google does not publish per-model free-tier limits (they appear per project in AI Studio), so the default spacing of 10 requests per minute is a conservative guess.
+    - **Impact:** on a busy day the LLM step may add nothing, and the run says so. The live measurement covers 3 pages and 19 proposed specs, with 0 rejected, which is too small to estimate a hallucination rate.
 
 13. **Free-tier data use.**
     - **What:** with an LLM key configured, element labels and texts from the tested page are sent to the provider. Google's pricing page says free-tier content is used to improve its products.

@@ -4,122 +4,129 @@ from pages.site_automationexercise_c_page import Page
 
 
 def test_t01(page):
+    'Fill email address'
+    p = Page(page)
+    p.e01_input().fill('test@example.com')
+    assert p.e01_input().evaluate("el => el.checkValidity()") is True, 'expected the field to be valid'
+
+
+def test_t02(page):
     'Your email address: valid partition'
     p = Page(page)
     p.e01_input().fill('test.user@example.com')
     assert p.e01_input().evaluate("el => el.checkValidity()") is True, 'expected the field to be valid'
 
 
-def test_t02(page):
+def test_t03(page):
     'Your email address: invalid partition (not an email)'
     p = Page(page)
     p.e01_input().fill('not-an-email')
     assert p.e01_input().evaluate("el => el.checkValidity()") is False, 'expected the field to be invalid'
 
 
-def test_t03(page):
+def test_t04(page):
     'Your email address: required left empty'
     p = Page(page)
     assert p.e01_input().evaluate("el => el.checkValidity()") is False, 'expected the field to be invalid'
 
 
-def test_t04(page):
+def test_t05(page):
     'subscribe: is clickable'
     p = Page(page)
     p.e04_button().click(trial=True)
 
 
-def test_t05(page):
+def test_t06(page):
     'Test Cases: is clickable'
     p = Page(page)
     p.e02_test_cases().click(trial=True)
 
 
-def test_t06(page):
+def test_t07(page):
     'APIs list for practice: is clickable'
     p = Page(page)
     p.e03_apis_list_for_practi().click(trial=True)
 
 
-def test_t07(page):
+def test_t08(page):
     'Home: is clickable'
     p = Page(page)
     p.e05_home().click(trial=True)
 
 
-def test_t08(page):
+def test_t09(page):
     '\ue8f8 Products: is clickable'
     p = Page(page)
     p.e06_products().click(trial=True)
 
 
-def test_t09(page):
+def test_t10(page):
     'Cart: is clickable'
     p = Page(page)
     p.e07_cart().click(trial=True)
 
 
-def test_t10(page):
+def test_t11(page):
     'Signup / Login: is clickable'
     p = Page(page)
     p.e08_signup_login().click(trial=True)
 
 
-def test_t11(page):
+def test_t12(page):
     'Test Cases: is clickable'
     p = Page(page)
     p.e09_test_cases().click(trial=True)
 
 
-def test_t12(page):
+def test_t13(page):
     'API Testing: is clickable'
     p = Page(page)
     p.e10_api_testing().click(trial=True)
 
 
-def test_t13(page):
+def test_t14(page):
     'Video Tutorials: is clickable'
     p = Page(page)
     p.e11_video_tutorials().click(trial=True)
 
 
-def test_t14(page):
+def test_t15(page):
     'Contact us: is clickable'
     p = Page(page)
     p.e12_contact_us().click(trial=True)
 
 
-def test_t15(page):
+def test_t16(page):
     'Test Cases: is clickable'
     p = Page(page)
     p.e13_test_cases().click(trial=True)
 
 
-def test_t16(page):
+def test_t17(page):
     'APIs list for practice: is clickable'
     p = Page(page)
     p.e14_apis_list_for_practi().click(trial=True)
 
 
-def test_t17(page):
+def test_t18(page):
     '(5) H&M: is clickable'
     p = Page(page)
     p.e15_5_h_m().click(trial=True)
 
 
-def test_t18(page):
+def test_t19(page):
     'Tshirt: is clickable'
     p = Page(page)
     p.e16_tshirt().click(trial=True)
 
 
-def test_t19(page):
+def test_t20(page):
     'Dress: is clickable'
     p = Page(page)
     p.e17_dress().click(trial=True)
 
 
-def test_t20(page):
+def test_t21(page):
     'Outfits: is clickable'
     p = Page(page)
     p.e18_outfits().click(trial=True)

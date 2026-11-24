@@ -1,6 +1,22 @@
 [
   {
     "id": "t01",
+    "title": "Filter examples by search term",
+    "technique": "llm",
+    "steps": [
+      {
+        "element": "e01",
+        "action": "fill",
+        "value": "Dropdown"
+      }
+    ],
+    "target": "e01",
+    "expect": "valid",
+    "limit": null,
+    "priority": 0.435
+  },
+  {
+    "id": "t02",
     "title": "Filter examples: valid partition",
     "technique": "ep",
     "steps": [
@@ -16,7 +32,7 @@
     "priority": 0.42
   },
   {
-    "id": "t02",
+    "id": "t03",
     "title": "The Internet: home: is clickable",
     "technique": "click",
     "steps": [],
@@ -26,7 +42,7 @@
     "priority": 0.36
   },
   {
-    "id": "t03",
+    "id": "t04",
     "title": "A/B Testing: is clickable",
     "technique": "click",
     "steps": [],
@@ -36,7 +52,7 @@
     "priority": 0.36
   },
   {
-    "id": "t04",
+    "id": "t05",
     "title": "Accessibility Issues: is clickable",
     "technique": "click",
     "steps": [],
@@ -46,7 +62,7 @@
     "priority": 0.36
   },
   {
-    "id": "t05",
+    "id": "t06",
     "title": "Add/Remove Elements: is clickable",
     "technique": "click",
     "steps": [],
@@ -56,7 +72,7 @@
     "priority": 0.36
   },
   {
-    "id": "t06",
+    "id": "t07",
     "title": "Advanced Iframes: is clickable",
     "technique": "click",
     "steps": [],
@@ -66,7 +82,7 @@
     "priority": 0.36
   },
   {
-    "id": "t07",
+    "id": "t08",
     "title": "Advanced Shadow DOM: is clickable",
     "technique": "click",
     "steps": [],
@@ -76,7 +92,7 @@
     "priority": 0.36
   },
   {
-    "id": "t08",
+    "id": "t09",
     "title": "Autocomplete: is clickable",
     "technique": "click",
     "steps": [],
@@ -86,7 +102,7 @@
     "priority": 0.36
   },
   {
-    "id": "t09",
+    "id": "t10",
     "title": "Basic Auth: is clickable",
     "technique": "click",
     "steps": [],
@@ -96,7 +112,7 @@
     "priority": 0.36
   },
   {
-    "id": "t10",
+    "id": "t11",
     "title": "Broken Images: is clickable",
     "technique": "click",
     "steps": [],
@@ -106,7 +122,7 @@
     "priority": 0.36
   },
   {
-    "id": "t11",
+    "id": "t12",
     "title": "Browser Permissions: is clickable",
     "technique": "click",
     "steps": [],
@@ -116,7 +132,7 @@
     "priority": 0.36
   },
   {
-    "id": "t12",
+    "id": "t13",
     "title": "Canvas: is clickable",
     "technique": "click",
     "steps": [],
@@ -126,7 +142,7 @@
     "priority": 0.36
   },
   {
-    "id": "t13",
+    "id": "t14",
     "title": "Challenging DOM: is clickable",
     "technique": "click",
     "steps": [],
@@ -136,7 +152,7 @@
     "priority": 0.36
   },
   {
-    "id": "t14",
+    "id": "t15",
     "title": "Chat: is clickable",
     "technique": "click",
     "steps": [],
@@ -146,7 +162,7 @@
     "priority": 0.36
   },
   {
-    "id": "t15",
+    "id": "t16",
     "title": "Checkboxes: is clickable",
     "technique": "click",
     "steps": [],
@@ -156,7 +172,7 @@
     "priority": 0.36
   },
   {
-    "id": "t16",
+    "id": "t17",
     "title": "Context Menu: is clickable",
     "technique": "click",
     "steps": [],
@@ -166,7 +182,7 @@
     "priority": 0.36
   },
   {
-    "id": "t17",
+    "id": "t18",
     "title": "Cookie Consent: is clickable",
     "technique": "click",
     "steps": [],
@@ -176,7 +192,7 @@
     "priority": 0.36
   },
   {
-    "id": "t18",
+    "id": "t19",
     "title": "Custom Dropdown: is clickable",
     "technique": "click",
     "steps": [],
@@ -186,7 +202,7 @@
     "priority": 0.36
   },
   {
-    "id": "t19",
+    "id": "t20",
     "title": "Date & Time Pickers: is clickable",
     "technique": "click",
     "steps": [],
@@ -196,7 +212,7 @@
     "priority": 0.36
   },
   {
-    "id": "t20",
+    "id": "t21",
     "title": "Digest Authentication: is clickable",
     "technique": "click",
     "steps": [],
@@ -206,7 +222,7 @@
     "priority": 0.36
   },
   {
-    "id": "t21",
+    "id": "t22",
     "title": "Disappearing Elements: is clickable",
     "technique": "click",
     "steps": [],
@@ -216,7 +232,7 @@
     "priority": 0.36
   },
   {
-    "id": "t22",
+    "id": "t23",
     "title": "Drag and Drop: is clickable",
     "technique": "click",
     "steps": [],
@@ -226,7 +242,7 @@
     "priority": 0.36
   },
   {
-    "id": "t23",
+    "id": "t24",
     "title": "Dropdown: is clickable",
     "technique": "click",
     "steps": [],
@@ -236,21 +252,11 @@
     "priority": 0.36
   },
   {
-    "id": "t24",
+    "id": "t25",
     "title": "Dynamic Content: is clickable",
     "technique": "click",
     "steps": [],
     "target": "e24",
-    "expect": "clickable",
-    "limit": null,
-    "priority": 0.36
-  },
-  {
-    "id": "t25",
-    "title": "Dynamic Controls: is clickable",
-    "technique": "click",
-    "steps": [],
-    "target": "e25",
     "expect": "clickable",
     "limit": null,
     "priority": 0.36

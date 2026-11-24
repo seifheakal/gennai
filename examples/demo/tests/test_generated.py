@@ -63,87 +63,123 @@ def test_t07(page):
 
 
 def test_t08(page):
+    'Test Name too short'
+    p = Page(page)
+    p.e01_name().fill('A')
+    assert p.e01_name().evaluate("el => el.checkValidity()") is False, 'expected the field to be invalid'
+
+
+def test_t09(page):
+    'Test Name valid'
+    p = Page(page)
+    p.e01_name().fill('John Doe')
+    assert p.e01_name().evaluate("el => el.checkValidity()") is True, 'expected the field to be valid'
+
+
+def test_t10(page):
     'Name: valid partition'
     p = Page(page)
     p.e01_name().fill('Test User')
     assert p.e01_name().evaluate("el => el.checkValidity()") is True, 'expected the field to be valid'
 
 
-def test_t09(page):
+def test_t11(page):
     'Name: required left empty'
     p = Page(page)
     assert p.e01_name().evaluate("el => el.checkValidity()") is False, 'expected the field to be invalid'
 
 
-def test_t10(page):
+def test_t12(page):
     'I accept the terms: valid partition'
     p = Page(page)
     p.e05_i_accept_the_terms().check()
     assert p.e05_i_accept_the_terms().is_checked(), 'expected checked'
 
 
-def test_t11(page):
+def test_t13(page):
     'I accept the terms: required left empty'
     p = Page(page)
     assert p.e05_i_accept_the_terms().evaluate("el => el.checkValidity()") is False, 'expected the field to be invalid'
 
 
-def test_t12(page):
+def test_t14(page):
     'Submit: is clickable'
     p = Page(page)
     p.e07_submit().click(trial=True)
 
 
-def test_t13(page):
+def test_t15(page):
+    'Test Email valid'
+    p = Page(page)
+    p.e02_email().fill('test@example.com')
+    assert p.e02_email().evaluate("el => el.checkValidity()") is True, 'expected the field to be valid'
+
+
+def test_t16(page):
     'Email: valid partition'
     p = Page(page)
     p.e02_email().fill('test.user@example.com')
     assert p.e02_email().evaluate("el => el.checkValidity()") is True, 'expected the field to be valid'
 
 
-def test_t14(page):
+def test_t17(page):
     'Email: invalid partition (not an email)'
     p = Page(page)
     p.e02_email().fill('not-an-email')
     assert p.e02_email().evaluate("el => el.checkValidity()") is False, 'expected the field to be invalid'
 
 
-def test_t15(page):
+def test_t18(page):
     'Age: 17 (below min)'
     p = Page(page)
     p.e03_age().fill('17')
     assert p.e03_age().evaluate("el => el.checkValidity()") is False, 'expected the field to be invalid'
 
 
-def test_t16(page):
+def test_t19(page):
     'Age: 120 (max)'
     p = Page(page)
     p.e03_age().fill('120')
     assert p.e03_age().evaluate("el => el.checkValidity()") is True, 'expected the field to be valid'
 
 
-def test_t17(page):
+def test_t20(page):
     'Age: 121 (above max)'
     p = Page(page)
     p.e03_age().fill('121')
     assert p.e03_age().evaluate("el => el.checkValidity()") is False, 'expected the field to be invalid'
 
 
-def test_t18(page):
+def test_t21(page):
+    'Test Age under minimum'
+    p = Page(page)
+    p.e03_age().fill('15')
+    assert p.e03_age().evaluate("el => el.checkValidity()") is False, 'expected the field to be invalid'
+
+
+def test_t22(page):
+    'Test Age valid'
+    p = Page(page)
+    p.e03_age().fill('25')
+    assert p.e03_age().evaluate("el => el.checkValidity()") is True, 'expected the field to be valid'
+
+
+def test_t23(page):
     'Age: valid partition'
     p = Page(page)
     p.e03_age().fill('18')
     assert p.e03_age().evaluate("el => el.checkValidity()") is True, 'expected the field to be valid'
 
 
-def test_t19(page):
+def test_t24(page):
+    'Test Country selection'
+    p = Page(page)
+    p.e04_country().select_option('us')
+    assert p.e04_country().input_value() == 'us', 'option not selected'
+
+
+def test_t25(page):
     'Country: valid partition'
     p = Page(page)
     p.e04_country().select_option('eg')
     assert p.e04_country().input_value() == 'eg', 'option not selected'
-
-
-def test_t20(page):
-    'Load offers: is clickable'
-    p = Page(page)
-    p.e06_load_offers().click(trial=True)

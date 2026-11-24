@@ -1,6 +1,6 @@
 # Demo script (2 to 3 minutes)
 
-Before recording: install once (see README Quickstart), close other windows, and open a terminal in the repo folder. No API key is needed.
+Before recording: install once (see README Quickstart), close other windows, and open a terminal in the repo folder. No API key is needed. With a free Gemini key in `.env`, the model's extra tests show up as `llm` rows.
 
 ## 1. The problem (20 s)
 
@@ -16,7 +16,7 @@ Run:
 python gennai.py demo --headed
 ```
 
-Point at the browser window while it runs. Then point at the terminal summary: 7 elements, 20 tests, 18 passed, 2 failed.
+Point at the browser window while it runs. Then point at the terminal summary. With the key our run showed 7 elements, 25 tests (6 from the model; the number varies with the model's answer), 23 passed and 2 failed. Without it, 20 tests, 18 passed and 2 failed.
 
 Say: "`demo` serves a small local sign-up page and runs the same pipeline as `run <url>`. The page has two planted problems, and the tool found both."
 

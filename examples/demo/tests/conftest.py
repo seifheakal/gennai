@@ -7,7 +7,7 @@ import pytest
 from playwright.sync_api import Error as PlaywrightError
 from playwright.sync_api import sync_playwright
 
-URL = 'http://127.0.0.1:52391/'
+URL = 'http://127.0.0.1:53598/'
 ACTION_TIMEOUT_MS = 5000
 NAV_TIMEOUT_MS = 30000  # page loads can be much slower than actions
 SHOTS = Path(__file__).resolve().parent.parent / "screenshots"
