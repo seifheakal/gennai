@@ -91,6 +91,8 @@ def _summary(r: dict, out: Path) -> None:
         print(f"  history:   run {h['runs']} of this site; {s['flaky']} flaky in the last "
               f"{h['window']} runs ({h['file']})")  # fmt: skip
     print(f"  llm:       {r['llm']}")
+    if r.get("notifications"):
+        print(f"  notified:  {', '.join(f'{k} {v}' for k, v in r['notifications'].items())}")
     print(f"  time:      {r['total_s']}s")
     print(f"  report:    {out / 'report.html'}")
 

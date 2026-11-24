@@ -15,6 +15,7 @@ from pathlib import Path
 from gennai import GennaiError, NoTestableElements
 from gennai.config import Settings
 from gennai.llm import propose_cases
+from gennai.notify import notify
 from gennai.phase1_explore import explore
 from gennai.phase2_generate import generate
 from gennai.phase3_codegen import write_project
@@ -108,4 +109,8 @@ def run_pipeline(
         "llm_stats": llm,
         "review": review_stats,
     }
-    return write_results(out, meta, rows, history, settings.flaky_window)
+    results = write_results(out, meta, rows, history, settings.flaky_window)
+    results["notifications"] = notify(settings, results, out)  # {} when none is configured
+    if results["notifications"]:
+        (out / "results.json").write_text(json.dumps(results, indent=2), encoding="utf-8")
+    return results

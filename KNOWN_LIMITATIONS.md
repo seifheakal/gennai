@@ -85,3 +85,9 @@ Real flaws in the current version that were too expensive or risky to fix within
     - **Impact:** treat "flaky" as "look at this test's recent runs", not as a verdict. Its evidence is only as long as the window.
     - **Why left:** the history is one append-only file on purpose, so it stays easy to inspect.
     - **Needed for production:** a minimum number of runs before judging, retries inside a run to confirm flake, file locking or a database for concurrent runs, and rotation of old records.
+
+17. **Notifications are one-shot.**
+    - **What:** one Slack-compatible webhook and one email recipient list, one attempt each with a 15 s timeout, no retry and no queue. Sending was verified against local receivers only. The message names the run folder, not a link, because the report is a local file.
+    - **Impact:** a notification lost to a network error is reported in the run summary but not resent.
+    - **Why left:** the tool is a single-user CLI; a retry queue needs a long-running process.
+    - **Needed for production:** retries with backoff, a hosted report to link to, and per-channel message formatting.

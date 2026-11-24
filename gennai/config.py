@@ -40,6 +40,13 @@ class Settings:
     login_url: str = ""  # with user and password: log in before exploring and in each test run
     login_user: str = field(default="", repr=False)
     login_password: str = field(default="", repr=False)
+    slack_webhook_url: str = field(default="", repr=False)  # the URL is a secret
+    smtp_host: str = ""
+    smtp_port: int = 587
+    smtp_user: str = ""
+    smtp_password: str = field(default="", repr=False)
+    email_from: str = ""
+    email_to: str = ""
 
 
 def _positive_int(name: str, default: int) -> int:
@@ -87,6 +94,14 @@ def _login() -> tuple[str, str, str]:
     return values  # type: ignore[return-value]
 
 
+def _webhook() -> str:
+    url = os.environ.get("GENNAI_SLACK_WEBHOOK_URL", "").strip()
+    local = url.startswith(("http://127.0.0.1:", "http://localhost:"))  # local receivers
+    if url and not (url.startswith("https://") or local):
+        raise GennaiError("GENNAI_SLACK_WEBHOOK_URL must start with https://")
+    return url
+
+
 def load_settings() -> Settings:
     """Read GENNAI_* variables, validating each; fails fast naming the bad variable."""
     load_dotenv()
@@ -115,4 +130,13 @@ def load_settings() -> Settings:
         login_url=login_url,
         login_user=login_user,
         login_password=login_password,
+        slack_webhook_url=_webhook(),
+        smtp_host=os.environ.get("GENNAI_SMTP_HOST", "").strip(),
+        smtp_port=_positive_int("GENNAI_SMTP_PORT", d.smtp_port),
+        smtp_user=os.environ.get("GENNAI_SMTP_USER", "").strip(),
+        smtp_password=os.environ.get("GENNAI_SMTP_PASSWORD", ""),
+        email_from=os.environ.get("GENNAI_EMAIL_FROM", "").strip()
+        or os.environ.get("GENNAI_SMTP_USER", "").strip()
+        or "gennai@localhost",
+        email_to=os.environ.get("GENNAI_EMAIL_TO", "").strip(),
     )

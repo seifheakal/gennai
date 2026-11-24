@@ -125,6 +125,12 @@ GENNAI_LOGIN_PASSWORD=...
 - The user name and password are never logged, written to an output file or sent to the LLM. Phase 1 also never reads the value of any password field.
 - `python gennai.py demo --login` signs in to the demo's own test account (`demo` / `demo-pass`, shown on `demo/login.html`) and tests `demo/account.html`, which redirects to the sign-in page without a session. The demo's "session" is a cookie set by page script: it exercises the login fixture, not real security.
 
+**Notifications.** Off unless configured in `.env`. When a run finishes, GenNAI sends a one-line summary (URL, passed, failed, failure classes, flaky count, report folder) to each configured channel:
+
+- **Slack** (or any Slack-compatible incoming webhook): `GENNAI_SLACK_WEBHOOK_URL=https://hooks.slack.com/services/...`. It must be `https://`; `http://127.0.0.1:` and `http://localhost:` are also accepted, for local receivers.
+- **Email**: `GENNAI_SMTP_HOST`, `GENNAI_SMTP_PORT` (default 587; 465 uses implicit TLS), `GENNAI_SMTP_USER`, `GENNAI_SMTP_PASSWORD`, `GENNAI_EMAIL_FROM` (default: the SMTP user) and `GENNAI_EMAIL_TO`. STARTTLS is used when the server offers it; without TLS the password is never sent and the email is not sent.
+- A failed notification is a warning, not an error: the run still exits 0. The result per channel (`sent` or `failed: ...`) is in the summary and in `results.json` (`notifications`). The webhook URL and the SMTP password are never logged.
+
 **Run history and flaky tests.** Every run is appended as one JSON line to `runs/history/<site>.jsonl` (`demo.jsonl` for the demo). The file is only ever appended to, never rewritten:
 
 - A test is matched across runs by what it does: the page path, the attributes of the elements it touches, its actions and values, and its expectation. Its `t01`-style id is only a priority rank and is not used, and neither is the host, so the demo's random port doesn't matter.
@@ -221,14 +227,19 @@ The remaining `locator_not_found`, on a "Tshirt" category link, appeared in 2 of
 - The password string was in no file of either run's output folder. A wrong password stopped the run with `login ... failed: still on the login form after submitting it`.
 - I did not run the login against the-internet.herokuapp.com: its `/login` takes the practice account shown on that page, and signing in to a third-party site is something to do yourself (`GENNAI_LOGIN_URL=https://the-internet.herokuapp.com/login`, then `run https://the-internet.herokuapp.com/secure`).
 
+**Notifications** (measured 2026-11-24 with local receivers, not real Slack or a real mail server):
+- A demo run with a webhook URL pointing at a local HTTP server and SMTP pointing at a local SMTP sink printed `notified: slack sent, email sent`. The receiver got the POST `{"text": "GenNAI finished http://127.0.0.1:58518/: 20 passed, 2 failed (element_intercepted 1, assertion 1), 0 flaky. Report: gennai_notify/report.html"}`, and the sink got an email with the subject `GenNAI: 20 passed, 2 failed` and the same text.
+- With nothing listening on the webhook port, and an SMTP user configured against the sink (which offers no TLS), the run still exited 0 with `slack failed: URLError, email failed: SMTPException: server offers no TLS; not sending the password`. Neither the webhook path nor the password was in the output.
+- Sending to a real Slack workspace or mail provider needs your own webhook or account and was not tested here.
+
 **The tool itself.**
-- 68 tests pass in about 2 minutes. They include:
+- 76 tests pass in about 2 minutes. They include:
   - five end-to-end runs against the local demo: single-page, multi-page crawl, a review that rejects and edits cases, run history marking a flaky test, and a run behind the demo's login (which also checks that the password appears in no output file or log line);
   - tests that the review step refuses structural edits, including an id that would inject code into a test function name;
   - a test that feeds hostile strings through code generation and parses every generated file;
   - a test that a spec referencing a non-existent element is rejected.
 - `ruff check` and `ruff format --check` are clean.
-- The code is 1,738 lines of Python in `gennai.py` and `gennai/`. The course version had about 11,700 lines of Python across the phase folders and the web UI.
+- The code is 1,851 lines of Python in `gennai.py` and `gennai/`. The course version had about 11,700 lines of Python across the phase folders and the web UI.
 
 ## Course constraints and what changed for the demo
 

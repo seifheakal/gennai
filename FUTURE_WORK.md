@@ -5,8 +5,7 @@ Features and ideas that were left out on purpose, one line each: what, where it 
 ## Removed from the course version (did not work or was simulated)
 
 - **Web chat UI**: a browser interface over the same pipeline. The course's Flask UI ran the old phases by changing directories and copying files between them, and it broke once the phases were rebuilt.
-- **Notifications**: Slack or email when a run finishes. The course version's functions only logged "sent" and sent nothing.
-Rebuilt since, and described in the README: multi-page crawling (`--max-pages`), login with credentials from `.env` (`GENNAI_LOGIN_*`), human review of generated tests (`--review`), and run history with flaky-test marking (`runs/history/<site>.jsonl`). The course's reviewer was simulated with `random.random()`; the rebuilt one waits for a person. The course's SQLite history never stored a non-empty result; the rebuilt one is an append-only JSONL file.
+Rebuilt since, and described in the README: multi-page crawling (`--max-pages`), login with credentials from `.env` (`GENNAI_LOGIN_*`), Slack and email notifications (`GENNAI_SLACK_WEBHOOK_URL`, `GENNAI_SMTP_*`), human review of generated tests (`--review`), and run history with flaky-test marking (`runs/history/<site>.jsonl`). The course's reviewer was simulated with `random.random()`; the rebuilt one waits for a person. The course's SQLite history never stored a non-empty result; the rebuilt one is an append-only JSONL file. The course's notifications only logged "sent"; the rebuilt ones send and report each channel's result.
 
 ## Ideas to build next
 
