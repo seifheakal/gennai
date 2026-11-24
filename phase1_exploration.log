@@ -1,7 +1,0 @@
-2025-12-20 21:03:11 - phase1_accessibility_parser.AccessibilityParser - INFO - BFS starting: max_depth=2, max_states=20
-2025-12-20 21:03:11 - phase1_accessibility_parser.AccessibilityParser - INFO - Navigating to: https://automationexercise.com/
-2025-12-20 21:04:20 - phase1_accessibility_parser.AccessibilityParser - INFO - BFS starting: max_depth=2, max_states=20
-2025-12-20 21:04:20 - phase1_accessibility_parser.AccessibilityParser - INFO - Navigating to: https://automationexercise.com/
-2025-12-20 21:04:26 - phase1_accessibility_parser.AccessibilityParser - INFO - STEP 1: Parsing accessibility tree (Layer A)
-2025-12-20 21:04:26 - phase1_accessibility_parser.AccessibilityParser - INFO - STEP 2: Extracting interactive elements from tree
-2025-12-20 21:04:26 - phase1_accessibility_parser.AccessibilityParser - INFO - STEP 3: Generating locators for 8 elements
