@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>How GenNAI was built</title>
+<style>
+:root{--bg:#fbfbfc;--fg:#1c1c1f;--muted:#64646b;--line:#e2e2e7;--card:#fff;--accent:#2f55d4;
+--accent-bg:#eef2ff;--ok:#0a7d27;--ok-bg:#e7f5ec;--warn:#9a5b00;--warn-bg:#fff4e0}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#141416;--fg:#ececef;
+--muted:#9a9aa2;--line:#2c2c31;--card:#1c1c20;--accent:#8aa2ff;--accent-bg:#1e2442;--ok:#5cc97a;
+--ok-bg:#15291c;--warn:#f0b15a;--warn-bg:#2e2412}}
+:root[data-theme="dark"]{--bg:#141416;--fg:#ececef;--muted:#9a9aa2;--line:#2c2c31;--card:#1c1c20;
+--accent:#8aa2ff;--accent-bg:#1e2442;--ok:#5cc97a;--ok-bg:#15291c;--warn:#f0b15a;--warn-bg:#2e2412}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:1040px;margin:0 auto;padding:40px 16px 80px}
+h1{font-size:clamp(28px,5vw,40px);line-height:1.15;margin:0 0 12px}
+h2{font-size:22px;margin:48px 0 6px}
+p.lead{font-size:18px;color:var(--muted);max-width:720px;margin:0}
+.sub{color:var(--muted);margin:0 0 18px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:28px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.stat b{display:block;font-size:26px}.stat span{color:var(--muted);font-size:14px}
+.flow{display:flex;flex-wrap:wrap;gap:8px;align-items:stretch;margin-top:14px}
+.step{flex:1 1 150px;background:var(--card);border:1px solid var(--line);border-radius:10px;
+padding:12px 14px;position:relative}
+.step small{display:block;color:var(--accent);font-weight:600;font-size:12px;letter-spacing:.04em;
+text-transform:uppercase}
+.step b{display:block;margin:2px 0 4px}.step p{margin:0;color:var(--muted);font-size:14px}
+.step.gate{border-color:var(--ok);background:var(--ok-bg)}.step.gate small{color:var(--ok)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px 18px}
+.card h3{margin:0 0 6px;font-size:16px}.card p,.card li{color:var(--muted);font-size:15px}
+.card ul{margin:6px 0 0;padding-left:18px}.card p{margin:0}
+.role{display:inline-block;font-size:12px;font-weight:600;padding:2px 8px;border-radius:999px;
+background:var(--accent-bg);color:var(--accent);margin-bottom:6px}
+.timeline{list-style:none;margin:14px 0 0;padding:0;border-left:2px solid var(--line)}
+.timeline li{position:relative;padding:0 0 18px 20px}
+.timeline li::before{content:"";position:absolute;left:-7px;top:6px;width:12px;height:12px;
+border-radius:50%;background:var(--accent)}
+.timeline b{display:block}.timeline span{color:var(--muted);font-size:15px}
+.compare{width:100%;border-collapse:collapse;margin-top:14px;font-size:15px}
+.compare th,.compare td{border-bottom:1px solid var(--line);padding:10px 8px;text-align:left;vertical-align:top}
+.compare th{color:var(--muted);font-weight:600;font-size:13px;text-transform:uppercase}
+.tag{font-size:12px;font-weight:600;padding:2px 8px;border-radius:999px}
+.tag.ok{background:var(--ok-bg);color:var(--ok)}.tag.warn{background:var(--warn-bg);color:var(--warn)}
+.wrap{overflow-x:auto}
+footer{margin-top:48px;color:var(--muted);font-size:14px}
+a{color:var(--accent)}
+code{font-size:14px}
+</style>
+</head>
+<body>
+<main>
+  <h1>How GenNAI was built with AI</h1>
+  <p class="lead">AI agents planned, wrote and checked the code under written rules. I set the goals, the
+    constraints and every decision. Each claim on this page comes from the repo, its history or a saved run.</p>
+
+  <div class="stats">
+    <div class="stat"><b>~11,700 → 2,540</b><span>lines of Python, course version → now, with every course feature</span></div>
+    <div class="stat"><b>36 → 40 → 88</b><span>tests: first merge → showcase PR → course features merged</span></div>
+    <div class="stat"><b>3 sites</b><span>local demo + two public practice sites, run for every result</span></div>
+    <div class="stat"><b>0 keys</b><span>in files or commits, scanned before pushing</span></div>
+  </div>
+
+  <h2>The loop every change went through</h2>
+  <p class="sub">The lead model never accepted "done" from a worker. Green steps are the checks.</p>
+  <div class="flow">
+    <div class="step"><small>1 · Spec</small><b>Rules first</b><p>Finish, don't expand. Demo first. Measure every claim.</p></div>
+    <div class="step"><small>2 · Plan</small><b>Opus</b><p>Splits the work, decides the design, writes self-contained briefs.</p></div>
+    <div class="step"><small>3 · Build</small><b>Sonnet subagents</b><p>One brief each: goal, owned files, constraints, proof command.</p></div>
+    <div class="step gate"><small>4 · Prove</small><b>Run the proof</b><p>Opus reads the diff and runs the command itself.</p></div>
+    <div class="step gate"><small>5 · Live run</small><b>Real pages</b><p>Demo, automationexercise.com, the-internet.herokuapp.com.</p></div>
+    <div class="step gate"><small>6 · CI</small><b>Lint + tests</b><p>On GitHub, per pull request; merged only when green.</p></div>
+  </div>
+
+  <h2>Who did what</h2>
+  <p class="sub">Roles as the spec assigned them for the core rebuild (PR #1). The showcase (PR #3) and the course
+    features (PR #2) were written by Claude sessions directly, without subagents.</p>
+  <div class="grid">
+    <div class="card"><span class="role">Me</span><h3>Goals and decisions</h3>
+      <ul><li>The framing: the course limited the model, so I engineered the harness</li>
+        <li>The scope: everything the course had, minimal, never less</li>
+        <li>Model choice and the API key</li><li>Every merge, and what to showcase</li></ul></div>
+    <div class="card"><span class="role">Claude Opus</span><h3>Lead</h3>
+      <ul><li>Plans and briefs</li><li>Design decisions</li><li>Reviews every diff and runs the proof</li>
+        <li>Small edits itself</li></ul></div>
+    <div class="card"><span class="role">Claude Sonnet</span><h3>Workers</h3>
+      <ul><li>Code for one brief each</li><li>Never two on the same files</li>
+        <li>Independent pieces in parallel</li></ul></div>
+    <div class="card"><span class="role">Claude Haiku</span><h3>Mechanical jobs</h3>
+      <ul><li>Delete clutter, renames</li><li>Count lines, grep TODOs</li><li>Secret scan</li></ul></div>
+  </div>
+
+  <h2>Timeline</h2>
+  <ol class="timeline">
+    <li><b>Dec 2025 · Course version</b><span>Specs in <code>prompts/</code>, most code generated. Best efficiency
+      score and highest mark, but about 11,700 lines whose phases no longer connected. Human review was
+      <code>random.random()</code>.</span></li>
+    <li><b>Nov 2026 · The spec</b><span>Written in a separate planning chat: the Ponytail rules, demo first, a verified
+      free model, LLM safety as requirements, read-only references, git rules and model roles.</span></li>
+    <li><b>Finish the core · PR #1</b><span>One-command pipeline on three sites. Live runs exposed bugs: an
+      off-screen skip link, 503 pages misread as missing locators, a 5 s page-load timeout. Each was fixed and re-run.
+      Gemini measured live: one call per run, gate accepted all specs. 36 tests.</span></li>
+    <li><b>Showcase · PR #3</b><span>Tabbed report with filters, LLM response time and tokens, Phase 3 self-check,
+      a fix for <code>.env</code> comments read as keys. 40 tests.</span></li>
+    <li><b>Course features · PR #2</b><span>A parallel session on its own branch: crawl, human review, run history
+      and flaky tests, login, notifications, web UI. One commit per feature, no subagents. 88 tests.</span></li>
+  </ol>
+
+  <h2>How claims were checked</h2>
+  <div class="grid">
+    <div class="card"><h3>Run it for real</h3><p>Every feature on the demo and public practice sites. Report
+      and web UI clicked through in a real browser.</p></div>
+    <div class="card"><h3>Adversarial tests</h3><p>Prompt-escaping labels, hostile strings through codegen, invented
+      elements, a <code>code</code> field from the model, <code>&lt;script&gt;</code> in the report.</p></div>
+    <div class="card"><h3>Measured numbers</h3><p>Provider-reported tokens, timed responses, README tables from saved
+      runs in <code>examples/</code>.</p></div>
+    <div class="card"><h3>Docs checked against code</h3><p>When a draft named three regression tests that didn't
+      exist, the doc was corrected, not the claim kept.</p></div>
+  </div>
+
+  <h2>Two versions compared</h2>
+  <div class="wrap"><table class="compare">
+    <tr><th></th><th>Course version</th><th>This version</th></tr>
+    <tr><td>Process</td><td>Specs in, code out</td><td>Spec with hard rules, lead and workers, proof per change</td></tr>
+    <tr><td>Size</td><td>~11,700 lines</td><td>2,540 lines, every course feature working</td></tr>
+    <tr><td>Human review</td><td><span class="tag warn">simulated</span></td><td><span class="tag ok">real, edits are
+      checked</span></td></tr>
+    <tr><td>Saved results</td><td><span class="tag warn">0 tests</span></td><td><span class="tag ok">every number from
+      a saved run</span></td></tr>
+    <tr><td>LLM</td><td>none called</td><td>free tier, JSON only, deterministic gate</td></tr>
+  </table></div>
+
+  <footer>Full text: <a href="../BUILT_WITH_AI.md">BUILT_WITH_AI.md</a> · Algorithms:
+    <a href="../TECHNICAL.md">TECHNICAL.md</a> · Spec: <a href="../prompts/FINALIZATION_PROMPT.md">prompts/FINALIZATION_PROMPT.md</a></footer>
+</main>
+</body>
+</html>
